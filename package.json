@@ -1,0 +1,62 @@
+{
+  "name": "kinoteka",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "npx prisma generate && npx prisma migrate deploy && next build",
+    "postinstall": "prisma generate",
+    "start": "next start",
+    "lint": "next lint",
+    "docker:start": "powershell -ExecutionPolicy Bypass -NoProfile -File ./start.ps1",
+    "docker:rebuild": "docker-compose up -d --build app",
+    "docker:up": "docker-compose up -d --build",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "npx prisma migrate dev",
+    "db:push": "npx prisma db push",
+    "db:seed": "npx prisma db seed",
+    "db:studio": "npx prisma studio",
+    "db:reset": "npx prisma migrate reset",
+    "import:tmdb": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} scripts/import-tmdb.ts"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.17.0",
+    "@tanstack/react-query": "^5.62.0",
+    "@types/react-google-recaptcha": "^2.1.9",
+    "bcryptjs": "^2.4.3",
+    "freekeys": "^0.0.4",
+    "groq-sdk": "^0.37.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
+    "next": "^15.0.5",
+    "next-auth": "^4.24.11",
+    "next-intl": "^4.5.6",
+    "prisma": "^6.17.0",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "react-google-recaptcha": "^3.1.0",
+    "resend": "^6.5.2",
+    "sib-api-v3-sdk": "^8.5.0",
+    "zod": "^3.24.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/nodemailer": "^6.4.21",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.5",
+    "nodemailer": "^6.10.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

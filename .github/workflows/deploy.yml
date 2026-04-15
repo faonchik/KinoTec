@@ -1,0 +1,75 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via webhook
+        run: |
+          # Получаем URL сайта и секрет
+          SITE_URL="${{ secrets.SITE_URL }}"
+          WEBHOOK_SECRET="${{ secrets.DEPLOY_WEBHOOK_SECRET }}"
+          
+          if [ -z "$SITE_URL" ]; then
+            SITE_URL="https://kinoteck.ru"
+          fi
+          
+          if [ -z "$WEBHOOK_SECRET" ]; then
+            echo "❌ Error: DEPLOY_WEBHOOK_SECRET is not set"
+            echo "💡 Add DEPLOY_WEBHOOK_SECRET to GitHub secrets"
+            exit 1
+          fi
+          
+          # Пробуем сначала через Next.js API, если не работает - через PHP скрипт
+          WEBHOOK_URL="$SITE_URL/api/webhook/deploy"
+          FALLBACK_URL="$SITE_URL/webhook-deploy.php"
+          
+          echo "🔗 Trying webhook: $WEBHOOK_URL"
+          
+          # Отправляем запрос на webhook
+          # Используем X-Deploy-Secret вместо Authorization (nginx может не передавать Authorization)
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Content-Type: application/json" \
+            -H "X-Deploy-Secret: $WEBHOOK_SECRET" \
+            -H "Authorization: Bearer $WEBHOOK_SECRET" \
+            -d "{\"action\":\"deploy\",\"ref\":\"${{ github.ref }}\"}" \
+            "$WEBHOOK_URL" 2>&1)
+          
+          http_code=$(echo "$response" | tail -n1)
+          
+          # Если 404, пробуем fallback
+          if [ "$http_code" -eq 404 ]; then
+            echo "⚠️ Next.js webhook not found, trying PHP fallback: $FALLBACK_URL"
+            response=$(curl -s -w "\n%{http_code}" -X POST \
+              -H "Content-Type: application/json" \
+              -H "X-Deploy-Secret: $WEBHOOK_SECRET" \
+              -H "Authorization: Bearer $WEBHOOK_SECRET" \
+              -d "{\"action\":\"deploy\",\"ref\":\"${{ github.ref }}\"}" \
+              "$FALLBACK_URL" 2>&1)
+            http_code=$(echo "$response" | tail -n1)
+          fi
+          
+          body=$(echo "$response" | head -n-1)
+          
+          if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 201 ]; then
+            echo "✅ Webhook called successfully"
+            echo "Response: $body"
+          else
+            echo "❌ Webhook failed with code: $http_code"
+            echo "Response: $body"
+            exit 1
+          fi
+          
+          echo "⏳ Deployment is running on server..."
+          echo "💡 Check server logs for deployment progress"

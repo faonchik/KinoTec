@@ -1,0 +1,846 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String                  @id @default(cuid())
+  email               String                  @unique
+  name                String?
+  password            String
+  avatar              String?
+  role                Role                    @default(USER)
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  bio                 String?
+  isPublic            Boolean                 @default(true)
+  // Виртуальная валюта
+  coins               Int                     @default(0)
+  totalCoinsEarned    Int                     @default(0)
+  // Кастомизация
+  theme               String                  @default("dark")
+  profileFrame        String?
+  profileBadge        String?
+  nameColor           String?
+  avatarEffect        String?
+  chatBubble          String?
+  emojiPack           String?
+  profileBackground   String?
+  // Связи
+  activities          Activity[]
+  comments            Comment[]
+  movieComments       MovieComment[]
+  articleComments     ArticleComment[]
+  seriesComments      SeriesComment[]
+  favorites           Favorite[]
+  collections         Collection[]
+  following           Follow[]                @relation("Followers")
+  followers           Follow[]                @relation("Following")
+  ratings             Rating[]
+  reviews             Review[]
+  achievements        UserAchievement[]
+  challenges          UserChallenge[]
+  watchHistory        WatchHistory[]
+  seriesWatchHistory  SeriesWatchHistory[]
+  hostedParties       WatchParty[]            @relation("HostedParties")
+  partyMessages       WatchPartyMessage[]
+  partyParticipations WatchPartyParticipant[]
+  watchlists          Watchlist[]
+  seriesWatchlists    SeriesWatchlist[]
+  seriesRatings       SeriesRating[]
+  seriesReviews       SeriesReview[]
+  purchasedItems      UserShopItem[]
+  coinTransactions    CoinTransaction[]
+  settings            UserSettings?
+  passwordResetTokens PasswordResetToken[]
+  notifications       Notification[]
+}
+
+model Movie {
+  id            String            @id @default(cuid())
+  title         String
+  originalTitle String?
+  description   String?
+  poster        String?
+  backdrop      String?
+  trailer       String?
+  releaseDate   DateTime?
+  runtime       Int?
+  budget        BigInt?
+  revenue       BigInt?
+  country       String?
+  status        MovieStatus       @default(RELEASED)
+  popularity    Float             @default(0)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  directorId    String?
+  videoQuality  String?
+  videoUrl      String?
+  kinopoiskId   String?           @unique
+  tmdbId        String?
+  collections   CollectionMovie[]
+  favorites     Favorite[]
+  director      Director?         @relation(fields: [directorId], references: [id])
+  actors        MovieActor[]
+  genres        MovieGenre[]
+  photos        MoviePhoto[]
+  ratings       Rating[]
+  reviews       Review[]
+  watchHistory  WatchHistory[]
+  watchParties  WatchParty[]
+  watchlists    Watchlist[]
+  comments      MovieComment[]
+}
+
+model WatchHistory {
+  id          String   @id @default(cuid())
+  progress    Int      @default(0)
+  completed   Boolean  @default(false)
+  lastWatched DateTime @default(now())
+  createdAt   DateTime @default(now())
+  userId      String
+  movieId     String
+  movie       Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+}
+
+model Genre {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  slug        String        @unique
+  description String?
+  movies      MovieGenre[]
+  series      SeriesGenre[]
+}
+
+model MovieGenre {
+  movieId String
+  genreId String
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+}
+
+model Actor {
+  id         String        @id @default(cuid())
+  name       String
+  bio        String?
+  photo      String?
+  birthDate  DateTime?
+  birthPlace String?
+  deathDate  DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  photos     ActorPhoto[]
+  movies     MovieActor[]
+  series     SeriesActor[]
+}
+
+model MovieActor {
+  movieId   String
+  actorId   String
+  character String?
+  order     Int     @default(0)
+  actor     Actor   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  movie     Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, actorId])
+}
+
+model Director {
+  id         String          @id @default(cuid())
+  name       String
+  bio        String?
+  photo      String?
+  birthDate  DateTime?
+  birthPlace String?
+  deathDate  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  photos     DirectorPhoto[]
+  movies     Movie[]
+}
+
+model Review {
+  id         String    @id @default(cuid())
+  content    String
+  isApproved Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  userId     String
+  movieId    String
+  comments   Comment[]
+  movie      Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// 💬 КОММЕНТАРИИ К ФИЛЬМАМ
+// ============================================
+
+model MovieComment {
+  id        String           @id @default(cuid())
+  content   String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  userId    String
+  movieId   String
+  parentId  String?
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     Movie            @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  parent    MovieComment?    @relation("MovieCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   MovieComment[]   @relation("MovieCommentReplies")
+
+  @@index([movieId, createdAt])
+}
+
+model Rating {
+  id        String         @id @default(cuid())
+  value     Int            @db.SmallInt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  userId    String
+  movieId   String
+  movie     Movie          @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  history   RatingHistory[]
+
+  @@unique([userId, movieId])
+}
+
+// История изменений рейтингов
+model RatingHistory {
+  id        String   @id @default(cuid())
+  ratingId  String
+  oldValue  Int?
+  newValue  Int
+  createdAt DateTime @default(now())
+  rating    Rating   @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+
+  @@index([ratingId, createdAt])
+}
+
+model Watchlist {
+  id        String        @id @default(cuid())
+  type      WatchlistType @default(WANT_TO_WATCH)
+  createdAt DateTime      @default(now())
+  userId    String
+  movieId   String
+  movie     Movie         @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  movieId   String
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+}
+
+model Article {
+  id          String           @id @default(cuid())
+  title       String
+  slug        String           @unique
+  content     String
+  excerpt     String?
+  cover       String?
+  published   Boolean          @default(false)
+  publishedAt DateTime?
+  category    ArticleCategory  @default(NEWS)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  comments    ArticleComment[]
+}
+
+model MoviePhoto {
+  id      String  @id @default(cuid())
+  url     String
+  caption String?
+  order   Int     @default(0)
+  movieId String
+  movie   Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model ActorPhoto {
+  id      String  @id @default(cuid())
+  url     String
+  caption String?
+  order   Int     @default(0)
+  actorId String
+  actor   Actor   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+}
+
+model DirectorPhoto {
+  id         String   @id @default(cuid())
+  url        String
+  caption    String?
+  order      Int      @default(0)
+  directorId String
+  director   Director @relation(fields: [directorId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id          String              @id @default(cuid())
+  code        String              @unique
+  name        String
+  description String
+  icon        String
+  points      Int                 @default(10)
+  category    AchievementCategory @default(GENERAL)
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  unlockedAt    DateTime    @default(now())
+  userId        String
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  followerId  String
+  followingId String
+  follower    User     @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model Activity {
+  id        String       @id @default(cuid())
+  type      ActivityType
+  createdAt DateTime     @default(now())
+  userId    String
+  movieId   String?
+  reviewId  String?
+  metadata  Json?
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Collection {
+  id          String            @id @default(cuid())
+  title       String
+  slug        String            @unique
+  description String?
+  cover       String?
+  isPublic    Boolean           @default(true)
+  isFeatured  Boolean           @default(false)
+  order       Int               @default(0)
+  userId      String?           // Для персональных подборок
+  user        User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  movies      CollectionMovie[]
+}
+
+model CollectionMovie {
+  collectionId String
+  movieId      String
+  order        Int        @default(0)
+  note         String?
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  movie        Movie      @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, movieId])
+}
+
+model Challenge {
+  id           String          @id @default(cuid())
+  title        String
+  slug         String          @unique
+  description  String
+  cover        String?
+  type         ChallengeType
+  goal         Int
+  points       Int             @default(100)
+  startDate    DateTime?
+  endDate      DateTime?
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  conditions   Json?
+  participants UserChallenge[]
+}
+
+model UserChallenge {
+  id          String    @id @default(cuid())
+  progress    Int       @default(0)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  joinedAt    DateTime  @default(now())
+  userId      String
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId])
+}
+
+model WatchParty {
+  id           String                  @id @default(cuid())
+  code         String                  @unique
+  name         String?
+  isActive     Boolean                 @default(true)
+  isPublic     Boolean                 @default(true)
+  password     String?
+  currentTime  Int                     @default(0)
+  isPlaying    Boolean                 @default(false)
+  maxUsers     Int                     @default(10)
+  createdAt    DateTime                @default(now())
+  hostId       String
+  movieId      String
+  host         User                    @relation("HostedParties", fields: [hostId], references: [id], onDelete: Cascade)
+  movie        Movie                   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  messages     WatchPartyMessage[]
+  participants WatchPartyParticipant[]
+}
+
+model WatchPartyParticipant {
+  id       String     @id @default(cuid())
+  joinedAt DateTime   @default(now())
+  partyId  String
+  userId   String
+  party    WatchParty @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([partyId, userId])
+}
+
+model WatchPartyMessage {
+  id        String     @id @default(cuid())
+  content   String
+  createdAt DateTime   @default(now())
+  partyId   String
+  userId    String
+  party     WatchParty @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum MovieStatus {
+  RUMORED
+  PLANNED
+  IN_PRODUCTION
+  POST_PRODUCTION
+  RELEASED
+  CANCELED
+}
+
+enum WatchlistType {
+  WANT_TO_WATCH
+  WATCHING
+  WATCHED
+}
+
+enum ArticleCategory {
+  NEWS
+  INTERVIEW
+  REVIEW
+  FEATURE
+}
+
+enum AchievementCategory {
+  GENERAL
+  WATCHING
+  REVIEWS
+  SOCIAL
+  COLLECTOR
+}
+
+enum ActivityType {
+  WATCHED_MOVIE
+  RATED_MOVIE
+  REVIEWED_MOVIE
+  ADDED_TO_WATCHLIST
+  ADDED_TO_FAVORITES
+  UNLOCKED_ACHIEVEMENT
+  FOLLOWED_USER
+  COMPLETED_CHALLENGE
+}
+
+enum ChallengeType {
+  GENRE
+  DIRECTOR
+  ACTOR
+  YEAR
+  COUNTRY
+  MARATHON
+  CUSTOM
+}
+
+// ============================================
+// 📺 СЕРИАЛЫ
+// ============================================
+
+model Series {
+  id              String               @id @default(cuid())
+  title           String
+  originalTitle   String?
+  description     String?
+  poster          String?
+  backdrop        String?
+  trailer         String?
+  firstAirDate    DateTime?
+  lastAirDate     DateTime?
+  status          SeriesStatus         @default(RETURNING)
+  episodeRuntime  Int?
+  country         String?
+  popularity      Float                @default(0)
+  tmdbId          Int?                 @unique
+  kinopoiskId     String?              @unique
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  seasons         Season[]
+  genres          SeriesGenre[]
+  actors          SeriesActor[]
+  watchlists      SeriesWatchlist[]
+  watchHistory    SeriesWatchHistory[]
+  watchParties    SeriesWatchParty[]
+  ratings         SeriesRating[]
+  reviews         SeriesReview[]
+  notifications   Notification[]
+  comments        SeriesComment[]
+}
+
+model Season {
+  id           String    @id @default(cuid())
+  seasonNumber Int
+  name         String?
+  overview     String?
+  poster       String?
+  airDate      DateTime?
+  seriesId     String
+  series       Series    @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  episodes     Episode[]
+
+  @@unique([seriesId, seasonNumber])
+}
+
+model Episode {
+  id            String    @id @default(cuid())
+  episodeNumber Int
+  name          String
+  overview      String?
+  stillPath     String?
+  airDate       DateTime?
+  runtime       Int?
+  seasonId      String
+  season        Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([seasonId, episodeNumber])
+}
+
+model SeriesGenre {
+  seriesId String
+  genreId  String
+  series   Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  genre    Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, genreId])
+}
+
+model SeriesActor {
+  seriesId  String
+  actorId   String
+  character String?
+  order     Int    @default(0)
+  series    Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  actor     Actor  @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, actorId])
+}
+
+model SeriesWatchlist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  seriesId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series    Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, seriesId])
+}
+
+model SeriesWatchHistory {
+  id              String   @id @default(cuid())
+  lastSeasonNum   Int      @default(1)
+  lastEpisodeNum  Int      @default(1)
+  completed       Boolean  @default(false)
+  lastWatched     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  userId          String
+  seriesId        String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series          Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, seriesId])
+}
+
+model SeriesRating {
+  id        String   @id @default(cuid())
+  value     Int      @db.SmallInt
+  createdAt DateTime @default(now())
+  userId    String
+  seriesId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series    Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, seriesId])
+}
+
+model SeriesReview {
+  id         String   @id @default(cuid())
+  content    String
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  userId     String
+  seriesId   String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series     Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, seriesId])
+}
+
+model SeriesWatchParty {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String?
+  isActive      Boolean  @default(true)
+  isPublic      Boolean  @default(true)
+  password      String?
+  currentSeason Int      @default(1)
+  currentEpisode Int     @default(1)
+  currentTime   Int      @default(0)
+  isPlaying     Boolean  @default(false)
+  maxUsers      Int      @default(10)
+  createdAt     DateTime @default(now())
+  hostId        String
+  seriesId      String
+  series        Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+}
+
+enum SeriesStatus {
+  RETURNING
+  ENDED
+  CANCELED
+  IN_PRODUCTION
+}
+
+// ============================================
+// 💰 ВИРТУАЛЬНАЯ ВАЛЮТА И МАГАЗИН
+// ============================================
+
+model ShopItem {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  type        ShopItemType
+  value       String         // CSS класс, URL или код
+  price       Int
+  rarity      ItemRarity     @default(COMMON)
+  isActive    Boolean        @default(true)
+  preview     String?        // URL превью
+  createdAt   DateTime       @default(now())
+  purchases   UserShopItem[]
+}
+
+model UserShopItem {
+  id         String   @id @default(cuid())
+  isEquipped Boolean  @default(false)
+  purchasedAt DateTime @default(now())
+  userId     String
+  itemId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item       ShopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+}
+
+model CoinTransaction {
+  id          String          @id @default(cuid())
+  amount      Int
+  type        TransactionType
+  description String?
+  createdAt   DateTime        @default(now())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum ShopItemType {
+  PROFILE_FRAME      // Рамка профиля
+  PROFILE_BADGE      // Значок у имени
+  NAME_COLOR         // Цвет никнейма
+  THEME              // Тема оформления
+  AVATAR_EFFECT      // Эффект аватара
+  CHAT_BUBBLE        // Стиль сообщений в чате
+  EMOJI_PACK         // Набор эмодзи
+  BACKGROUND         // Фон профиля
+}
+
+enum ItemRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum TransactionType {
+  EARN_CHALLENGE     // За челлендж
+  EARN_REVIEW        // За отзыв
+  EARN_RATING        // За оценку
+  EARN_DAILY         // Ежедневный бонус
+  EARN_ACHIEVEMENT   // За достижение
+  EARN_REFERRAL      // За приглашение
+  SPEND_SHOP         // Покупка в магазине
+  SPEND_GIFT         // Подарок другу
+  ADMIN_GRANT        // Начислено админом
+  ADMIN_REMOVE       // Списано админом
+}
+
+// ============================================
+// 💬 КОММЕНТАРИИ К СТАТЬЯМ
+// ============================================
+
+model ArticleComment {
+  id        String           @id @default(cuid())
+  content   String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  userId    String
+  articleId String
+  parentId  String?
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  parent    ArticleComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   ArticleComment[] @relation("CommentReplies")
+}
+
+// ============================================
+// 💬 КОММЕНТАРИИ К СЕРИАЛАМ
+// ============================================
+
+model SeriesComment {
+  id        String           @id @default(cuid())
+  content   String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  userId    String
+  seriesId  String
+  parentId  String?
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series    Series           @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  parent    SeriesComment?   @relation("SeriesCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   SeriesComment[]  @relation("SeriesCommentReplies")
+
+  @@index([seriesId, createdAt])
+}
+
+// ============================================
+// ⚙️ НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ
+// ============================================
+
+model UserSettings {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  // Уведомления
+  emailNotifications    Boolean  @default(true)
+  pushNotifications     Boolean  @default(true)
+  notifyNewReleases     Boolean  @default(true)
+  notifyNewSeasons      Boolean  @default(true)
+  notifyReviews         Boolean  @default(true)
+  notifyFollowers       Boolean  @default(true)
+  // Приватность
+  showWatchHistory      Boolean  @default(true)
+  showRatings           Boolean  @default(true)
+  showFavorites         Boolean  @default(true)
+  // Прочее
+  language              String   @default("ru")
+  autoplayTrailers      Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// 🔔 УВЕДОМЛЕНИЯ
+// ============================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seriesId  String?          // Для уведомлений о сезонах
+  series    Series?          @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  NEW_SEASON
+  NEW_EPISODE
+  NEW_RELEASE
+  REVIEW_APPROVED
+  FOLLOWED_USER_ACTIVITY
+  SYSTEM
+}
+
+// ============================================
+// 🔐 СБРОС ПАРОЛЯ
+// ============================================
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}

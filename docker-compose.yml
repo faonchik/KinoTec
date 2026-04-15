@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: kinoteka_db
+    environment:
+      POSTGRES_USER: kinoteka
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kinoteka_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kinoteka -d kinoteka_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    container_name: kinoteka_app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://kinoteka:password@postgres:5432/kinoteka_db?schema=public
+      - NEXTAUTH_SECRET=your-super-secret-key-change-in-production
+      - NEXTAUTH_URL=http://localhost:3000
+      # Увеличиваем лимит размера заголовков для предотвращения HTTP 431 (64KB)
+      - NODE_OPTIONS=--max-http-header-size=65536
+      # TMDB API (опционально)
+      - TMDB_API_KEY=${TMDB_API_KEY:-}
+      # Groq API (для AI чата)
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      # Email настройки - Yandex Cloud транзакционная почта
+      # ВАЖНО: Используйте пароль приложения, а не основной пароль!
+      # Инструкция: см. YANDEX_CLOUD_EMAIL_SETUP.md
+      # Поддержка как SMTP_*, так и EMAIL_* переменных
+      - SMTP_HOST=${SMTP_HOST:-${EMAIL_HOST:-smtp.yandex.ru}}
+      - SMTP_PORT=${SMTP_PORT:-${EMAIL_PORT:-587}}
+      - SMTP_SECURE=${SMTP_SECURE:-${EMAIL_SECURE:-false}}
+      - SMTP_USER=${SMTP_USER:-${EMAIL_USER:-ваш-email@yandex.ru}}
+      - SMTP_PASS=${SMTP_PASS:-${EMAIL_PASSWORD:-ваш-пароль-приложения}}
+      # SMTP_FROM не нужен - используется SMTP_USER
+      # Webhook для деплоя
+      - DEPLOY_WEBHOOK_SECRET=${DEPLOY_WEBHOOK_SECRET:-deploy-secret-key-change-in-production}
+      - SITE_URL=${SITE_URL:-https://kinoteck.ru}
+      # OpenAI API (для Telegram бота)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    # Убираем volumes для production контейнера - они перезаписывают собранные файлы
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Telegram бот для управления контентом
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: kinoteka_bot
+    environment:
+      - DATABASE_URL=postgresql://kinoteka:password@postgres:5432/kinoteka_db?schema=public
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_ADMIN_ID=${TELEGRAM_ADMIN_ID:-809818162}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - TMDB_API_KEY=${TMDB_API_KEY:-}
+      - UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY:-}
+      - SITE_URL=${SITE_URL:-http://localhost:3000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+

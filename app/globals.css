@@ -1,0 +1,632 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
+    background-color: var(--bg-primary, #0f172a);
+    color: var(--text-primary, #f1f5f9);
+  }
+
+  /* Улучшение производительности на мобильных */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  button, a {
+    touch-action: manipulation;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Aspect ratio for movie posters */
+  .aspect-poster {
+    aspect-ratio: 2/3;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-slate-800/50 backdrop-blur-xl border border-slate-700/50;
+  }
+
+  /* Hide scrollbar for horizontal scroll sections */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent;
+  }
+
+  /* Fade animations */
+  .animate-in {
+    animation: animate-in 0.3s ease-out forwards;
+  }
+
+  .fade-in {
+    --tw-enter-opacity: 0;
+  }
+
+  .slide-in-from-left {
+    --tw-enter-translate-x: -1rem;
+  }
+
+  .zoom-in-95 {
+    --tw-enter-scale: 0.95;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: var(--tw-enter-opacity, 1);
+      transform: translate(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0)) scale(var(--tw-enter-scale, 1));
+    }
+    to {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+
+  /* Shimmer animation for loading spinner */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+/* ============================================
+   🎨 ТЕМЫ ОФОРМЛЕНИЯ
+   ============================================ */
+
+:root {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --border: #334155;
+}
+
+/* Тёмная (по умолчанию) */
+.theme-dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --accent: #f59e0b;
+}
+
+/* Светлая */
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent: #f59e0b;
+}
+
+/* Полуночный синий */
+.theme-midnight {
+  --bg-primary: #0a1628;
+  --bg-secondary: #1a2332;
+  --bg-tertiary: #2a3441;
+  --text-primary: #e0e7ff;
+  --text-secondary: #a5b4fc;
+  --accent: #6366f1;
+}
+
+/* Лесная зелень */
+.theme-forest {
+  --bg-primary: #0d1f0d;
+  --bg-secondary: #1a2e1a;
+  --bg-tertiary: #274027;
+  --text-primary: #d1fae5;
+  --text-secondary: #6ee7b7;
+  --accent: #10b981;
+}
+
+/* Аметист */
+.theme-amethyst {
+  --bg-primary: #1a0d2e;
+  --bg-secondary: #2a1a3e;
+  --bg-tertiary: #3a274e;
+  --text-primary: #f3e8ff;
+  --text-secondary: #c084fc;
+  --accent: #a855f7;
+}
+
+/* Ретро кинотеатр */
+.theme-retro {
+  --bg-primary: #1a0f0f;
+  --bg-secondary: #2a1f1f;
+  --bg-tertiary: #3a2f2f;
+  --text-primary: #fef3c7;
+  --text-secondary: #fde68a;
+  --accent: #fbbf24;
+}
+
+/* Нуар */
+.theme-noir {
+  --bg-primary: #000000;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --accent: #ffffff;
+}
+
+/* Киберпанк */
+.theme-cyberpunk {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #2a2a3e;
+  --text-primary: #00ff88;
+  --text-secondary: #00cc6a;
+  --accent: #ff0080;
+}
+
+/* Голливуд */
+.theme-hollywood {
+  --bg-primary: #1a0f0a;
+  --bg-secondary: #2a1f1a;
+  --bg-tertiary: #3a2f2a;
+  --text-primary: #ffd700;
+  --text-secondary: #ffed4e;
+  --accent: #ffb800;
+}
+
+/* Космос */
+.theme-space {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #2a2a3e;
+  --text-primary: #e0e7ff;
+  --text-secondary: #a5b4fc;
+  --accent: #818cf8;
+}
+
+/* Хамелеон (меняется в зависимости от времени) */
+.theme-chameleon {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --accent: #f59e0b;
+}
+
+/* Применение переменных к html и body */
+html.theme-dark,
+html.theme-light,
+html.theme-midnight,
+html.theme-forest,
+html.theme-amethyst,
+html.theme-retro,
+html.theme-noir,
+html.theme-cyberpunk,
+html.theme-hollywood,
+html.theme-space,
+html.theme-chameleon {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Применение переменных */
+.theme-dark,
+.theme-light,
+.theme-midnight,
+.theme-forest,
+.theme-amethyst,
+.theme-retro,
+.theme-noir,
+.theme-cyberpunk,
+.theme-hollywood,
+.theme-space,
+.theme-chameleon {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Применение к bg-slate-950 (используется как основной фон) */
+.theme-dark .bg-slate-950,
+.theme-light .bg-slate-950,
+.theme-midnight .bg-slate-950,
+.theme-forest .bg-slate-950,
+.theme-amethyst .bg-slate-950,
+.theme-retro .bg-slate-950,
+.theme-noir .bg-slate-950,
+.theme-cyberpunk .bg-slate-950,
+.theme-hollywood .bg-slate-950,
+.theme-space .bg-slate-950,
+.theme-chameleon .bg-slate-950 {
+  background-color: var(--bg-primary) !important;
+}
+
+.theme-dark body,
+.theme-light body,
+.theme-midnight body,
+.theme-forest body,
+.theme-amethyst body,
+.theme-retro body,
+.theme-noir body,
+.theme-cyberpunk body,
+.theme-hollywood body,
+.theme-space body,
+.theme-chameleon body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Применение к элементам интерфейса */
+.theme-dark .bg-slate-900,
+.theme-light .bg-slate-900,
+.theme-midnight .bg-slate-900,
+.theme-forest .bg-slate-900,
+.theme-amethyst .bg-slate-900,
+.theme-retro .bg-slate-900,
+.theme-noir .bg-slate-900,
+.theme-cyberpunk .bg-slate-900,
+.theme-hollywood .bg-slate-900,
+.theme-space .bg-slate-900,
+.theme-chameleon .bg-slate-900 {
+  background-color: var(--bg-primary) !important;
+}
+
+.theme-dark .bg-slate-800,
+.theme-light .bg-slate-800,
+.theme-midnight .bg-slate-800,
+.theme-forest .bg-slate-800,
+.theme-amethyst .bg-slate-800,
+.theme-retro .bg-slate-800,
+.theme-noir .bg-slate-800,
+.theme-cyberpunk .bg-slate-800,
+.theme-hollywood .bg-slate-800,
+.theme-space .bg-slate-800,
+.theme-chameleon .bg-slate-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-dark .bg-slate-700,
+.theme-light .bg-slate-700,
+.theme-midnight .bg-slate-700,
+.theme-forest .bg-slate-700,
+.theme-amethyst .bg-slate-700,
+.theme-retro .bg-slate-700,
+.theme-noir .bg-slate-700,
+.theme-cyberpunk .bg-slate-700,
+.theme-hollywood .bg-slate-700,
+.theme-space .bg-slate-700,
+.theme-chameleon .bg-slate-700 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .text-slate-100,
+.theme-light .text-slate-100,
+.theme-midnight .text-slate-100,
+.theme-forest .text-slate-100,
+.theme-amethyst .text-slate-100,
+.theme-retro .text-slate-100,
+.theme-noir .text-slate-100,
+.theme-cyberpunk .text-slate-100,
+.theme-hollywood .text-slate-100,
+.theme-space .text-slate-100,
+.theme-chameleon .text-slate-100 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-slate-400,
+.theme-light .text-slate-400,
+.theme-midnight .text-slate-400,
+.theme-forest .text-slate-400,
+.theme-amethyst .text-slate-400,
+.theme-retro .text-slate-400,
+.theme-noir .text-slate-400,
+.theme-cyberpunk .text-slate-400,
+.theme-hollywood .text-slate-400,
+.theme-space .text-slate-400,
+.theme-chameleon .text-slate-400 {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .border-slate-700,
+.theme-light .border-slate-700,
+.theme-midnight .border-slate-700,
+.theme-forest .border-slate-700,
+.theme-amethyst .border-slate-700,
+.theme-retro .border-slate-700,
+.theme-noir .border-slate-700,
+.theme-cyberpunk .border-slate-700,
+.theme-hollywood .border-slate-700,
+.theme-space .border-slate-700,
+.theme-chameleon .border-slate-700 {
+  border-color: var(--border) !important;
+}
+
+/* Улучшенные темы */
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --border: #cbd5e1;
+}
+
+.theme-midnight {
+  --bg-primary: #0a1628;
+  --bg-secondary: #1a2332;
+  --bg-tertiary: #2a3441;
+  --text-primary: #e0e7ff;
+  --text-secondary: #a5b4fc;
+  --text-muted: #818cf8;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --border: #3730a3;
+}
+
+.theme-forest {
+  --bg-primary: #0d1f0d;
+  --bg-secondary: #1a2e1a;
+  --bg-tertiary: #274027;
+  --text-primary: #d1fae5;
+  --text-secondary: #6ee7b7;
+  --text-muted: #34d399;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --border: #065f46;
+}
+
+.theme-amethyst {
+  --bg-primary: #1a0d2e;
+  --bg-secondary: #2a1a3e;
+  --bg-tertiary: #3a274e;
+  --text-primary: #f3e8ff;
+  --text-secondary: #c084fc;
+  --text-muted: #a78bfa;
+  --accent: #a855f7;
+  --accent-hover: #9333ea;
+  --border: #6b21a8;
+}
+
+.theme-retro {
+  --bg-primary: #1a0f0f;
+  --bg-secondary: #2a1f1f;
+  --bg-tertiary: #3a2f2f;
+  --text-primary: #fef3c7;
+  --text-secondary: #fde68a;
+  --text-muted: #fcd34d;
+  --accent: #fbbf24;
+  --accent-hover: #f59e0b;
+  --border: #92400e;
+}
+
+.theme-noir {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e5;
+  --text-muted: #a3a3a3;
+  --accent: #ffffff;
+  --accent-hover: #d4d4d4;
+  --border: #404040;
+}
+
+.theme-cyberpunk {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #2a2a3e;
+  --text-primary: #00ff88;
+  --text-secondary: #00cc6a;
+  --text-muted: #00aa55;
+  --accent: #ff0080;
+  --accent-hover: #cc0066;
+  --border: #4a0040;
+}
+
+.theme-hollywood {
+  --bg-primary: #1a0f0a;
+  --bg-secondary: #2a1f1a;
+  --bg-tertiary: #3a2f2a;
+  --text-primary: #ffd700;
+  --text-secondary: #ffed4e;
+  --text-muted: #fbbf24;
+  --accent: #ffb800;
+  --accent-hover: #d97706;
+  --border: #92400e;
+}
+
+.theme-space {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #2a2a3e;
+  --text-primary: #e0e7ff;
+  --text-secondary: #a5b4fc;
+  --text-muted: #818cf8;
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --border: #4c1d95;
+}
+
+/* Хамелеон - динамическая тема */
+.theme-chameleon {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --border: #334155;
+}
+
+/* Анимация для хамелеона */
+@media (prefers-color-scheme: light) {
+  .theme-chameleon {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f1f5f9;
+    --bg-tertiary: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+  }
+}
+
+/* Улучшение скроллбара для разных тем */
+.theme-dark ::-webkit-scrollbar-track,
+.theme-light ::-webkit-scrollbar-track,
+.theme-midnight ::-webkit-scrollbar-track,
+.theme-forest ::-webkit-scrollbar-track,
+.theme-amethyst ::-webkit-scrollbar-track,
+.theme-retro ::-webkit-scrollbar-track,
+.theme-noir ::-webkit-scrollbar-track,
+.theme-cyberpunk ::-webkit-scrollbar-track,
+.theme-hollywood ::-webkit-scrollbar-track,
+.theme-space ::-webkit-scrollbar-track,
+.theme-chameleon ::-webkit-scrollbar-track {
+  background-color: var(--bg-secondary);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb,
+.theme-light ::-webkit-scrollbar-thumb,
+.theme-midnight ::-webkit-scrollbar-thumb,
+.theme-forest ::-webkit-scrollbar-thumb,
+.theme-amethyst ::-webkit-scrollbar-thumb,
+.theme-retro ::-webkit-scrollbar-thumb,
+.theme-noir ::-webkit-scrollbar-thumb,
+.theme-cyberpunk ::-webkit-scrollbar-thumb,
+.theme-hollywood ::-webkit-scrollbar-thumb,
+.theme-space ::-webkit-scrollbar-thumb,
+.theme-chameleon ::-webkit-scrollbar-thumb {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb:hover,
+.theme-light ::-webkit-scrollbar-thumb:hover,
+.theme-midnight ::-webkit-scrollbar-thumb:hover,
+.theme-forest ::-webkit-scrollbar-thumb:hover,
+.theme-amethyst ::-webkit-scrollbar-thumb:hover,
+.theme-retro ::-webkit-scrollbar-thumb:hover,
+.theme-noir ::-webkit-scrollbar-thumb:hover,
+.theme-cyberpunk ::-webkit-scrollbar-thumb:hover,
+.theme-hollywood ::-webkit-scrollbar-thumb:hover,
+.theme-space ::-webkit-scrollbar-thumb:hover,
+.theme-chameleon ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+}
+
+/* Применение темы ко всем текстовым элементам */
+.theme-dark .text-white,
+.theme-light .text-white,
+.theme-midnight .text-white,
+.theme-forest .text-white,
+.theme-amethyst .text-white,
+.theme-retro .text-white,
+.theme-noir .text-white,
+.theme-cyberpunk .text-white,
+.theme-hollywood .text-white,
+.theme-space .text-white,
+.theme-chameleon .text-white {
+  color: var(--text-primary) !important;
+}
+
+/* Применение темы к градиентам */
+.theme-dark .bg-gradient-to-r,
+.theme-light .bg-gradient-to-r,
+.theme-midnight .bg-gradient-to-r,
+.theme-forest .bg-gradient-to-r,
+.theme-amethyst .bg-gradient-to-r,
+.theme-retro .bg-gradient-to-r,
+.theme-noir .bg-gradient-to-r,
+.theme-cyberpunk .bg-gradient-to-r,
+.theme-hollywood .bg-gradient-to-r,
+.theme-space .bg-gradient-to-r,
+.theme-chameleon .bg-gradient-to-r {
+  background: linear-gradient(to right, var(--accent), var(--accent-hover)) !important;
+}

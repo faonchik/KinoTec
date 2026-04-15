@@ -1,0 +1,112 @@
+name: Manual Deploy Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      host_ip:
+        description: 'Host IP address'
+        required: true
+        default: '31.31.197.17'
+      ssh_user:
+        description: 'SSH username'
+        required: true
+        default: 'u3350084'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          
+          # Проверяем наличие SSH ключа
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ Error: SSH_PRIVATE_KEY secret is not set"
+            exit 1
+          fi
+          
+          # Сохраняем приватный ключ
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Проверяем наличие HOST_IP
+          HOST_IP="${{ github.event.inputs.host_ip }}"
+          if [ -z "$HOST_IP" ]; then
+            echo "❌ Error: HOST_IP is not set"
+            exit 1
+          fi
+          
+          # Добавляем хост в known_hosts
+          echo "🔑 Adding host to known_hosts..."
+          ssh-keyscan -H "$HOST_IP" >> ~/.ssh/known_hosts 2>&1 || {
+            echo "⚠️  Warning: ssh-keyscan failed, but continuing..."
+          }
+          
+          # Проверяем подключение
+          echo "🔌 Testing SSH connection..."
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 "${{ github.event.inputs.ssh_user }}@$HOST_IP" "echo 'SSH connection successful'" || {
+            echo "❌ Error: Cannot connect to server"
+            exit 1
+          }
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ github.event.inputs.ssh_user }}@${{ github.event.inputs.host_ip }} << 'DEPLOY_SCRIPT'
+            set -e
+            echo "🚀 Starting deployment..."
+            
+            # Определяем путь к проекту
+            if [ -d "/www/kinoteck.ru/www" ]; then
+              PROJECT_DIR="/www/kinoteck.ru/www"
+            elif [ -d "/var/www/kinoteck.ru" ]; then
+              PROJECT_DIR="/var/www/kinoteck.ru"
+            elif [ -d "$HOME/www" ]; then
+              PROJECT_DIR="$HOME/www"
+            else
+              echo "❌ Project directory not found!"
+              exit 1
+            fi
+            
+            cd "$PROJECT_DIR"
+            echo "📂 Working directory: $PROJECT_DIR"
+            
+            # Обновляем код
+            echo "📥 Pulling latest changes..."
+            git fetch origin
+            git reset --hard origin/main || git reset --hard origin/master
+            
+            # Останавливаем контейнеры
+            echo "🛑 Stopping containers..."
+            docker-compose down || true
+            
+            # Собираем и запускаем
+            echo "🔨 Building containers..."
+            docker-compose build --no-cache
+            
+            echo "🚀 Starting containers..."
+            docker-compose up -d
+            
+            # Ждем готовности БД
+            echo "⏳ Waiting for database..."
+            sleep 10
+            
+            # Применяем миграции
+            echo "📊 Running migrations..."
+            docker-compose exec -T app npx prisma generate || true
+            docker-compose exec -T app npx prisma migrate deploy || true
+            
+            echo "✅ Deployment completed successfully!"
+            docker-compose ps
+          DEPLOY_SCRIPT
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/id_rsa
+

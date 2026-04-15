@@ -1,0 +1,25 @@
+# Dev Dockerfile для hot reload
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache libc6-compat
+
+# Копируем package.json и устанавливаем зависимости
+COPY package*.json ./
+RUN npm ci --legacy-peer-deps
+
+# Генерируем Prisma клиент
+COPY prisma ./prisma
+RUN npx prisma generate --schema=./prisma/schema.prisma
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+# Увеличиваем лимит размера заголовков для предотвращения HTTP 431
+ENV NODE_OPTIONS="--max-http-header-size=32768"
+
+# В dev режиме запускаем next dev
+CMD ["npm", "run", "dev"]
+
