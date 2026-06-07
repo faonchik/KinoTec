@@ -114,12 +114,12 @@ export function BackgroundUpload({
   return (
     <div className="relative">
       {/* Preview */}
-      <div className="relative h-48 rounded-xl overflow-hidden border-2 border-white/[0.12] bg-gradient-to-b from-[#121821] to-[#0b0f14]">
+      <div className="relative h-48 rounded-xl overflow-hidden border-2 border-white/[0.12] bg-gradient-to-b from-[#121821] to-[#141414]">
         <div
           className="absolute inset-0"
           style={backgroundStyle}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b0f14]/50 to-[#0b0f14]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#141414]/50 to-[#141414]/80" />
         
         {/* Overlay with buttons */}
         <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 hover:opacity-100 transition-opacity bg-black/20">

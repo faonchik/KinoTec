@@ -15,6 +15,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const isStreamingPreview = pathname === "/streaming-preview" || pathname.startsWith("/streaming-preview/");
   /** Полноэкранные страницы входа/регистрации — без сайдбара и общего футера, как отдельный портал */
   const isAuthPortal = pathname === "/auth" || pathname.startsWith("/auth/");
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
 
   if (isStreamingPreview) {
     return <>{children}</>;
@@ -23,6 +24,16 @@ export function AppChrome({ children }: { children: ReactNode }) {
   if (isAuthPortal) {
     return (
       <>
+        {children}
+        <AIChatButton />
+      </>
+    );
+  }
+
+  if (isAdmin) {
+    return (
+      <>
+        <Header />
         {children}
         <AIChatButton />
       </>

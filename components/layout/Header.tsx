@@ -12,9 +12,12 @@ import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { NotificationsButton } from "@/components/notifications/NotificationsButton";
 import { FilmStripMark } from "@/components/layout/FilmStripMark";
 import { HeaderSearch } from "@/components/layout/HeaderSearch";
+import { usePathname } from "next/navigation";
 import type { Locale } from "@/i18n/config";
 
 export function Header() {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin") || pathname === "/admin";
   const { data: session, status } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -232,8 +235,10 @@ export function Header() {
   const headerBar = (
     <header
       ref={headerRef}
-        className="site-header fixed left-0 right-0 top-0 z-[950] overflow-visible border-b border-white/[0.08] bg-[#141414] shadow-[0_1px_0_rgba(0,0,0,0.45)] sm:left-[76px] lg:left-[212px]"
-      >
+      className={`site-header fixed left-0 right-0 top-0 z-[950] overflow-visible border-b border-white/[0.08] bg-[#141414] shadow-[0_1px_0_rgba(0,0,0,0.45)] ${
+        isAdmin ? "sm:left-[260px]" : "sm:left-[76px] lg:left-[212px]"
+      }`}
+    >
       <div ref={headerBarRef} className="flex items-center gap-3 overflow-visible px-3 py-3 sm:px-5 lg:px-8">
         <div className="flex shrink-0 items-center gap-2 sm:hidden">
           <button
@@ -322,7 +327,7 @@ export function Header() {
 
   return (
     <>
-      <div className="shrink-0" style={{ height: spacerHeight }} aria-hidden />
+      {!isAdmin && <div className="shrink-0" style={{ height: spacerHeight }} aria-hidden />}
       {userMenuMounted ? createPortal(headerBar, document.body) : headerBar}
 
       {isUserMenuOpen && userMenuMounted && session

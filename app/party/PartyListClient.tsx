@@ -175,7 +175,7 @@ export function PartyListClient(props: PartyListClientProps) {
     "inline-flex items-center justify-center rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-2 text-xs font-semibold text-white/80 transition hover:border-white/20 hover:bg-white/[0.08]";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0f14] pb-20 pt-6 sm:pt-10">
+    <div className="relative min-h-screen overflow-hidden bg-[#141414] pb-20 pt-6 sm:pt-10">
       <div
         className="pointer-events-none absolute inset-0 opacity-100"
         aria-hidden
@@ -298,7 +298,7 @@ export function PartyListClient(props: PartyListClientProps) {
                   placeholder="КОД"
                   maxLength={6}
                   autoComplete="off"
-                  className="h-12 w-full rounded-xl border border-white/[0.1] bg-[#0b0f14]/80 px-4 font-mono text-sm font-semibold uppercase tracking-[0.4em] text-white placeholder:text-white/20 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20 sm:max-w-[220px] sm:tracking-[0.5em]"
+                  className="h-12 w-full rounded-xl border border-white/[0.1] bg-[#141414]/80 px-4 font-mono text-sm font-semibold uppercase tracking-[0.4em] text-white placeholder:text-white/20 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20 sm:max-w-[220px] sm:tracking-[0.5em]"
                 />
                 <button
                   type="submit"
@@ -327,7 +327,7 @@ export function PartyListClient(props: PartyListClientProps) {
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1f28] to-[#0b0f14] font-mono text-[11px] text-white/25">
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1f28] to-[#141414] font-mono text-[11px] text-white/25">
                           Нет постера
                         </div>
                       )}
@@ -408,7 +408,7 @@ export function PartyListClient(props: PartyListClientProps) {
             ) : null}
 
             {/* CTA */}
-            <aside className="overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-br from-[#161c26] via-[#121821] to-[#0b0f14] p-[1px] shadow-2xl shadow-black/40">
+            <aside className="overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-br from-[#161c26] via-[#121821] to-[#141414] p-[1px] shadow-2xl shadow-black/40">
               <div className="rounded-[22px] bg-[#0f141c]/90 p-6 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8">
                 <div className="max-w-lg">
                   <h3 className="font-oswald text-2xl font-bold text-white sm:text-3xl">Свой показ за пару кликов</h3>
@@ -556,7 +556,7 @@ export function PartyListClient(props: PartyListClientProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Пароль"
-                className="h-12 w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 font-mono text-sm text-white outline-none placeholder:text-white/25 focus:border-red-500/40 focus:ring-1 focus:ring-red-500/20"
+                className="h-12 w-full rounded-xl border border-white/[0.1] bg-[#141414] px-4 font-mono text-sm text-white outline-none placeholder:text-white/25 focus:border-red-500/40 focus:ring-1 focus:ring-red-500/20"
                 autoFocus
               />
               {error ? <p className="font-mono text-[12px] text-red-400">{error}</p> : null}

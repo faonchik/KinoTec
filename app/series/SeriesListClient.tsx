@@ -58,7 +58,7 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
   };
 
   return (
-    <div className="min-h-full bg-[#0b0f14]">
+    <div className="min-h-full bg-[#141414]">
       {/* Title Section */}
       <div className="px-4 pb-3 pt-6 sm:px-8 sm:pt-8 lg:px-12">
         <div className="mb-3 flex items-center gap-3">
@@ -123,7 +123,7 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
                       <Image src={url!} alt={s.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw" />
                     );
                   })() : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#121821] to-[#0b0f14] font-mono text-xs text-white/25">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#121821] to-[#141414] font-mono text-xs text-white/25">
                       КТ
                     </div>
                   )}

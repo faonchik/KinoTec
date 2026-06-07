@@ -128,7 +128,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
   const endItem = Math.min(currentPage * MOVIES_PER_PAGE, total);
 
   return (
-    <div className="min-h-full bg-[#0b0f14]">
+    <div className="min-h-full bg-[#141414]">
       <div className="flex flex-col gap-4 px-4 pb-4 pt-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 lg:px-12">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl">Каталог фильмов</h1>

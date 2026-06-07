@@ -106,7 +106,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative min-h-[60vh] overflow-hidden bg-[#0b0f14]">
+      <div className="relative min-h-[60vh] overflow-hidden bg-[#141414]">
         <HeroBackdrop
           backdrop={movie.backdrop}
           poster={movie.poster}

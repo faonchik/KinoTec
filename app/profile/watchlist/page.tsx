@@ -47,7 +47,7 @@ export default async function WatchlistPage() {
   const mins = totalRuntime % 60;
 
   return (
-    <div className="min-h-screen bg-[#0b0f14]">
+    <div className="min-h-screen bg-[#141414]">
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-8 lg:px-12 pt-8 pb-2">
         <div className="flex items-center gap-3">

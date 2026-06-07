@@ -125,7 +125,7 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[#0b0f14]">
+    <div className="min-h-screen bg-[#141414]">
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-8 lg:px-12 pt-8 pb-2">
         <div>
@@ -330,7 +330,7 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
                             ? <img src={url!} alt={movie.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                             : <Image src={url!} alt={movie.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />;
                         })() : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14]" />
+                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#141414]" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                         {daysUntil !== null && daysUntil > 0 && (

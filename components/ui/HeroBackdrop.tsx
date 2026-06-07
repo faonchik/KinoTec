@@ -61,9 +61,9 @@ export function HeroBackdrop({
   const exhausted = index >= sources.length;
 
   const defaultOverlay =
-    "absolute inset-0 bg-gradient-to-r from-[#0b0f14] via-[#0b0f14]/92 to-[#0b0f14]/55";
+    "absolute inset-0 bg-gradient-to-r from-[#141414] via-[#141414]/92 to-[#141414]/55";
   const topOverlay =
-    "absolute inset-0 bg-gradient-to-t from-[#0b0f14] via-[#0b0f14]/25 to-[#0b0f14]/65";
+    "absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/25 to-[#141414]/65";
 
   return (
     <div className={className} aria-hidden>
@@ -87,7 +87,7 @@ export function HeroBackdrop({
           }}
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/45 via-[#121821] to-[#0b0f14]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/45 via-[#121821] to-[#141414]" />
       )}
 
       <div className={overlayClassName ?? defaultOverlay} />

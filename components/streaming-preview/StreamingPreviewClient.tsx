@@ -11,7 +11,7 @@ import { previewMoviePageHref } from "@/lib/streaming-preview/previewLinks";
 import { CinematicMainExperience } from "./CinematicMainExperience";
 import type { StreamingPreviewMovie, StreamingPreviewPayload } from "./types";
 
-const SP_BG = "#0b0f14";
+const SP_BG = "#141414";
 const SP_SURFACE = "#121821";
 const SP_ACCENT = "#ffb84d";
 

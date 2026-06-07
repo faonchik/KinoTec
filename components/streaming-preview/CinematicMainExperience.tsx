@@ -9,7 +9,7 @@ import { HeroBackdrop } from "@/components/ui/HeroBackdrop";
 import { ProxiedImage } from "@/components/ui/ProxiedImage";
 import type { StreamingPreviewMovie, StreamingPreviewPayload } from "./types";
 
-const SP_BG = "#0b0f14";
+const SP_BG = "#141414";
 const SP_SURFACE = "#121821";
 const SP_ACCENT = "#ffb84d";
 
@@ -54,7 +54,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
   const hero = data.hero;
   const heroVideo = hero && isDirectVideo(hero.videoUrl) ? hero.videoUrl : hero && isDirectVideo(hero.trailer) ? hero.trailer : null;
   const pageRgb = embedded ? "20 20 20" : "11 15 20";
-  const pageHex = embedded ? "#141414" : "#0b0f14";
+  const pageHex = embedded ? "#141414" : "#141414";
 
   const similar = useMemo(
     () => (detail ? similarFromPool(data.pool, detail) : []),
@@ -151,7 +151,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
             aria-hidden
           />
           <div
-            className={`absolute inset-0 z-[2] bg-gradient-to-t to-transparent ${embedded ? "from-[#141414] via-[#141414]/65" : "from-[#0b0f14] via-[#0b0f14]/65"}`}
+            className={`absolute inset-0 z-[2] bg-gradient-to-t to-transparent ${embedded ? "from-[#141414] via-[#141414]/65" : "from-[#141414] via-[#141414]/65"}`}
             aria-hidden
           />
           <div
@@ -214,7 +214,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                         setMiniPlayer(hero);
                         setDetail(null);
                       }}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#ffb84d] px-8 py-3.5 text-sm font-semibold text-[#0b0f14] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)]"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#ffb84d] px-8 py-3.5 text-sm font-semibold text-[#141414] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)]"
                     >
                       <PlaySolidIcon className="h-5 w-5" />
                       Смотреть

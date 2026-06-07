@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getServerSession } from "next-auth";
-import { getTranslations } from "next-intl/server";
 import { cache } from "react";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
@@ -11,7 +10,6 @@ import { Badge } from "@/components/ui/Badge";
 import { WatchExperienceClient } from "@/components/player/WatchExperienceClient";
 import { resolveMovieWatchEmbed } from "@/lib/player/resolveWatchEmbed";
 import { usesExplicitMovieEmbedTemplate } from "@/lib/player/embedUrl";
-import { getPlayableMoviesForWatchStrip } from "@/lib/movies/playableForWatch";
 import { isUsableDirectVideoUrlForNativePlayer } from "@/lib/player/directVideoUrl";
 
 interface WatchPageProps {
@@ -95,11 +93,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
   });
 
   const genreIds = movie.genres.map((g) => g.genreId);
-  const [recommendations, availableFilms, tWatch] = await Promise.all([
-    getRecommendations(id, genreIds),
-    getPlayableMoviesForWatchStrip(id, 18),
-    getTranslations("watchPage"),
-  ]);
+  const recommendations = await getRecommendations(id, genreIds);
 
   const avgRating = movie.ratings.length
     ? (movie.ratings.reduce((acc, r) => acc + r.value, 0) / movie.ratings.length).toFixed(1)
@@ -114,7 +108,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
     Boolean(movie.kinopoiskId?.trim());
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#141414]">
       {/* Плеер */}
       <div className="w-full bg-black">
         <div className="mx-auto max-w-[1400px]">
@@ -132,8 +126,6 @@ export default async function WatchPage({ params }: WatchPageProps) {
             initialProgress={initialProgress}
             isAuthenticated={Boolean(userId)}
             runtimeMinutes={movie.runtime}
-            availableFilms={availableFilms}
-            availableFilmsTitle={tWatch("availableFilms")}
           />
           {!hasPlayback && (
             <p className="px-4 py-3 text-center text-sm text-white/50">

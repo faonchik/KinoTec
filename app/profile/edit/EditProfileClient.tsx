@@ -72,7 +72,7 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f14]">
+    <div className="min-h-screen bg-[#141414]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

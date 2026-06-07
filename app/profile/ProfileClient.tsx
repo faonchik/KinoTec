@@ -160,12 +160,12 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews 
   ];
 
   return (
-    <div className="min-h-screen bg-[#0b0f14]">
+    <div className="min-h-screen bg-[#141414]">
       {/* Cover Section */}
       <div className="relative h-[160px] sm:h-[240px] lg:h-[340px]">
         {/* Cover Image */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#121821] to-[#0b0f14]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b0f14]/70 to-[#0b0f14]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#121821] to-[#141414]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#141414]/70 to-[#141414]" />
 
         {/* Avatar */}
         <div className="absolute left-4 sm:left-8 lg:left-12 bottom-[-30px] z-10">
@@ -273,7 +273,7 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews 
                             sizes="(max-width: 640px) 50vw, 25vw"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14] flex items-center justify-center text-2xl">🎬</div>
+                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#141414] flex items-center justify-center text-2xl">🎬</div>
                         )}
                         <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
                           <h3 className="font-mono text-[12px] font-semibold text-white line-clamp-2 group-hover:text-[#ffb84d] transition-colors">{f.movie.title}</h3>
@@ -304,7 +304,7 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews 
                         {w.movie.poster ? (
                           shouldUseUnoptimized(w.movie.poster) ? <img src={getProxiedImageUrl(w.movie.poster)!} alt={w.movie.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" /> : <Image src={getProxiedImageUrl(w.movie.poster)!} alt={w.movie.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14] flex items-center justify-center text-2xl">🎬</div>
+                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#141414] flex items-center justify-center text-2xl">🎬</div>
                         )}
                         <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
                           <h3 className="font-mono text-[12px] font-semibold text-white line-clamp-2">{w.movie.title}</h3>
@@ -333,7 +333,7 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews 
                       <div key={review.id} className="bg-[#121821] rounded-2xl p-5 border border-white/[0.04] flex gap-4">
                         {/* Постер фильма */}
                         <Link href={`/movies/${review.movie.id}`} className="group flex-shrink-0">
-                          <div className="relative w-16 aspect-[2/3] rounded-xl overflow-hidden bg-[#0b0f14]">
+                          <div className="relative w-16 aspect-[2/3] rounded-xl overflow-hidden bg-[#141414]">
                             {review.movie.poster ? (
                               <ProxiedImage
                                 src={review.movie.poster}

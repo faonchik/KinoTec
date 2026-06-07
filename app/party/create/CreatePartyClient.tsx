@@ -70,7 +70,7 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0f14] pb-16 pt-8">
+    <div className="relative min-h-screen overflow-hidden bg-[#141414] pb-16 pt-8">
       <div
         className="pointer-events-none absolute inset-0 opacity-90"
         aria-hidden
@@ -96,11 +96,11 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Поиск по названию…"
-            className="mb-4 w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
+            className="mb-4 w-full rounded-xl border border-white/[0.1] bg-[#141414] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
           />
 
           {selectedMovie ? (
-            <div className="flex items-center gap-4 rounded-xl border border-white/[0.1] bg-[#0b0f14]/80 p-4">
+            <div className="flex items-center gap-4 rounded-xl border border-white/[0.1] bg-[#141414]/80 p-4">
               {selectedMovie.poster ? (
                 <Image
                   src={selectedMovie.poster}
@@ -162,7 +162,7 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
               value={partyName}
               onChange={(e) => setPartyName(e.target.value)}
               placeholder="Например: вечерний сеанс"
-              className="w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
+              className="w-full rounded-xl border border-white/[0.1] bg-[#141414] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
             />
           </div>
 
@@ -175,7 +175,7 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
                 className={`rounded-xl border-2 p-4 text-left transition-colors ${
                   isPublic
                     ? "border-emerald-500/50 bg-emerald-500/10"
-                    : "border-white/[0.08] bg-[#0b0f14]/60 hover:border-white/15"
+                    : "border-white/[0.08] bg-[#141414]/60 hover:border-white/15"
                 }`}
               >
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-400/90">Открытая</p>
@@ -189,7 +189,7 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
                 className={`rounded-xl border-2 p-4 text-left transition-colors ${
                   !isPublic
                     ? "border-red-500/50 bg-red-500/10"
-                    : "border-white/[0.08] bg-[#0b0f14]/60 hover:border-white/15"
+                    : "border-white/[0.08] bg-[#141414]/60 hover:border-white/15"
                 }`}
               >
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-red-300/90">Закрытая</p>
@@ -207,7 +207,7 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Задайте пароль"
-                className="w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#141414] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
               />
             </div>
           )}

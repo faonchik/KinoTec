@@ -46,7 +46,10 @@ export type HomeMovieForPreview = {
   avgRating?: number;
 };
 
-export function homeMovieToStreamingPreview(m: HomeMovieForPreview): StreamingPreviewMovie {
+export function homeMovieToStreamingPreview(
+  m: HomeMovieForPreview,
+  progressMap?: Map<string, number>
+): StreamingPreviewMovie {
   const ratings = m.ratings ?? [];
   const avgRating =
     typeof m.avgRating === "number"
@@ -56,11 +59,19 @@ export function homeMovieToStreamingPreview(m: HomeMovieForPreview): StreamingPr
         : 0;
   const genres = m.genres ?? [];
   const rd = m.releaseDate;
+
+  let description = m.description;
+  if (description?.includes("Вспомогательная карточка")) {
+    description = "Эксклюзивная будущая премьера на КиноТека.";
+  }
+
+  const actualProgress = progressMap?.get(m.id) ?? 0;
+
   return {
     id: m.id,
     title: m.title,
     originalTitle: m.originalTitle,
-    description: m.description,
+    description: description,
     poster: m.poster,
     backdrop: m.backdrop,
     trailer: m.trailer,
@@ -71,7 +82,7 @@ export function homeMovieToStreamingPreview(m: HomeMovieForPreview): StreamingPr
     genreNames: genres.map((g) => g.genre.name),
     genreSlugs: genres.map((g) => g.genre.slug),
     avgRating,
-    demoProgress: demoProgressFromId(m.id),
+    demoProgress: actualProgress,
   };
 }
 

@@ -68,15 +68,16 @@ export function KinoboxPlayer({
     container.innerHTML = "";
 
     const scriptId = `kinobox-script-${rootId}`;
-    const existingSame = document.getElementById(scriptId);
-    if (existingSame) existingSame.remove();
     const existingLegacy = document.getElementById("kinobox-script");
     if (existingLegacy) existingLegacy.remove();
 
-    const script = document.createElement("script");
-    script.id = scriptId;
-    script.src = "https://kinobox.tv/kinobox.min.js";
-    script.async = true;
+    const mirrors = [
+      "https://kinobox.in/kinobox.min.js",
+      "https://kinobox.net/kinobox.min.js",
+      "https://kinobox.cc/kinobox.min.js",
+      "https://kinobox.tv/kinobox.min.js"
+    ];
+    let mirrorIndex = 0;
 
     const hideLoader = () => {
       if (!cancelled) setIsLoading(false);
@@ -125,33 +126,54 @@ export function KinoboxPlayer({
       }, probeMs);
     };
 
-    script.onload = () => {
-      hideLoader();
-      window.requestAnimationFrame(() => {
-        window.setTimeout(() => {
-          if (cancelled) return;
-          if (!document.getElementById(rootId)) {
-            onFallbackRef.current?.();
-            return;
-          }
-          runKinoboxInit();
-        }, 50);
-      });
-    };
-    script.onerror = () => {
-      hideLoader();
-      if (!cancelled) onFallbackRef.current?.();
+    const loadScript = () => {
+      if (cancelled) return;
+
+      const existingSame = document.getElementById(scriptId);
+      if (existingSame) existingSame.remove();
+
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = mirrors[mirrorIndex];
+      script.async = true;
+
+      script.onload = () => {
+        hideLoader();
+        window.requestAnimationFrame(() => {
+          window.setTimeout(() => {
+            if (cancelled) return;
+            if (!document.getElementById(rootId)) {
+              onFallbackRef.current?.();
+              return;
+            }
+            runKinoboxInit();
+          }, 50);
+        });
+      };
+
+      script.onerror = () => {
+        console.warn(`Kinobox mirror load failed: ${mirrors[mirrorIndex]}`);
+        mirrorIndex++;
+        if (mirrorIndex < mirrors.length) {
+          loadScript();
+        } else {
+          hideLoader();
+          if (!cancelled) onFallbackRef.current?.();
+        }
+      };
+
+      document.head.appendChild(script);
     };
 
     const fallback = window.setTimeout(hideLoader, 14_000);
-
-    document.head.appendChild(script);
+    loadScript();
 
     return () => {
       cancelled = true;
       window.clearTimeout(fallback);
       if (probeId !== undefined) window.clearTimeout(probeId);
-      script.remove();
+      const s = document.getElementById(scriptId);
+      if (s) s.remove();
       container.innerHTML = "";
     };
   }, [kinopoiskId, imdbId, tmdbId, title, year]);

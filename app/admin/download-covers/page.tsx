@@ -112,7 +112,7 @@ export default function DownloadCoversPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f14] p-12">
+    <div className="min-h-screen bg-[#141414] p-12">
       <h1 className="font-oswald text-3xl font-bold text-white mb-2">📥 Скачивание обложек</h1>
       <p className="font-mono text-[11px] text-white/35 mb-4">Используется прокси images.weserv.nl для обхода блокировки TMDB</p>
       <p className="font-mono text-[13px] text-white/45 mb-6">{status}</p>

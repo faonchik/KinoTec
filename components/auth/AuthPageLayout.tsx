@@ -8,7 +8,7 @@ import type { Locale } from "@/i18n/config";
 
 /** Поля ввода в стиле портала */
 export const authInputClass =
-  "w-full rounded-xl border border-white/[0.12] bg-[#0b0f14]/90 px-5 py-3.5 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] placeholder:text-white/35 outline-none transition focus:border-[#ffb84d]/55 focus:ring-2 focus:ring-[#ffb84d]/18 disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-xl border border-white/[0.12] bg-[#141414]/90 px-5 py-3.5 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] placeholder:text-white/35 outline-none transition focus:border-[#ffb84d]/55 focus:ring-2 focus:ring-[#ffb84d]/18 disabled:cursor-not-allowed disabled:opacity-50";
 
 export const authLabelTextClass =
   "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white/45";
@@ -16,7 +16,7 @@ export const authLabelTextClass =
 export const authLabelClass = `mb-2.5 block ${authLabelTextClass}`;
 
 export const authPrimaryButtonClass =
-  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-5 py-4 font-mono text-sm font-semibold text-[#0b0f14] transition hover:bg-[#ffc56a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb84d] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121821] disabled:pointer-events-none disabled:opacity-45";
+  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-5 py-4 font-mono text-sm font-semibold text-[#141414] transition hover:bg-[#ffc56a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb84d] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121821] disabled:pointer-events-none disabled:opacity-45";
 
 export const authGhostButtonClass =
   "inline-flex w-full items-center justify-center rounded-xl border border-white/[0.14] bg-white/[0.04] px-5 py-4 font-mono text-sm font-medium text-white/85 transition hover:border-[#ffb84d]/35 hover:bg-white/[0.07] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb84d]/30";
@@ -55,7 +55,7 @@ export function AuthPageLayout({
 
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center justify-center px-5 py-10 sm:px-8 sm:py-14">
-      <div className="pointer-events-none absolute inset-0 bg-[#0b0f14]" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-[#141414]" aria-hidden />
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_110%_70%_at_50%_-25%,rgba(255,184,77,0.14),transparent_52%),radial-gradient(ellipse_50%_45%_at_100%_0%,rgba(18,24,33,0.85),transparent)]"
         aria-hidden

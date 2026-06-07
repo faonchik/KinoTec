@@ -51,7 +51,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
   const { actors, total, totalPages } = await getActors(page, params.q);
 
   return (
-    <div className="min-h-screen bg-[#0b0f14]">
+    <div className="min-h-screen bg-[#141414]">
       {/* Divider */}
       <div className="h-px bg-white/[0.08]" />
 
@@ -113,7 +113,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
                     <Image src={url!} alt={actor.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                   );
                 })() : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14] flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#141414] flex items-center justify-center">
                     <svg className="w-16 h-16 text-[#3A4560]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>

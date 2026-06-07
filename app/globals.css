@@ -635,16 +635,16 @@ html.theme-chameleon {
 }
 
 /* Применение темы к градиентам */
-.theme-dark .bg-gradient-to-r,
-.theme-light .bg-gradient-to-r,
-.theme-midnight .bg-gradient-to-r,
-.theme-forest .bg-gradient-to-r,
-.theme-amethyst .bg-gradient-to-r,
-.theme-retro .bg-gradient-to-r,
-.theme-noir .bg-gradient-to-r,
-.theme-cyberpunk .bg-gradient-to-r,
-.theme-hollywood .bg-gradient-to-r,
-.theme-space .bg-gradient-to-r,
-.theme-chameleon .bg-gradient-to-r {
+.theme-dark .theme-gradient-accent,
+.theme-light .theme-gradient-accent,
+.theme-midnight .theme-gradient-accent,
+.theme-forest .theme-gradient-accent,
+.theme-amethyst .theme-gradient-accent,
+.theme-retro .theme-gradient-accent,
+.theme-noir .theme-gradient-accent,
+.theme-cyberpunk .theme-gradient-accent,
+.theme-hollywood .theme-gradient-accent,
+.theme-space .theme-gradient-accent,
+.theme-chameleon .theme-gradient-accent {
   background: linear-gradient(to right, var(--accent), var(--accent-hover)) !important;
 }

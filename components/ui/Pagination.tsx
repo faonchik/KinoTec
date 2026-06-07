@@ -68,7 +68,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
             href={getPageUrl(page)}
             className={`min-w-[36px] h-9 flex items-center justify-center rounded-lg font-mono text-[13px] font-medium transition-colors ${
               page === currentPage
-                ? "bg-[#ffb84d] text-[#0b0f14]"
+                ? "bg-[#ffb84d] text-[#141414]"
                 : "text-white/45 hover:text-white hover:bg-white/[0.08]"
             }`}
           >

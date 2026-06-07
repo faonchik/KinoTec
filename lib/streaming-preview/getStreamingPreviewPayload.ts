@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getTranslations } from "next-intl/server";
+import prisma from "@/lib/prisma";
 import {
   getPopularMovies,
   getLatestMovies,
@@ -15,23 +16,23 @@ import {
 import { buildPayloadFromPool, padRowWithDemoMovies } from "@/lib/streaming-preview/fallbackMovies";
 import type { StreamingPreviewMovie, StreamingPreviewPayload } from "@/components/streaming-preview/types";
 
-function mapHomeToPreview(arr: unknown[]): StreamingPreviewMovie[] {
-  if (!Array.isArray(arr)) return [];
-  return arr.map((m) => homeMovieToStreamingPreview(m as HomeMovieForPreview));
-}
-
-function pickHero(...lists: StreamingPreviewMovie[][]): StreamingPreviewMovie | null {
-  for (const list of lists) {
-    const withVisual = list.find((m) => m.backdrop || m.poster);
-    if (withVisual) return withVisual;
-    if (list[0]) return list[0];
-  }
-  return null;
-}
-
 export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayload> {
   const t = await getTranslations("home");
   const session = await getServerSession(authOptions);
+
+  // Fetch watch history progress for all displayed movies if user is logged in
+  const watchHistories = session?.user?.id
+    ? await prisma.watchHistory.findMany({
+        where: { userId: session.user.id },
+      })
+    : [];
+  const progressMap = new Map<string, number>();
+  watchHistories.forEach((wh) => progressMap.set(wh.movieId, wh.progress));
+
+  function mapHomeToPreview(arr: unknown[]): StreamingPreviewMovie[] {
+    if (!Array.isArray(arr)) return [];
+    return arr.map((m) => homeMovieToStreamingPreview(m as HomeMovieForPreview, progressMap));
+  }
 
   const [popularRaw, latestRaw, topRaw, personalRaw] = await Promise.all([
     getPopularMovies(),
@@ -89,7 +90,51 @@ export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayl
     movies: padRowWithDemoMovies(latestMapped, 5),
   });
 
-  const hero = pickHero(popularMapped, latestMapped, topMapped, personalMapped);
+  // Hero selection logic:
+  // 1. If user has watch history, use the last watched movie with actual progress.
+  // 2. Otherwise, use the newest premiere (released or upcoming).
+  let hero: StreamingPreviewMovie | null = null;
+
+  if (session?.user?.id) {
+    const lastWatch = await prisma.watchHistory.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { lastWatched: "desc" },
+      include: {
+        movie: {
+          include: {
+            genres: { include: { genre: true } },
+            ratings: true,
+          },
+        },
+      },
+    });
+
+    if (lastWatch && lastWatch.movie) {
+      hero = homeMovieToStreamingPreview(lastWatch.movie as unknown as HomeMovieForPreview, progressMap);
+      hero.demoProgress = lastWatch.progress;
+    }
+  }
+
+  if (!hero) {
+    const newestPremiere = await prisma.movie.findFirst({
+      where: {
+        releaseDate: { not: null },
+      },
+      orderBy: {
+        releaseDate: "desc",
+      },
+      include: {
+        genres: { include: { genre: true } },
+        ratings: true,
+      },
+    });
+
+    if (newestPremiere) {
+      hero = homeMovieToStreamingPreview(newestPremiere as unknown as HomeMovieForPreview, progressMap);
+      hero.demoProgress = 0; // Pre-premiere has no watch progress
+    }
+  }
+
   const fallback = buildPayloadFromPool(pool);
 
   return {
