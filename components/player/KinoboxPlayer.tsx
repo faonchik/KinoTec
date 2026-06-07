@@ -72,10 +72,10 @@ export function KinoboxPlayer({
     if (existingLegacy) existingLegacy.remove();
 
     const mirrors = [
-      "https://kinobox.in/kinobox.min.js",
-      "https://kinobox.net/kinobox.min.js",
+      "https://kinobox.tv/kinobox.min.js",
       "https://kinobox.cc/kinobox.min.js",
-      "https://kinobox.tv/kinobox.min.js"
+      "https://kinobox.in/kinobox.min.js",
+      "https://kinobox.net/kinobox.min.js"
     ];
     let mirrorIndex = 0;
 

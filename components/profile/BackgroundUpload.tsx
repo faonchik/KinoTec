@@ -8,6 +8,14 @@ interface BackgroundUploadProps {
   onBackgroundChange?: (background: string | null) => void;
 }
 
+const PRESET_BACKGROUNDS = [
+  { key: "neon-cinema", label: "Неон", url: "/backdrops/neon-cinema.png" },
+  { key: "space-nebula", label: "Космос", url: "/backdrops/space-nebula.png" },
+  { key: "retro-film", label: "Ретро", url: "/backdrops/retro-film.png" },
+  { key: "cyber-city", label: "Киберпанк", url: "/backdrops/cyber-city.png" },
+  { key: "gold-stage", label: "Сцена", url: "/backdrops/gold-stage.png" },
+];
+
 export function BackgroundUpload({
   currentBackground,
   onBackgroundChange,
@@ -16,6 +24,39 @@ export function BackgroundUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSelectPreset = async (url: string) => {
+    setIsUploading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/user/background", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ background: url }),
+      });
+      const contentType = res.headers.get("content-type");
+      if (!res.ok) {
+        if (contentType && contentType.includes("application/json")) {
+          const data = await res.json();
+          setError(data.error || "Ошибка при выборе фона");
+        } else {
+          setError("Ошибка при выборе фона");
+        }
+      } else {
+        if (contentType && contentType.includes("application/json")) {
+          const data = await res.json();
+          setBackground(data.background);
+          onBackgroundChange?.(data.background);
+          window.dispatchEvent(new CustomEvent("backgroundUpdated", { detail: { background: data.background } }));
+          setError("");
+        }
+      }
+    } catch {
+      setError("Ошибка при обновлении фона");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -186,8 +227,46 @@ export function BackgroundUpload({
       {error && (
         <p className="mt-2 text-sm text-red-400">{error}</p>
       )}
+
+      {/* Предустановленные фоны */}
+      <div className="mt-4">
+        <p className="text-xs font-mono text-white/50 mb-2">Готовые фоны:</p>
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isUploading}
+            className={`px-3 py-2 rounded-xl text-[11px] font-mono border transition-all ${
+              !background
+                ? "bg-[#ffb84d] text-black border-transparent font-bold"
+                : "bg-white/[0.05] border-white/10 text-white/75 hover:bg-white/[0.08]"
+            }`}
+          >
+            🌑 Дефолтный серый
+          </button>
+          {PRESET_BACKGROUNDS.map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              onClick={() => void handleSelectPreset(preset.url)}
+              disabled={isUploading}
+              className={`px-3 py-2 rounded-xl text-[11px] font-mono border transition-all flex items-center gap-1.5 ${
+                background === preset.url
+                  ? "bg-[#ffb84d] text-black border-transparent font-bold shadow-md"
+                  : "bg-white/[0.05] border-white/10 text-white/75 hover:bg-white/[0.08]"
+              }`}
+            >
+              <div
+                className="w-4 h-3.5 rounded bg-cover bg-center border border-white/20"
+                style={{ backgroundImage: `url(${preset.url})` }}
+              />
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
       
-      <p className="mt-2 font-mono text-[11px] text-white/35">
+      <p className="mt-3 font-mono text-[11px] text-white/35">
         Рекомендуемый размер: 1920x340 пикселей. Максимальный размер файла: 6MB.
       </p>
     </div>
