@@ -57,4 +57,4 @@ ENV HOSTNAME "0.0.0.0"
 # Увеличиваем лимит размера заголовков для предотвращения HTTP 431 (64KB)
 ENV NODE_OPTIONS="--max-http-header-size=65536"
 
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]
