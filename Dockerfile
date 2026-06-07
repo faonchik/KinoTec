@@ -15,6 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV NEXTJS_DOCKER_BUILD=true
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
 # Сборка Next (без migrate deploy — в build нет доступа к БД)
 RUN for i in 1 2 3; do \
