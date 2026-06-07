@@ -142,10 +142,10 @@ export function HeaderSearch() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="header-search-title"
-              className="fixed left-1/2 top-[max(5rem,10vh)] z-[1002] w-[min(94vw,560px)] -translate-x-1/2 overflow-hidden rounded-xl border border-white/[0.1] bg-[#181818] shadow-[0_24px_80px_rgba(0,0,0,0.65)]"
-              initial={{ opacity: 0, y: -12, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.99 }}
+              className="fixed left-1/2 top-[max(5rem,10vh)] z-[1002] w-[min(94vw,560px)] overflow-hidden rounded-xl border border-white/[0.1] bg-[#181818] shadow-[0_24px_80px_rgba(0,0,0,0.65)]"
+              initial={{ opacity: 0, y: -12, scale: 0.98, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+              exit={{ opacity: 0, y: -8, scale: 0.99, x: "-50%" }}
               transition={{ type: "spring", stiffness: 420, damping: 32 }}
             >
               <h2 id="header-search-title" className="sr-only">
