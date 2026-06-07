@@ -40,9 +40,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # Копируем Prisma для миграций
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-# CLI и движки для `prisma migrate deploy` при старте (в build нет DATABASE_URL / БД)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# Устанавливаем Prisma CLI и его зависимости в рантайм-образ для выполнения миграций при старте
+RUN npm install prisma@6.17.0 --omit=dev --no-save && \
+    chown -R nextjs:nodejs ./node_modules
 
 RUN mkdir -p /tmp/.npm && chown nextjs:nodejs /tmp/.npm
 
@@ -57,4 +57,4 @@ ENV HOSTNAME "0.0.0.0"
 # Увеличиваем лимит размера заголовков для предотвращения HTTP 431 (64KB)
 ENV NODE_OPTIONS="--max-http-header-size=65536"
 
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]
