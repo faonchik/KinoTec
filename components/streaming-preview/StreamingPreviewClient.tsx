@@ -143,7 +143,7 @@ export function StreamingPreviewClient({ data }: { data: StreamingPreviewPayload
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex items-center gap-3 rounded-xl px-2 py-3 text-white/55 transition hover:bg-white/[0.06] hover:text-white lg:px-3"
+                className="group flex items-center justify-center lg:justify-start gap-3 rounded-xl px-2 py-3 text-white/55 transition hover:bg-white/[0.06] hover:text-white lg:px-3"
               >
                 <item.icon className="h-5 w-5 shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="hidden text-sm font-medium lg:inline">{item.label}</span>

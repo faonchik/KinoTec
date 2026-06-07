@@ -132,7 +132,7 @@ export function CinematicSidebar() {
             <Link
               key={href}
               href={href}
-              className={`group flex items-center gap-3 rounded-xl px-2 py-2.5 transition lg:px-3 ${
+              className={`group flex items-center justify-center lg:justify-start gap-3 rounded-xl px-2 py-2.5 transition lg:px-3 ${
                 on ? "bg-white/[0.12] text-white" : "text-white/72 hover:bg-white/[0.08] hover:text-white"
               }`}
               title={label}
