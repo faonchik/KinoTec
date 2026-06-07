@@ -41,7 +41,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 # Устанавливаем Prisma CLI и его зависимости в рантайм-образ для выполнения миграций при старте
-RUN npm install prisma@6.17.0 --omit=dev --no-save && \
+RUN npm install prisma@6.17.0 --omit=dev --no-save --legacy-peer-deps && \
     chown -R nextjs:nodejs ./node_modules
 
 RUN mkdir -p /tmp/.npm && chown nextjs:nodejs /tmp/.npm
