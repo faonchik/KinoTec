@@ -37,6 +37,7 @@ export function validateMassOperation<T>(
 }
 
 // Защита от mass assignment
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function sanitizeObject<T extends Record<string, any>>(
   obj: T,
   allowedFields: (keyof T)[]
@@ -65,7 +66,7 @@ const PROTECTED_FIELDS = [
 ];
 
 export function detectProtectedFieldAccess(
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   request?: Request
 ): string[] {
   const violations: string[] = [];

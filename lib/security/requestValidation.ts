@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Валидация размеров запросов и защита от DoS
 
 import { logSecurityEvent } from "./logger";
@@ -80,7 +81,7 @@ export function validateArraySize<T>(
 }
 
 // Проверка на подозрительные паттерны в данных
-export function detectSuspiciousPatterns(data: Record<string, unknown>): string[] {
+export function detectSuspiciousPatterns(data: any): string[] {
   const warnings: string[] = [];
 
   // Проверка на слишком много специальных символов

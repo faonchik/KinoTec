@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { SearchBar } from "./components/SearchBar";
 import { SearchFilters } from "./components/SearchFilters";
 import { SearchResults } from "./components/SearchResults";
@@ -30,6 +31,7 @@ interface SearchClientProps {
 }
 
 export function SearchClient({ genres, years, countries }: SearchClientProps) {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +43,14 @@ export function SearchClient({ genres, years, countries }: SearchClientProps) {
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [minRating, setMinRating] = useState<number>(0);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const urlQuerySeeded = useRef(false);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (urlQuerySeeded.current || !q?.trim()) return;
+    urlQuerySeeded.current = true;
+    setQuery(q);
+  }, [searchParams]);
 
   const performSearch = useCallback(async (searchQuery: string = query) => {
     if (!searchQuery.trim()) {
@@ -125,7 +135,7 @@ export function SearchClient({ genres, years, countries }: SearchClientProps) {
     <div className="min-h-screen bg-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">🔍 Поиск</h1>
+          <h1 className="mb-2 text-4xl font-bold text-white">Поиск</h1>
           <p className="text-slate-400">Найдите фильмы, актёров и режиссёров</p>
         </div>
 
@@ -185,10 +195,9 @@ export function SearchClient({ genres, years, countries }: SearchClientProps) {
         <SearchResults results={results} />
 
         {query && !isLoading && results.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
-            <p className="text-slate-400 text-lg">Ничего не найдено</p>
-            <p className="text-slate-500 text-sm mt-2">Попробуйте изменить запрос</p>
+          <div className="py-12 text-center">
+            <p className="text-lg text-slate-400">Ничего не найдено</p>
+            <p className="mt-2 text-sm text-slate-500">Попробуйте изменить запрос</p>
           </div>
         )}
 

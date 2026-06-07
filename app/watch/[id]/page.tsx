@@ -2,15 +2,23 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
+import { getTranslations } from "next-intl/server";
+import { cache } from "react";
 import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 import { Badge } from "@/components/ui/Badge";
-import { KinoboxPlayer } from "@/components/player/KinoboxPlayer";
+import { WatchExperienceClient } from "@/components/player/WatchExperienceClient";
+import { resolveMovieWatchEmbed } from "@/lib/player/resolveWatchEmbed";
+import { usesExplicitMovieEmbedTemplate } from "@/lib/player/embedUrl";
+import { getPlayableMoviesForWatchStrip } from "@/lib/movies/playableForWatch";
+import { isUsableDirectVideoUrlForNativePlayer } from "@/lib/player/directVideoUrl";
 
 interface WatchPageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getMovie(id: string) {
+const getMovie = cache(async (id: string) => {
   const movie = await prisma.movie.findUnique({
     where: { id },
     include: {
@@ -26,7 +34,7 @@ async function getMovie(id: string) {
 
   if (!movie) notFound();
   return movie;
-}
+});
 
 async function getRecommendations(movieId: string, genreIds: string[]) {
   return await prisma.movie.findMany({
@@ -60,26 +68,80 @@ export async function generateMetadata({ params }: WatchPageProps): Promise<Meta
 export default async function WatchPage({ params }: WatchPageProps) {
   const { id } = await params;
   const movie = await getMovie(id);
-  
+
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+
+  let initialProgress = 0;
+  if (userId) {
+    const wh = await prisma.watchHistory.findUnique({
+      where: { userId_movieId: { userId, movieId: id } },
+    });
+    initialProgress = wh?.progress ?? 0;
+  }
+
+  const { embedSrc, usedTmdbSearch, tmdbResolved } = await resolveMovieWatchEmbed({
+    tmdbId: movie.tmdbId,
+    kinopoiskId: movie.kinopoiskId,
+    title: movie.title,
+    originalTitle: movie.originalTitle,
+    releaseDate: movie.releaseDate,
+  });
+
+  const playerTmdbId = tmdbResolved ?? null;
+  const forceIframeEmbed = usesExplicitMovieEmbedTemplate({
+    tmdbId: playerTmdbId ?? movie.tmdbId,
+    kinopoiskId: movie.kinopoiskId,
+  });
+
   const genreIds = movie.genres.map((g) => g.genreId);
-  const recommendations = await getRecommendations(id, genreIds);
+  const [recommendations, availableFilms, tWatch] = await Promise.all([
+    getRecommendations(id, genreIds),
+    getPlayableMoviesForWatchStrip(id, 18),
+    getTranslations("watchPage"),
+  ]);
 
   const avgRating = movie.ratings.length
     ? (movie.ratings.reduce((acc, r) => acc + r.value, 0) / movie.ratings.length).toFixed(1)
     : null;
 
   const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : null;
+  const hasDirectFile = isUsableDirectVideoUrlForNativePlayer(movie.videoUrl);
+  const hasPlayback =
+    hasDirectFile ||
+    Boolean(embedSrc) ||
+    Boolean(playerTmdbId?.trim()) ||
+    Boolean(movie.kinopoiskId?.trim());
 
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Плеер */}
       <div className="w-full bg-black">
-        <div className="max-w-[1400px] mx-auto">
-          <KinoboxPlayer
-            title={movie.originalTitle || movie.title}
-            year={year || undefined}
-            className="w-full"
+        <div className="mx-auto max-w-[1400px]">
+          <WatchExperienceClient
+            movieId={movie.id}
+            title={movie.title}
+            videoUrl={movie.videoUrl}
+            embedSrc={embedSrc}
+            playerTmdbId={playerTmdbId}
+            playerKinopoiskId={movie.kinopoiskId}
+            forceIframeEmbed={forceIframeEmbed}
+            releaseYear={year}
+            poster={movie.poster}
+            backdrop={movie.backdrop}
+            initialProgress={initialProgress}
+            isAuthenticated={Boolean(userId)}
+            runtimeMinutes={movie.runtime}
+            availableFilms={availableFilms}
+            availableFilmsTitle={tWatch("availableFilms")}
           />
+          {!hasPlayback && (
+            <p className="px-4 py-3 text-center text-sm text-white/50">
+              Не удалось подобрать онлайн-плеер
+              {usedTmdbSearch ? " (поиск TMDB не дал подходящего id)." : "."} Укажите tmdbId или Kinopoisk id в карточке
+              фильма либо настройте переменные окружения плеера в документации проекта.
+            </p>
+          )}
         </div>
       </div>
 
@@ -210,7 +272,9 @@ export default async function WatchPage({ params }: WatchPageProps) {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xl">🎬</div>
+                        <div className="flex h-full w-full items-center justify-center font-mono text-[10px] text-slate-500">
+                          КТ
+                        </div>
                       )}
                       
                       {/* Play icon on hover */}

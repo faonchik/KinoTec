@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { validateMassOperation } from "@/lib/security/massOperation";
-import { logSecurityEvent } from "@/lib/security/logger";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);

@@ -15,6 +15,16 @@ interface CreatePartyClientProps {
   movies: Movie[];
 }
 
+function PosterPlaceholder({ className }: { className?: string }) {
+  return (
+    <div
+      className={`flex items-center justify-center rounded bg-zinc-800 text-[10px] font-mono uppercase tracking-wider text-zinc-500 ${className ?? ""}`}
+    >
+      Нет постера
+    </div>
+  );
+}
+
 export function CreatePartyClient({ movies }: CreatePartyClientProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,58 +70,69 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">🎉 Watch Party</h1>
-          <p className="text-slate-400">Смотрите фильмы вместе с друзьями</p>
+    <div className="relative min-h-screen overflow-hidden bg-[#0b0f14] pb-16 pt-8">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-90"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(229,9,20,0.12), transparent 50%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-2xl px-4">
+        <div className="mb-10 text-center">
+          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-red-400/80">
+            Новая комната
+          </p>
+          <h1 className="font-oswald text-3xl font-bold tracking-tight text-white sm:text-4xl">Совместный просмотр</h1>
+          <p className="mt-3 text-sm text-white/45">Выберите фильм и настройте доступ. Код комнаты появится после создания.</p>
         </div>
 
-        {/* Выбор фильма */}
-        <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-          <h2 className="text-xl font-bold text-white mb-4">Выберите фильм</h2>
+        <div className="mb-6 rounded-2xl border border-white/[0.08] bg-[#121821]/80 p-6 shadow-xl shadow-black/30">
+          <h2 className="mb-4 font-oswald text-xl font-semibold text-white">Фильм</h2>
 
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Поиск фильма..."
-            className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 mb-4"
+            placeholder="Поиск по названию…"
+            className="mb-4 w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
           />
 
           {selectedMovie ? (
-            <div className="flex items-center gap-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+            <div className="flex items-center gap-4 rounded-xl border border-white/[0.1] bg-[#0b0f14]/80 p-4">
               {selectedMovie.poster ? (
                 <Image
                   src={selectedMovie.poster}
                   alt={selectedMovie.title}
                   width={60}
                   height={90}
-                  className="rounded"
+                  className="rounded-lg object-cover"
                 />
               ) : (
-                <div className="w-15 h-22 bg-slate-700 rounded flex items-center justify-center text-2xl">
-                  🎬
-                </div>
+                <PosterPlaceholder className="h-[90px] w-[60px] shrink-0" />
               )}
-              <div className="flex-1">
-                <p className="text-white font-semibold">{selectedMovie.title}</p>
-                <p className="text-amber-400 text-sm">Выбран для просмотра</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-white">{selectedMovie.title}</p>
+                <p className="mt-1 font-mono text-xs text-red-300/80">Выбран</p>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedMovie(null)}
-                className="text-slate-400 hover:text-white"
+                className="shrink-0 rounded-lg px-2 py-1 text-sm text-white/40 transition hover:bg-white/10 hover:text-white"
+                aria-label="Снять выбор"
               >
-                ✕
+                ×
               </button>
             </div>
           ) : (
-            <div className="max-h-64 overflow-y-auto space-y-2">
+            <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
               {filteredMovies.slice(0, 20).map((movie) => (
                 <button
                   key={movie.id}
+                  type="button"
                   onClick={() => setSelectedMovie(movie)}
-                  className="w-full flex items-center gap-3 p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors text-left"
+                  className="flex w-full items-center gap-3 rounded-xl border border-transparent bg-white/[0.03] p-3 text-left transition hover:border-white/[0.08] hover:bg-white/[0.06]"
                 >
                   {movie.poster ? (
                     <Image
@@ -119,125 +140,113 @@ export function CreatePartyClient({ movies }: CreatePartyClientProps) {
                       alt={movie.title}
                       width={40}
                       height={60}
-                      className="rounded"
+                      className="rounded object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-15 bg-slate-600 rounded flex items-center justify-center">
-                      🎬
-                    </div>
+                    <PosterPlaceholder className="h-[60px] w-10 shrink-0" />
                   )}
-                  <span className="text-white">{movie.title}</span>
+                  <span className="truncate text-sm text-white/90">{movie.title}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* Настройки комнаты */}
-        <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-          <h2 className="text-xl font-bold text-white mb-4">Настройки комнаты</h2>
+        <div className="mb-6 rounded-2xl border border-white/[0.08] bg-[#121821]/80 p-6 shadow-xl shadow-black/30">
+          <h2 className="mb-4 font-oswald text-xl font-semibold text-white">Параметры</h2>
 
-          {/* Название */}
           <div className="mb-4">
-            <label className="block text-slate-300 mb-2">Название (опционально)</label>
+            <label className="mb-2 block text-sm text-white/55">Название (необязательно)</label>
             <input
               type="text"
               value={partyName}
               onChange={(e) => setPartyName(e.target.value)}
-              placeholder="Например: Вечерний киносеанс"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+              placeholder="Например: вечерний сеанс"
+              className="w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
             />
           </div>
 
-          {/* Тип комнаты */}
           <div className="mb-4">
-            <label className="block text-slate-300 mb-2">Тип комнаты</label>
+            <label className="mb-2 block text-sm text-white/55">Доступ</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setIsPublic(true)}
-                className={`p-4 rounded-xl border-2 transition-colors ${
+                className={`rounded-xl border-2 p-4 text-left transition-colors ${
                   isPublic
-                    ? "border-green-500 bg-green-500/10"
-                    : "border-slate-600 bg-slate-700/50 hover:border-slate-500"
+                    ? "border-emerald-500/50 bg-emerald-500/10"
+                    : "border-white/[0.08] bg-[#0b0f14]/60 hover:border-white/15"
                 }`}
               >
-                <div className="text-2xl mb-1">🔓</div>
-                <div className="text-white font-medium">Открытая</div>
-                <p className="text-slate-400 text-xs">Любой может войти</p>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-400/90">Открытая</p>
+                <p className="mt-1 text-sm font-medium text-white">Без пароля</p>
+                <p className="mt-1 text-xs text-white/40">Вход по коду из списка</p>
               </button>
 
               <button
                 type="button"
                 onClick={() => setIsPublic(false)}
-                className={`p-4 rounded-xl border-2 transition-colors ${
+                className={`rounded-xl border-2 p-4 text-left transition-colors ${
                   !isPublic
-                    ? "border-red-500 bg-red-500/10"
-                    : "border-slate-600 bg-slate-700/50 hover:border-slate-500"
+                    ? "border-red-500/50 bg-red-500/10"
+                    : "border-white/[0.08] bg-[#0b0f14]/60 hover:border-white/15"
                 }`}
               >
-                <div className="text-2xl mb-1">🔒</div>
-                <div className="text-white font-medium">Закрытая</div>
-                <p className="text-slate-400 text-xs">Нужен пароль</p>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-red-300/90">Закрытая</p>
+                <p className="mt-1 text-sm font-medium text-white">С паролем</p>
+                <p className="mt-1 text-xs text-white/40">Только с паролем</p>
               </button>
             </div>
           </div>
 
-          {/* Пароль */}
           {!isPublic && (
             <div className="mb-4">
-              <label className="block text-slate-300 mb-2">Пароль комнаты</label>
+              <label className="mb-2 block text-sm text-white/55">Пароль</label>
               <input
                 type="text"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Введите пароль"
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+                placeholder="Задайте пароль"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#0b0f14] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-red-500/40 focus:outline-none focus:ring-1 focus:ring-red-500/20"
               />
             </div>
           )}
 
-          {/* Максимум участников */}
           <div>
-            <label className="block text-slate-300 mb-2">
-              Максимум участников: {maxUsers}
-            </label>
+            <label className="mb-2 block text-sm text-white/55">Максимум зрителей: {maxUsers}</label>
             <input
               type="range"
-              min="2"
-              max="50"
+              min={2}
+              max={50}
               value={maxUsers}
-              onChange={(e) => setMaxUsers(parseInt(e.target.value))}
-              className="w-full accent-amber-500"
+              onChange={(e) => setMaxUsers(parseInt(e.target.value, 10))}
+              className="w-full accent-[#e50914]"
             />
-            <div className="flex justify-between text-slate-500 text-sm">
+            <div className="flex justify-between text-xs text-white/35">
               <span>2</span>
               <span>50</span>
             </div>
           </div>
         </div>
 
-        {/* Кнопка создания */}
         <Button
           onClick={handleCreate}
           disabled={!selectedMovie || isCreating || (!isPublic && !password)}
-          className="w-full py-4 text-lg"
+          className="w-full py-4 text-base font-semibold"
         >
-          {isCreating ? "Создание..." : "🎉 Создать Watch Party"}
+          {isCreating ? "Создание…" : "Создать комнату"}
         </Button>
 
-        {/* Инструкция */}
-        <div className="mt-8 p-6 bg-slate-800/30 rounded-xl border border-slate-700/30">
-          <h3 className="text-lg font-semibold text-white mb-3">Как это работает?</h3>
-          <ol className="space-y-2 text-slate-400">
-            <li>1. Выберите фильм для просмотра</li>
-            <li>2. Создайте Watch Party и получите уникальный код</li>
-            <li>3. Поделитесь кодом с друзьями</li>
-            <li>4. Смотрите синхронно и общайтесь в чате!</li>
+        <div className="mt-8 rounded-2xl border border-white/[0.06] bg-[#121821]/40 p-6">
+          <h3 className="font-oswald text-lg font-semibold text-white">Как это работает</h3>
+          <ol className="mt-3 space-y-2 text-sm text-white/45">
+            <li>1. Выберите фильм.</li>
+            <li>2. Создайте комнату и получите код.</li>
+            <li>3. Отправьте код друзьям.</li>
+            <li>4. Смотрите синхронно и пишите в чате комнаты.</li>
           </ol>
         </div>
       </div>
     </div>
   );
 }
-

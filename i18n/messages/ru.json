@@ -26,7 +26,14 @@
     "minutesAgo": "{minutes} мин назад",
     "duration": "Длительность",
     "durationMinutes": "Длительность (мин)",
-    "selectLanguage": "Выбор языка"
+    "selectLanguage": "Выбор языка",
+    "searchMinHint": "Введите минимум 2 символа",
+    "searching": "Поиск…",
+    "searchNoResults": "Ничего не найдено",
+    "searchAdvanced": "Расширенный поиск",
+    "typeMovie": "Фильм",
+    "typeActor": "Актёр",
+    "typeDirector": "Режиссёр"
   },
   "nav": {
     "home": "Главная",
@@ -35,7 +42,6 @@
     "actors": "Актёры",
     "directors": "Режиссёры",
     "collections": "Подборки",
-    "challenges": "Челленджи",
     "calendar": "Премьеры",
     "watchParty": "Смотреть вместе",
     "blog": "Блог",
@@ -67,7 +73,10 @@
     "signUp": "Зарегистрироваться",
     "viewCatalog": "Смотреть каталог",
     "readMore": "Подробнее",
+    "play": "Смотреть",
     "addToFavorites": "В избранное",
+    "emptyCatalogTitle": "Каталог пока пуст",
+    "emptyCatalogDescription": "Подключите базу данных и импортируйте фильмы — или откройте каталог, когда данные появятся.",
     "articleCategories": {
       "NEWS": "Новости",
       "INTERVIEW": "Интервью",
@@ -153,24 +162,74 @@
     "loginToComment": "Войдите, чтобы оставить комментарий"
   },
   "auth": {
+    "common": {
+      "backToHome": "← На главную",
+      "loading": "Загрузка…",
+      "emailPlaceholder": "example@email.com",
+      "passwordPlaceholder": "••••••••",
+      "genericError": "Произошла ошибка"
+    },
     "signIn": {
       "title": "Вход",
+      "subtitle": "Войдите в аккаунт, чтобы продолжить с того места, где остановились.",
       "email": "Email",
       "password": "Пароль",
+      "forgotPassword": "Забыли?",
       "submit": "Войти",
-      "error": "Неверный email или пароль",
+      "submitting": "Вход…",
+      "invalidCredentials": "Неверный email или пароль",
+      "errorOnSignIn": "Произошла ошибка при входе",
+      "registeredHint": "Аккаунт создан. Войдите, используя email и пароль.",
       "noAccount": "Нет аккаунта?",
-      "createOne": "Создать"
+      "signUpLink": "Зарегистрироваться"
     },
     "signUp": {
       "title": "Регистрация",
+      "subtitle": "Создайте аккаунт, чтобы оценивать фильмы, вести списки и участвовать в сообществе.",
       "name": "Имя",
+      "namePlaceholder": "Ваше имя",
       "email": "Email",
       "password": "Пароль",
       "confirmPassword": "Подтвердите пароль",
       "submit": "Зарегистрироваться",
+      "submitting": "Регистрация…",
       "hasAccount": "Уже есть аккаунт?",
-      "signIn": "Войти"
+      "signIn": "Войти",
+      "errorMismatch": "Пароли не совпадают",
+      "errorMinLength": "Пароль должен содержать минимум 6 символов",
+      "errorGeneric": "Ошибка при регистрации",
+      "errorOnSignUp": "Произошла ошибка при регистрации"
+    },
+    "forgotPassword": {
+      "title": "Восстановление доступа",
+      "subtitle": "Укажите email аккаунта — пришлём ссылку для сброса пароля, если пользователь существует.",
+      "email": "Email",
+      "footerRemember": "Уже вспомнили пароль?",
+      "signIn": "Войти",
+      "submit": "Отправить инструкции",
+      "sending": "Отправка…",
+      "successBody": "Если аккаунт с таким email существует, мы отправили инструкции на почту. Проверьте папку «Спам», если письмо не пришло.",
+      "backToSignIn": "Вернуться ко входу",
+      "errorOnSend": "Произошла ошибка при отправке запроса"
+    },
+    "resetPassword": {
+      "title": "Новый пароль",
+      "subtitle": "Придумайте надёжный пароль и подтвердите его — после сохранения войдите в аккаунт заново.",
+      "footerRemember": "Вспомнили старый пароль?",
+      "signIn": "Войти",
+      "newPassword": "Новый пароль",
+      "confirmPassword": "Подтвердите пароль",
+      "placeholderMin8": "Минимум 8 символов",
+      "placeholderRepeat": "Повторите пароль",
+      "submit": "Сохранить новый пароль",
+      "saving": "Сохранение…",
+      "tokenMissing": "Токен сброса пароля отсутствует",
+      "tokenMissingBody": "Токен сброса пароля отсутствует. Запросите новую ссылку из письма или сформируйте запрос заново.",
+      "requestNew": "Запросить сброс пароля",
+      "successRedirect": "Пароль успешно изменён. Перенаправление на страницу входа…",
+      "errorMin8": "Пароль должен содержать минимум 8 символов",
+      "errorMismatch": "Пароли не совпадают",
+      "errorOnReset": "Произошла ошибка при сбросе пароля"
     }
   },
   "profile": {
@@ -187,8 +246,6 @@
     "empty": "Пока пусто",
     "stats": "Статистика",
     "statsDescription": "Ваша история просмотров",
-    "challenges": "Челленджи",
-    "challengesDescription": "Примите вызов",
     "feed": "Лента",
     "feedDescription": "Активность друзей",
     "party": "Watch Party",
@@ -219,19 +276,6 @@
     "collectionPrefix": "Подборка фильмов:",
     "moviesInCollection": "{count} фильмов в подборке"
   },
-  "challenges": {
-    "title": "Челленджи",
-    "description": "Принимайте киновызовы, смотрите фильмы и зарабатывайте очки!",
-    "accepted": "Принято",
-    "inProgress": "В процессе",
-    "completed": "Завершено",
-    "all": "Все",
-    "myActive": "Мои активные",
-    "completedChallenges": "Завершённые",
-    "empty": "Челленджи скоро появятся",
-    "noActive": "У вас нет активных челленджей",
-    "noCompleted": "У вас нет завершённых челленджей"
-  },
   "shortcuts": {
     "navigation": "Навигация",
     "home": "На главную",
@@ -261,6 +305,9 @@
     "moviesCount": "{count} фильмов в списке",
     "backToProfile": "← Назад в профиль",
     "findMovies": "Найти фильмы"
+  },
+  "watchPage": {
+    "availableFilms": "Доступно к просмотру"
   },
   "notFound": {
     "title": "404",

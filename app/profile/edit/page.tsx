@@ -19,14 +19,6 @@ async function getUserData(userId: string) {
       email: true,
       bio: true,
       avatar: true,
-      profileFrame: true,
-      profileBadge: true,
-      nameColor: true,
-      avatarEffect: true,
-      chatBubble: true,
-      emojiPack: true,
-      profileBackground: true,
-      theme: true,
     },
   });
 

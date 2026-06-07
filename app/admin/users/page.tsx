@@ -40,7 +40,6 @@ async function getUsers(page: number, query?: string) {
         email: true,
         avatar: true,
         role: true,
-        coins: true,
         createdAt: true,
         _count: {
           select: {

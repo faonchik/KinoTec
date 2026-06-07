@@ -4,7 +4,7 @@ interface SecurityEvent {
   type: "RATE_LIMIT" | "AUTH_FAILURE" | "UNAUTHORIZED" | "SUSPICIOUS_ACTIVITY" | "VALIDATION_ERROR" | "IDOR_ATTEMPT";
   severity: "low" | "medium" | "high" | "critical";
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   timestamp: Date;
   ip?: string;
   userId?: string;
@@ -18,7 +18,7 @@ export function logSecurityEvent(
   type: SecurityEvent["type"],
   severity: SecurityEvent["severity"],
   message: string,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, unknown>,
   request?: Request
 ) {
   const event: SecurityEvent = {

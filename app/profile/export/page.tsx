@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 
 export default function ExportPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -69,7 +69,7 @@ export default function ExportPage() {
       } else {
         setImportResult(`Ошибка: ${result.error}`);
       }
-    } catch (error) {
+    } catch {
       setImportResult("Ошибка чтения файла. Убедитесь, что это валидный JSON файл.");
     } finally {
       setImporting(false);

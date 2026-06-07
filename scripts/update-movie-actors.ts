@@ -31,9 +31,10 @@ interface TMDBCredits {
   cast: TMDBPerson[];
 }
 
-async function fetchTMDB(endpoint: string) {
+async function fetchTMDB(endpoint: string, params?: Record<string, string>) {
+  const qs = params ? "&" + new URLSearchParams(params).toString() : "";
   const response = await fetch(
-    `https://api.themoviedb.org/3${endpoint}?api_key=${TMDB_API_KEY}&language=ru-RU`
+    `https://api.themoviedb.org/3${endpoint}?api_key=${TMDB_API_KEY}&language=ru-RU${qs}`
   );
   if (!response.ok) {
     throw new Error(`TMDB API error: ${response.status}`);

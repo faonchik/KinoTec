@@ -36,51 +36,47 @@ export function BackgroundUpload({
     setError("");
     setIsUploading(true);
 
-    try {
-      // Читаем файл как base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
         const base64String = reader.result as string;
 
-        // Отправляем на сервер
         const res = await fetch("/api/user/background", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ background: base64String }),
         });
 
+        const contentType = res.headers.get("content-type");
         if (!res.ok) {
-          const contentType = res.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             const data = await res.json();
             setError(data.error || "Ошибка при загрузке");
           } else {
             setError("Ошибка при загрузке");
           }
-          } else {
-            const contentType = res.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-              const data = await res.json();
-              setBackground(data.background);
-              onBackgroundChange?.(data.background);
-              // Уведомляем о необходимости обновить фон
-              window.dispatchEvent(new CustomEvent("backgroundUpdated", { detail: { background: data.background } }));
-              setError("");
-            }
+        } else {
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            setBackground(data.background);
+            onBackgroundChange?.(data.background);
+            window.dispatchEvent(new CustomEvent("backgroundUpdated", { detail: { background: data.background } }));
+            setError("");
           }
-          setIsUploading(false);
-      };
-
-      reader.onerror = () => {
-        setError("Ошибка при чтении файла");
+        }
+      } catch {
+        setError("Ошибка при загрузке фона");
+      } finally {
         setIsUploading(false);
-      };
+      }
+    };
 
-      reader.readAsDataURL(file);
-    } catch {
-      setError("Ошибка при загрузке фона");
+    reader.onerror = () => {
+      setError("Ошибка при чтении файла");
       setIsUploading(false);
-    }
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const handleDelete = async () => {
@@ -118,12 +114,12 @@ export function BackgroundUpload({
   return (
     <div className="relative">
       {/* Preview */}
-      <div className="relative h-48 rounded-xl overflow-hidden border-2 border-[#3A4560] bg-gradient-to-b from-[#2A3550] to-[#151C2C]">
+      <div className="relative h-48 rounded-xl overflow-hidden border-2 border-white/[0.12] bg-gradient-to-b from-[#121821] to-[#0b0f14]">
         <div
           className="absolute inset-0"
           style={backgroundStyle}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#151C2C]/50 to-[#151C2C]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b0f14]/50 to-[#0b0f14]/80" />
         
         {/* Overlay with buttons */}
         <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 hover:opacity-100 transition-opacity bg-black/20">
@@ -131,7 +127,7 @@ export function BackgroundUpload({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="px-4 py-2 bg-[#FF8400] hover:bg-[#FF9F2E] text-white font-mono text-[13px] font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             title="Изменить фон"
           >
             {isUploading ? (
@@ -172,7 +168,7 @@ export function BackgroundUpload({
         {/* Info text when no background */}
         {!background && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <p className="font-mono text-[13px] text-[#8B95A8] text-center px-4">
+            <p className="font-mono text-[13px] text-white/45 text-center px-4">
               Наведите курсор для загрузки фона
             </p>
           </div>
@@ -191,7 +187,7 @@ export function BackgroundUpload({
         <p className="mt-2 text-sm text-red-400">{error}</p>
       )}
       
-      <p className="mt-2 font-mono text-[11px] text-[#5A6478]">
+      <p className="mt-2 font-mono text-[11px] text-white/35">
         Рекомендуемый размер: 1920x340 пикселей. Максимальный размер файла: 6MB.
       </p>
     </div>

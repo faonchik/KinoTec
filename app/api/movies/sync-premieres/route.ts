@@ -19,14 +19,15 @@ export async function GET(request: NextRequest) {
     
     // Получаем предстоящие фильмы из TMDB
     const upcomingMovies = await tmdb.getUpcomingMovies();
-    
-    if (!upcomingMovies || upcomingMovies.length === 0) {
+    const results = upcomingMovies?.results ?? [];
+
+    if (results.length === 0) {
       return NextResponse.json({ message: "No upcoming movies found", synced: 0 });
     }
 
     let synced = 0;
 
-    for (const tmdbMovie of upcomingMovies) {
+    for (const tmdbMovie of results) {
       try {
         // Проверяем, существует ли фильм
         const existing = await prisma.movie.findFirst({
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
               releaseDate: tmdbMovie.release_date
                 ? new Date(tmdbMovie.release_date)
                 : null,
-              runtime: tmdbMovie.runtime || null,
+              runtime: null,
               tmdbId: tmdbMovie.id.toString(),
               popularity: tmdbMovie.vote_average * tmdbMovie.vote_count || 0,
             },
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       message: "Premieres synced successfully",
       synced,
-      total: upcomingMovies.length,
+      total: results.length,
     });
   } catch (error) {
     console.error("Sync premieres error:", error);

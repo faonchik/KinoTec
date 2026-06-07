@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import type { Session } from "next-auth";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
 interface Comment {
@@ -147,7 +149,12 @@ export function MovieComments({ movieId }: MovieCommentsProps) {
       ) : (
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 text-center">
           <p className="text-slate-400 mb-3">Войдите, чтобы оставить комментарий</p>
-          <Button href="/auth/signin">Войти</Button>
+          <Link
+            href="/auth/signin"
+            className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#e50914]/50 focus:ring-offset-2 focus:ring-offset-[#141414] rounded-sm bg-[#e50914] font-semibold text-white shadow-[0_8px_24px_rgba(229,9,20,0.35)] hover:bg-[#f40612]"
+          >
+            Войти
+          </Link>
         </div>
       )}
 
@@ -162,7 +169,6 @@ export function MovieComments({ movieId }: MovieCommentsProps) {
             <CommentItem
               key={comment.id}
               comment={comment}
-              movieId={movieId}
               session={session}
               onReply={handleReply}
               replyingTo={replyingTo}
@@ -180,7 +186,6 @@ export function MovieComments({ movieId }: MovieCommentsProps) {
 
 function CommentItem({
   comment,
-  movieId,
   session,
   onReply,
   replyingTo,
@@ -190,8 +195,7 @@ function CommentItem({
   formatDate,
 }: {
   comment: Comment;
-  movieId: string;
-  session: any;
+  session: Session | null;
   onReply: (parentId: string) => void;
   replyingTo: string | null;
   setReplyingTo: (id: string | null) => void;

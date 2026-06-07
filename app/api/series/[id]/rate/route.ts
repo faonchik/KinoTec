@@ -46,28 +46,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    // Начисляем монеты за первую оценку
-    const isFirstRating = rating.createdAt.getTime() === rating.createdAt.getTime(); // Новая запись
-    if (isFirstRating) {
-      await prisma.$transaction([
-        prisma.user.update({
-          where: { id: session.user.id },
-          data: {
-            coins: { increment: 2 },
-            totalCoinsEarned: { increment: 2 },
-          },
-        }),
-        prisma.coinTransaction.create({
-          data: {
-            userId: session.user.id,
-            amount: 2,
-            type: "EARN_RATING",
-            description: `Оценка сериала: ${series.title}`,
-          },
-        }),
-      ]);
-    }
-
     return NextResponse.json({ rating });
   } catch (error) {
     console.error("Rate series error:", error);

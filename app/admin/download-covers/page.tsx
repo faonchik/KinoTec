@@ -112,15 +112,15 @@ export default function DownloadCoversPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#151C2C] p-12">
+    <div className="min-h-screen bg-[#0b0f14] p-12">
       <h1 className="font-oswald text-3xl font-bold text-white mb-2">📥 Скачивание обложек</h1>
-      <p className="font-mono text-[11px] text-[#5A6478] mb-4">Используется прокси images.weserv.nl для обхода блокировки TMDB</p>
-      <p className="font-mono text-[13px] text-[#8B95A8] mb-6">{status}</p>
+      <p className="font-mono text-[11px] text-white/35 mb-4">Используется прокси images.weserv.nl для обхода блокировки TMDB</p>
+      <p className="font-mono text-[13px] text-white/45 mb-6">{status}</p>
 
       {movies.length > 0 && !isRunning && (
         <button
           onClick={downloadAll}
-          className="bg-[#FF8400] hover:bg-[#FF9F2E] text-white font-mono text-[13px] font-semibold px-8 py-3 rounded-2xl transition-colors mb-6"
+          className="bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold px-8 py-3 rounded-2xl transition-colors mb-6"
         >
           🚀 Скачать все обложки ({movies.length} фильмов)
         </button>
@@ -129,9 +129,9 @@ export default function DownloadCoversPage() {
       {isRunning && (
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-2">
-            <div className="flex-1 h-3 bg-[#2A3550] rounded-full overflow-hidden">
+            <div className="flex-1 h-3 bg-white/[0.08] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#FF8400] rounded-full transition-all duration-300"
+                className="h-full bg-[#ffb84d] rounded-full transition-all duration-300"
                 style={{ width: `${progress.total ? (progress.done / progress.total * 100) : 0}%` }}
               />
             </div>
@@ -139,7 +139,7 @@ export default function DownloadCoversPage() {
               {progress.done}/{progress.total}
             </span>
           </div>
-          <p className="font-mono text-[11px] text-[#5A6478]">
+          <p className="font-mono text-[11px] text-white/35">
             {Math.round(progress.done / progress.total * 100)}% • ~{Math.round((progress.total - progress.done) * 0.4)}с осталось
           </p>
           {progress.errors > 0 && (
@@ -148,16 +148,16 @@ export default function DownloadCoversPage() {
         </div>
       )}
 
-      <div className="bg-[#1A2236] rounded-2xl p-4 max-h-[500px] overflow-y-auto font-mono text-[11px]">
+      <div className="bg-[#121821] rounded-2xl p-4 max-h-[500px] overflow-y-auto font-mono text-[11px]">
         {log.length === 0 ? (
-          <p className="text-[#5A6478]">Нажми кнопку — лог появится здесь...</p>
+          <p className="text-white/35">Нажми кнопку — лог появится здесь...</p>
         ) : (
           log.map((line, i) => (
             <p key={i} className={
               line.startsWith("✅") ? "text-green-400" :
               line.startsWith("❌") ? "text-red-400" :
               line.startsWith("⚠️") ? "text-yellow-400" :
-              "text-[#8B95A8]"
+              "text-white/45"
             }>{line}</p>
           ))
         )}

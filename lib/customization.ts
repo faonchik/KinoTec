@@ -113,12 +113,17 @@ export function getBackgroundStyle(backgroundValue: string | null | undefined): 
     };
   }
 
-  // Если это URL изображения
-  if (backgroundValue.startsWith("http") || backgroundValue.startsWith("/")) {
+  // Если это URL изображения или data URL после загрузки в профиль
+  if (
+    backgroundValue.startsWith("http") ||
+    backgroundValue.startsWith("/") ||
+    backgroundValue.startsWith("data:image/")
+  ) {
     return {
       backgroundImage: `url(${backgroundValue})`,
       backgroundSize: "cover",
       backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
     };
   }
 

@@ -41,7 +41,7 @@ function getCalendarDays(year: number, month: number) {
 }
 
 // Цвета жанров для легенды
-const GENRE_COLORS = ["#FF8400", "#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#FF5722", "#00BCD4", "#8BC34A"];
+const GENRE_COLORS = ["#ffb84d", "#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#FF5722", "#00BCD4", "#8BC34A"];
 
 export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
   const [view, setView] = useState<"list" | "calendar">("list");
@@ -125,18 +125,18 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[#151C2C]">
+    <div className="min-h-screen bg-[#0b0f14]">
       {/* Header */}
-      <div className="flex items-center justify-between px-12 pt-8 pb-2">
+      <div className="flex items-center justify-between px-4 sm:px-8 lg:px-12 pt-8 pb-2">
         <div>
-          <h1 className="font-oswald text-4xl font-bold text-white">📅 Календарь премьер</h1>
-          <p className="font-mono text-[13px] text-[#8B95A8] mt-1">Следите за новинками кино</p>
+          <h1 className="font-oswald text-4xl font-bold text-white">Календарь премьер</h1>
+          <p className="font-mono text-[13px] text-white/45 mt-1">Следите за новинками кино</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setView("list")}
             className={`font-mono text-[13px] font-medium px-4 py-2 rounded-2xl transition-colors ${
-              view === "list" ? "bg-[#FF8400] text-white" : "bg-[#2A3550] text-[#8B95A8] hover:text-white"
+              view === "list" ? "bg-[#ffb84d] text-white" : "bg-white/[0.08] text-white/45 hover:text-white"
             }`}
           >
             Список
@@ -144,7 +144,7 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
           <button
             onClick={() => setView("calendar")}
             className={`font-mono text-[13px] font-medium px-4 py-2 rounded-2xl transition-colors ${
-              view === "calendar" ? "bg-[#FF8400] text-white" : "bg-[#2A3550] text-[#8B95A8] hover:text-white"
+              view === "calendar" ? "bg-[#ffb84d] text-white" : "bg-white/[0.08] text-white/45 hover:text-white"
             }`}
           >
             Календарь
@@ -153,13 +153,13 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
       </div>
 
       {/* Genre Chips */}
-      <div className="flex items-center gap-2.5 px-12 py-4 overflow-x-auto scrollbar-hide">
+      <div className="flex items-center gap-2.5 px-4 sm:px-8 lg:px-12 py-4 overflow-x-auto scrollbar-hide">
         {genreChips.map((chip) => (
           <button
             key={chip.slug || "all"}
             onClick={() => setSelectedGenre(chip.slug)}
             className={`font-mono text-[13px] px-4 py-2 rounded-2xl whitespace-nowrap transition-colors ${
-              selectedGenre === chip.slug ? "bg-[#FF8400] text-white" : "bg-[#2A3550] text-[#8B95A8] hover:text-white"
+              selectedGenre === chip.slug ? "bg-[#ffb84d] text-white" : "bg-white/[0.08] text-white/45 hover:text-white"
             }`}
           >
             {chip.label}
@@ -169,16 +169,16 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
 
       {/* ====================== VIEW: CALENDAR ====================== */}
       {view === "calendar" && (
-        <div className="flex gap-8 px-12 py-6 pb-12">
+        <div className="flex flex-col lg:flex-row gap-6 px-4 sm:px-8 lg:px-12 py-6 pb-12">
           {/* Calendar Grid */}
           <div className="flex-1 space-y-6">
             {/* Month Navigation */}
             <div className="flex items-center justify-between">
-              <button onClick={prevMonth} className="w-9 h-9 bg-[#1E2740] rounded-[10px] border border-[#2A3550] flex items-center justify-center text-[#8B95A8] hover:text-white transition-colors">
+              <button onClick={prevMonth} className="w-9 h-9 bg-[#121821] rounded-[10px] border border-white/[0.08] flex items-center justify-center text-white/45 hover:text-white transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
               </button>
               <h2 className="font-oswald text-2xl font-bold text-white">{MONTH_NAMES[calMonth]} {calYear}</h2>
-              <button onClick={nextMonth} className="w-9 h-9 bg-[#1E2740] rounded-[10px] border border-[#2A3550] flex items-center justify-center text-[#8B95A8] hover:text-white transition-colors">
+              <button onClick={nextMonth} className="w-9 h-9 bg-[#121821] rounded-[10px] border border-white/[0.08] flex items-center justify-center text-white/45 hover:text-white transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -186,8 +186,8 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
             {/* Day Headers */}
             <div className="grid grid-cols-7 gap-0.5">
               {WEEKDAYS.map((d) => (
-                <div key={d} className="bg-[#1E2740] rounded-t-lg h-9 flex items-center justify-center">
-                  <span className="font-mono text-[11px] text-[#5A6478] font-semibold">{d}</span>
+                <div key={d} className="bg-[#121821] rounded-t-lg h-9 flex items-center justify-center">
+                  <span className="font-mono text-[11px] text-white/35 font-semibold">{d}</span>
                 </div>
               ))}
             </div>
@@ -204,20 +204,20 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
                     key={idx}
                     className={`min-h-[100px] p-2 rounded-lg transition-colors ${
                       day === null ? "bg-transparent" :
-                      isToday ? "bg-[#FF8400]/10 border border-[#FF8400]/50" :
-                      "bg-[#1A2236] hover:bg-[#1E2740]"
+                      isToday ? "bg-[#ffb84d]/10 border border-[#ffb84d]/50" :
+                      "bg-[#121821] hover:bg-[#121821]"
                     }`}
                   >
                     {day !== null && (
                       <>
                         <span className={`font-mono text-[11px] font-bold ${
-                          isToday ? "text-[#FF8400]" : "text-[#5A6478]"
+                          isToday ? "text-[#ffb84d]" : "text-white/35"
                         }`}>
                           {day}
                         </span>
                         {dayMovies.slice(0, 2).map((m) => (
                           <Link key={m.id} href={`/movies/${m.id}`} className="block mt-1">
-                            <div className="flex items-center gap-1 bg-[#2A3550]/50 rounded px-1 py-0.5 hover:bg-[#FF8400]/20 transition-colors">
+                            <div className="flex items-center gap-1 bg-white/[0.08]/50 rounded px-1 py-0.5 hover:bg-[#ffb84d]/20 transition-colors">
                               {m.poster && (
                                 <div className="relative w-4 h-5 flex-shrink-0 rounded overflow-hidden">
                                   {shouldUseUnoptimized(m.poster) ? <img src={getProxiedImageUrl(m.poster)!} alt="" className="absolute inset-0 w-full h-full object-cover" /> : <Image src={getProxiedImageUrl(m.poster)!} alt="" fill className="object-cover" sizes="16px" />}
@@ -228,7 +228,7 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
                           </Link>
                         ))}
                         {dayMovies.length > 2 && (
-                          <span className="font-mono text-[9px] text-[#FF8400] mt-0.5 block">+{dayMovies.length - 2} ещё</span>
+                          <span className="font-mono text-[9px] text-[#ffb84d] mt-0.5 block">+{dayMovies.length - 2} ещё</span>
                         )}
                       </>
                     )}
@@ -241,33 +241,33 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
           {/* Sidebar */}
           <div className="w-[300px] flex-shrink-0 space-y-6">
             {/* Today Card */}
-            <div className="bg-[#1E2740] rounded-2xl p-5">
+            <div className="bg-[#121821] rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">📅</span>
+                <span className="inline-block h-2 w-2 rounded-full bg-[#ffb84d]" aria-hidden />
                 <span className="font-oswald text-base font-semibold text-white">Сегодня</span>
               </div>
               <div className="text-center py-4">
-                <p className="font-oswald text-5xl font-bold text-[#FF8400]">{now.getDate()}</p>
-                <p className="font-mono text-[12px] text-[#8B95A8] mt-1">
+                <p className="font-oswald text-5xl font-bold text-[#ffb84d]">{now.getDate()}</p>
+                <p className="font-mono text-[12px] text-white/45 mt-1">
                   {now.toLocaleDateString("ru-RU", { month: "long", weekday: "long" })}
                 </p>
               </div>
             </div>
 
             {/* Upcoming Premieres */}
-            <div className="bg-[#1E2740] rounded-2xl p-5">
+            <div className="bg-[#121821] rounded-2xl p-5">
               <h3 className="font-oswald text-lg font-semibold text-white mb-4">Ближайшие премьеры</h3>
               <div className="space-y-3">
                 {nextPremiers.map((m) => (
                   <Link key={m.id} href={`/movies/${m.id}`} className="flex items-center gap-3 group">
-                    <div className="w-8 h-8 bg-[#FF8400] rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 bg-[#ffb84d] rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="font-oswald text-[12px] font-bold text-[#111]">
                         {m.releaseDate ? new Date(m.releaseDate).getDate() : "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-mono text-[12px] text-white group-hover:text-[#FF8400] transition-colors line-clamp-1">{m.title}</p>
-                      <p className="font-mono text-[10px] text-[#5A6478]">
+                      <p className="font-mono text-[12px] text-white group-hover:text-[#ffb84d] transition-colors line-clamp-1">{m.title}</p>
+                      <p className="font-mono text-[10px] text-white/35">
                         {m.genres[0]?.genre.name} • {m.releaseDate ? getDaysUntil(m.releaseDate) : 0} дн.
                       </p>
                     </div>
@@ -277,33 +277,33 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
             </div>
 
             {/* Genre Legend */}
-            <div className="bg-[#1E2740] rounded-2xl p-5">
+            <div className="bg-[#121821] rounded-2xl p-5">
               <h3 className="font-oswald text-lg font-semibold text-white mb-4">Жанры</h3>
               <div className="space-y-2.5">
                 {allGenres.slice(0, 5).map((g, i) => (
                   <div key={g.slug} className="flex items-center gap-2.5">
                     <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: GENRE_COLORS[i % GENRE_COLORS.length] }} />
-                    <span className="font-mono text-[12px] text-[#8B95A8]">{g.name}</span>
+                    <span className="font-mono text-[12px] text-white/45">{g.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Month Stats */}
-            <div className="bg-[#1E2740] rounded-2xl p-5">
+            <div className="bg-[#121821] rounded-2xl p-5">
               <h3 className="font-oswald text-lg font-semibold text-white mb-4">Статистика месяца</h3>
               <div className="flex gap-3">
-                <div className="flex-1 text-center bg-[#1A2236] rounded-xl p-3">
-                  <p className="font-oswald text-2xl font-bold text-[#FF8400]">{monthMovies.length}</p>
-                  <p className="font-mono text-[10px] text-[#5A6478]">Премьер</p>
+                <div className="flex-1 text-center bg-[#121821] rounded-xl p-3">
+                  <p className="font-oswald text-2xl font-bold text-[#ffb84d]">{monthMovies.length}</p>
+                  <p className="font-mono text-[10px] text-white/35">Премьер</p>
                 </div>
-                <div className="flex-1 text-center bg-[#1A2236] rounded-xl p-3">
+                <div className="flex-1 text-center bg-[#121821] rounded-xl p-3">
                   <p className="font-oswald text-2xl font-bold text-[#4CAF50]">{new Set(monthMovies.flatMap((m) => m.genres.map((g) => g.genre.slug))).size}</p>
-                  <p className="font-mono text-[10px] text-[#5A6478]">Жанров</p>
+                  <p className="font-mono text-[10px] text-white/35">Жанров</p>
                 </div>
-                <div className="flex-1 text-center bg-[#1A2236] rounded-xl p-3">
+                <div className="flex-1 text-center bg-[#121821] rounded-xl p-3">
                   <p className="font-oswald text-2xl font-bold text-[#2196F3]">{new Set(monthMovies.filter((m) => m.director).map((m) => m.director!.name)).size}</p>
-                  <p className="font-mono text-[10px] text-[#5A6478]">Реж.</p>
+                  <p className="font-mono text-[10px] text-white/35">Реж.</p>
                 </div>
               </div>
             </div>
@@ -316,21 +316,21 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
         <>
           {/* Featured */}
           {filteredUpcoming.length > 0 && (
-            <div className="px-12 py-4">
+            <div className="px-4 sm:px-8 lg:px-12 py-4">
               <h2 className="font-oswald text-xl font-semibold text-white mb-4">Скоро в кино</h2>
               <div className="grid md:grid-cols-3 gap-4">
                 {filteredUpcoming.slice(0, 3).map((movie) => {
                   const daysUntil = movie.releaseDate ? getDaysUntil(movie.releaseDate) : null;
                   return (
                     <Link key={movie.id} href={`/movies/${movie.id}`}>
-                      <div className="group relative h-[200px] rounded-2xl overflow-hidden bg-[#1A2236]">
+                      <div className="group relative h-[200px] rounded-2xl overflow-hidden bg-[#121821]">
                         {movie.backdrop || movie.poster ? (() => {
                           const url = getProxiedImageUrl(movie.backdrop || movie.poster!);
                           return shouldUseUnoptimized(url)
                             ? <img src={url!} alt={movie.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                             : <Image src={url!} alt={movie.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />;
                         })() : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#1E2740] to-[#2A3550]" />
+                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14]" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                         {daysUntil !== null && daysUntil > 0 && (
@@ -341,11 +341,11 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
                         <div className="absolute bottom-0 left-0 right-0 p-4">
                           <div className="flex gap-1.5 mb-2">
                             {movie.genres.slice(0, 2).map((mg) => (
-                              <span key={mg.genre.slug} className="font-mono text-[10px] text-[#FF8400] bg-[#FF8400]/20 px-2 py-0.5 rounded">{mg.genre.name}</span>
+                              <span key={mg.genre.slug} className="font-mono text-[10px] text-[#ffb84d] bg-[#ffb84d]/20 px-2 py-0.5 rounded">{mg.genre.name}</span>
                             ))}
                           </div>
-                          <h3 className="font-oswald text-lg font-bold text-white group-hover:text-[#FF8400] transition-colors">{movie.title}</h3>
-                          {movie.releaseDate && <p className="font-mono text-[11px] text-[#FF8400] mt-1">{formatDate(movie.releaseDate)}</p>}
+                          <h3 className="font-oswald text-lg font-bold text-white group-hover:text-[#ffb84d] transition-colors">{movie.title}</h3>
+                          {movie.releaseDate && <p className="font-mono text-[11px] text-[#ffb84d] mt-1">{formatDate(movie.releaseDate)}</p>}
                         </div>
                       </div>
                     </Link>
@@ -356,40 +356,40 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
           )}
 
           {/* List + Mini-calendar sidebar */}
-          <div className="flex gap-8 px-12 py-6 pb-12">
+          <div className="flex flex-col lg:flex-row gap-6 px-4 sm:px-8 lg:px-12 py-6 pb-12">
             {/* Left: list by month */}
             <div className="flex-1">
               <h2 className="font-oswald text-xl font-semibold text-white mb-2">Предстоящие премьеры</h2>
               {Object.keys(moviesByMonth).length === 0 ? (
-                <div className="text-center py-12 bg-[#1A2236] rounded-2xl">
-                  <p className="font-mono text-[13px] text-[#5A6478]">Нет информации о предстоящих премьерах</p>
+                <div className="text-center py-12 bg-[#121821] rounded-2xl">
+                  <p className="font-mono text-[13px] text-white/35">Нет информации о предстоящих премьерах</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {Object.entries(moviesByMonth).map(([month, movies]) => (
                     <div key={month}>
-                      <p className="font-mono text-[12px] font-semibold text-[#FF8400] mb-2 uppercase">{month}</p>
+                      <p className="font-mono text-[12px] font-semibold text-[#ffb84d] mb-2 uppercase">{month}</p>
                       <div className="space-y-0.5">
                         {movies.map((movie) => (
-                          <Link key={movie.id} href={`/movies/${movie.id}`} className="flex items-center gap-4 p-3 px-4 bg-[#1A2236] rounded-2xl hover:ring-1 hover:ring-[#FF8400]/30 transition-all group">
+                          <Link key={movie.id} href={`/movies/${movie.id}`} className="flex items-center gap-4 p-3 px-4 bg-[#121821] rounded-2xl hover:ring-1 hover:ring-[#ffb84d]/30 transition-all group">
                             <div className="flex-shrink-0 w-10 text-center">
-                              <span className="font-oswald text-lg font-bold text-[#FF8400]">
+                              <span className="font-oswald text-lg font-bold text-[#ffb84d]">
                                 {movie.releaseDate ? new Date(movie.releaseDate).getDate() : "?"}
                               </span>
                             </div>
-                            <div className="relative w-8 h-11 flex-shrink-0 rounded overflow-hidden bg-[#2A3550]">
-                              {movie.poster ? (shouldUseUnoptimized(movie.poster) ? <img src={getProxiedImageUrl(movie.poster)!} alt="" className="absolute inset-0 w-full h-full object-cover" /> : <Image src={getProxiedImageUrl(movie.poster)!} alt="" fill className="object-cover" sizes="32px" />) : <div className="w-full h-full flex items-center justify-center text-xs">🎬</div>}
+                            <div className="relative w-8 h-11 flex-shrink-0 rounded overflow-hidden bg-white/[0.08]">
+                              {movie.poster ? (shouldUseUnoptimized(movie.poster) ? <img src={getProxiedImageUrl(movie.poster)!} alt="" className="absolute inset-0 w-full h-full object-cover" /> : <Image src={getProxiedImageUrl(movie.poster)!} alt="" fill className="object-cover" sizes="32px" />) : <div className="w-full h-full flex items-center justify-center text-[10px] text-white/40">КТ</div>}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-mono text-[13px] font-semibold text-white group-hover:text-[#FF8400] transition-colors">{movie.title}</h4>
-                              <div className="flex items-center gap-2 font-mono text-[11px] text-[#5A6478]">
+                              <h4 className="font-mono text-[13px] font-semibold text-white group-hover:text-[#ffb84d] transition-colors">{movie.title}</h4>
+                              <div className="flex items-center gap-2 font-mono text-[11px] text-white/35">
                                 {movie.genres.slice(0, 2).map((g) => g.genre.name).join(", ")}
                                 {movie.director && <span>• {movie.director.name}</span>}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
                               {movie.genres[0] && (
-                                <span className="font-mono text-[10px] text-[#8B95A8] bg-[#2A3550] px-2 py-0.5 rounded">{movie.genres[0].genre.name}</span>
+                                <span className="font-mono text-[10px] text-white/45 bg-white/[0.08] px-2 py-0.5 rounded">{movie.genres[0].genre.name}</span>
                               )}
                             </div>
                           </Link>
@@ -404,21 +404,21 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
             {/* Right sidebar: mini calendar + events */}
             <div className="w-[320px] flex-shrink-0 space-y-4">
               {/* Mini calendar */}
-              <div className="bg-[#1E2740] rounded-2xl p-4">
+              <div className="bg-[#121821] rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-oswald text-base font-semibold text-white">{MONTH_NAMES[calMonth]} {calYear}</span>
                   <div className="flex gap-2">
-                    <button onClick={prevMonth} className="text-[#5A6478] hover:text-white transition-colors">
+                    <button onClick={prevMonth} className="text-white/35 hover:text-white transition-colors">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                    <button onClick={nextMonth} className="text-[#5A6478] hover:text-white transition-colors">
+                    <button onClick={nextMonth} className="text-white/35 hover:text-white transition-colors">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </button>
                   </div>
                 </div>
                 <div className="grid grid-cols-7 gap-1 mb-1">
                   {WEEKDAYS.map((d) => (
-                    <div key={d} className="text-center"><span className="font-mono text-[9px] text-[#5A6478]">{d}</span></div>
+                    <div key={d} className="text-center"><span className="font-mono text-[9px] text-white/35">{d}</span></div>
                   ))}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
@@ -429,8 +429,8 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
                     return (
                       <div key={idx} className={`w-full aspect-square flex items-center justify-center rounded ${
                         day === null ? "" :
-                        isToday2 ? "bg-[#FF8400] text-[#111]" :
-                        hasMovies ? "bg-[#FF8400]/20 text-[#FF8400]" : "text-[#5A6478] hover:bg-[#2A3550]"
+                        isToday2 ? "bg-[#ffb84d] text-[#111]" :
+                        hasMovies ? "bg-[#ffb84d]/20 text-[#ffb84d]" : "text-white/35 hover:bg-white/[0.08]"
                       } transition-colors`}>
                         {day !== null && <span className="font-mono text-[10px] font-semibold">{day}</span>}
                       </div>
@@ -442,17 +442,17 @@ export function CalendarClient({ upcoming, recent }: CalendarClientProps) {
               {/* Upcoming events */}
               <div>
                 <h3 className="font-oswald text-base font-semibold text-white mb-3">Ближайшие события</h3>
-                <div className="bg-[#1E2740] rounded-2xl p-4 space-y-3">
+                <div className="bg-[#121821] rounded-2xl p-4 space-y-3">
                   {nextPremiers.slice(0, 3).map((m) => (
                     <Link key={m.id} href={`/movies/${m.id}`} className="flex items-center gap-3 group">
-                      <div className="w-7 h-7 bg-[#FF8400] rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-7 h-7 bg-[#ffb84d] rounded-full flex items-center justify-center flex-shrink-0">
                         <span className="font-oswald text-[11px] font-bold text-[#111]">
                           {m.releaseDate ? new Date(m.releaseDate).getDate() : "?"}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-mono text-[12px] text-white group-hover:text-[#FF8400] transition-colors line-clamp-1">{m.title}</p>
-                        <p className="font-mono text-[10px] text-[#5A6478]">{m.genres[0]?.genre.name}</p>
+                        <p className="font-mono text-[12px] text-white group-hover:text-[#ffb84d] transition-colors line-clamp-1">{m.title}</p>
+                        <p className="font-mono text-[10px] text-white/35">{m.genres[0]?.genre.name}</p>
                       </div>
                     </Link>
                   ))}

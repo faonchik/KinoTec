@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "npx prisma generate && npx prisma migrate deploy && next build",
     "postinstall": "prisma generate",
     "start": "next start",
@@ -28,6 +28,7 @@
     "@tanstack/react-query": "^5.62.0",
     "@types/react-google-recaptcha": "^2.1.9",
     "bcryptjs": "^2.4.3",
+    "framer-motion": "^11.18.2",
     "freekeys": "^0.0.4",
     "groq-sdk": "^0.37.0",
     "jspdf": "^3.0.4",
@@ -41,6 +42,7 @@
     "react-google-recaptcha": "^3.1.0",
     "resend": "^6.5.2",
     "sib-api-v3-sdk": "^8.5.0",
+    "undici": "^6.25.0",
     "zod": "^3.24.0",
     "zustand": "^5.0.2"
   },

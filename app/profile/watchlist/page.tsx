@@ -47,21 +47,21 @@ export default async function WatchlistPage() {
   const mins = totalRuntime % 60;
 
   return (
-    <div className="min-h-screen bg-[#151C2C]">
+    <div className="min-h-screen bg-[#0b0f14]">
       {/* Header */}
-      <div className="flex items-center justify-between px-12 pt-8 pb-2">
+      <div className="flex items-center justify-between px-4 sm:px-8 lg:px-12 pt-8 pb-2">
         <div className="flex items-center gap-3">
           <h1 className="font-oswald text-3xl font-bold text-white">{t("title")}</h1>
-          <span className="font-mono text-[13px] text-white bg-[#FF8400] px-3 py-1 rounded-2xl">
+          <span className="font-mono text-[13px] text-white bg-[#ffb84d] px-3 py-1 rounded-2xl">
             {movies.length} фильмов
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/profile" className="font-mono text-[13px] text-[#FF8400] hover:text-[#FF9F2E] transition-colors">
+          <Link href="/profile" className="font-mono text-[13px] text-[#ffb84d] hover:text-[#ffc56a] transition-colors">
             ← Профиль
           </Link>
-          <span className="text-[#2A3550]">|</span>
-          <Link href="/movies" className="font-mono text-[13px] text-[#8B95A8] hover:text-white transition-colors">
+          <span className="text-white/20">|</span>
+          <Link href="/movies" className="font-mono text-[13px] text-white/45 hover:text-white transition-colors">
             Каталог
           </Link>
         </div>
@@ -69,26 +69,26 @@ export default async function WatchlistPage() {
 
       {/* Stats bar */}
       {movies.length > 0 && (
-        <div className="flex items-center gap-8 px-12 py-4 mt-2 bg-[#1A2236] rounded-xl mx-12">
+        <div className="flex items-center gap-8 px-4 sm:px-8 lg:px-12 py-4 mt-2 bg-[#121821] rounded-xl mx-4 sm:mx-8 lg:mx-12">
           <div className="text-center">
             <p className="font-oswald text-2xl font-bold text-white">{movies.length}</p>
-            <p className="font-mono text-[10px] text-[#5A6478]">Фильмов</p>
+            <p className="font-mono text-[10px] text-white/35">Фильмов</p>
           </div>
           <div className="text-center">
             <p className="font-oswald text-2xl font-bold text-white">{hours}h {mins}m</p>
-            <p className="font-mono text-[10px] text-[#5A6478]">Всего времени</p>
+            <p className="font-mono text-[10px] text-white/35">Всего времени</p>
           </div>
         </div>
       )}
 
       {/* Content */}
-      <div className="px-12 py-8">
+      <div className="px-4 sm:px-8 lg:px-12 py-6 sm:py-8">
         {movies.length === 0 ? (
-          <div className="text-center py-16 bg-[#1A2236] rounded-2xl">
+          <div className="text-center py-16 bg-[#121821] rounded-2xl">
             <div className="text-6xl mb-4">📭</div>
-            <p className="font-mono text-[13px] text-[#5A6478] mb-4">{t("empty")}</p>
+            <p className="font-mono text-[13px] text-white/35 mb-4">{t("empty")}</p>
             <Link href="/movies">
-              <button className="bg-[#FF8400] hover:bg-[#FF9F2E] text-white font-mono text-[13px] font-semibold px-6 py-3 rounded-2xl transition-colors">
+              <button className="bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold px-6 py-3 rounded-2xl transition-colors">
                 {t("findMovies")}
               </button>
             </Link>

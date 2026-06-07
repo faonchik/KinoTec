@@ -11,7 +11,6 @@ const createTransporter = () => {
   const smtpPassword = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD;
   // Для Gmail порт 587 использует STARTTLS (secure: false), порт 465 использует SSL (secure: true)
   const smtpSecure = smtpPort === 465;
-  const smtpFrom = process.env.SMTP_FROM || process.env.GMAIL_FROM || smtpUser;
 
   if (!smtpUser || !smtpPassword) {
     console.warn("Gmail SMTP credentials not configured. Email sending will be disabled.");

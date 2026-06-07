@@ -1,5 +1,7 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import prisma from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 import { SearchClient } from "./SearchClient";
 
 export const metadata: Metadata = {
@@ -41,11 +43,22 @@ async function getCountries() {
 }
 
 export default async function SearchPage() {
+  const t = await getTranslations("common");
   const [genres, years, countries] = await Promise.all([
     getGenres(),
     getYears(),
     getCountries(),
   ]);
 
-  return <SearchClient genres={genres} years={years} countries={countries} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center bg-slate-900 text-white/50">
+          {t("loading")}
+        </div>
+      }
+    >
+      <SearchClient genres={genres} years={years} countries={countries} />
+    </Suspense>
+  );
 }

@@ -1,46 +1,30 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
-import { getFrameClasses, getBackgroundStyle } from "@/lib/customization";
+import { ProxiedImage } from "@/components/ui/ProxiedImage";
 import { getProxiedImageUrl, shouldUseUnoptimized } from "@/lib/images";
-
-interface ShopItem {
-  id: string;
-  type: string;
-  value: string;
-}
+import { Rating } from "@/components/ui/Rating";
+import { Textarea } from "@/components/ui/Textarea";
+import { Button } from "@/components/ui/Button";
 
 interface User {
   id: string;
   name: string | null;
   email: string;
   avatar: string | null;
-  coins: number;
-  profileFrame: string | null;
-  profileBadge: string | null;
-  nameColor: string | null;
-  avatarEffect: string | null;
-  chatBubble: string | null;
-  emojiPack: string | null;
-  profileBackground: string | null;
-  theme: string | null;
   createdAt: Date;
   _count: {
     reviews: number;
     ratings: number;
     favorites: number;
     watchlists: number;
-    achievements: number;
     watchHistory: number;
   };
-  purchasedItems: Array<{
-    isEquipped: boolean;
-    item: ShopItem;
-  }>;
 }
 
 interface Favorite {
@@ -59,205 +43,137 @@ interface Watchlist {
   };
 }
 
+interface UserReview {
+  id: string;
+  type?: "review" | "comment";
+  content: string;
+  createdAt: Date;
+  movie: {
+    id: string;
+    title: string;
+    poster: string | null;
+    ratings: {
+      value: number;
+    }[];
+  };
+}
+
 interface ProfileClientProps {
   user: User;
   recentFavorites: Favorite[];
   recentWatchlist: Watchlist[];
+  reviews: UserReview[];
 }
 
-export function ProfileClient({ user, recentFavorites, recentWatchlist }: ProfileClientProps) {
+export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews }: ProfileClientProps) {
+  const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(user.avatar);
-  const [background, setBackground] = useState<string | null>(user.profileBackground);
-  const [activeTab, setActiveTab] = useState<"favorites" | "watchlist" | "reviews" | "achievements">("favorites");
-  const [isHoveringCover, setIsHoveringCover] = useState(false);
-  const [isUploadingBackground, setIsUploadingBackground] = useState(false);
-  const backgroundInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState<"favorites" | "watchlist" | "reviews">("favorites");
   const t = useTranslations("profile");
 
-  // Слушаем события обновления фона
-  useEffect(() => {
-    const handleBackgroundUpdate = (event: CustomEvent) => {
-      setBackground(event.detail.background);
-    };
+  // Редактирование отзывов
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [editRating, setEditRating] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editError, setEditError] = useState("");
 
-    window.addEventListener("backgroundUpdated", handleBackgroundUpdate as EventListener);
-    return () => {
-      window.removeEventListener("backgroundUpdated", handleBackgroundUpdate as EventListener);
-    };
-  }, []);
+  const handleEditStart = (review: UserReview) => {
+    setEditingId(review.id);
+    setEditContent(review.content);
+    setEditRating(review.movie.ratings?.[0]?.value || 0);
+    setEditError("");
+  };
 
-  const handleBackgroundSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditContent("");
+    setEditRating(0);
+    setEditError("");
+  };
 
-    // Проверка типа файла
-    if (!file.type.startsWith("image/")) {
-      alert("Выберите изображение");
+  const handleUpdate = async (e: React.FormEvent, reviewId: string) => {
+    e.preventDefault();
+    setEditError("");
+
+    if (!editContent.trim()) {
+      setEditError("Введите текст отзыва");
       return;
     }
 
-    // Проверка размера (макс 6MB для фона)
-    if (file.size > 6 * 1024 * 1024) {
-      alert("Размер файла не должен превышать 6MB");
+    if (editContent.length < 10) {
+      setEditError("Отзыв должен содержать минимум 10 символов");
       return;
     }
 
-    setIsUploadingBackground(true);
+    if (editRating === 0) {
+      setEditError("Выберите рейтинг");
+      return;
+    }
+
+    setIsUpdating(true);
 
     try {
-      // Читаем файл как base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result as string;
+      const response = await fetch(`/api/reviews/${reviewId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: editContent, rating: editRating }),
+      });
 
-        // Отправляем на сервер
-        const res = await fetch("/api/user/background", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ background: base64String }),
-        });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Ошибка при обновлении отзыва");
+      }
 
-        if (!res.ok) {
-          const contentType = res.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const data = await res.json();
-            alert(data.error || "Ошибка при загрузке");
-          } else {
-            alert("Ошибка при загрузке");
-          }
-        } else {
-          const contentType = res.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const data = await res.json();
-            setBackground(data.background);
-            // Уведомляем о необходимости обновить фон
-            window.dispatchEvent(new CustomEvent("backgroundUpdated", { detail: { background: data.background } }));
-          }
-        }
-        setIsUploadingBackground(false);
-      };
-
-      reader.onerror = () => {
-        alert("Ошибка при чтении файла");
-        setIsUploadingBackground(false);
-      };
-
-      reader.readAsDataURL(file);
-    } catch {
-      alert("Ошибка при загрузке фона");
-      setIsUploadingBackground(false);
+      setEditingId(null);
+      router.refresh();
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : "Ошибка при обновлении отзыва");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  const handleDeleteBackground = async () => {
-    if (!confirm("Удалить фон профиля?")) return;
+  const handleDelete = async (reviewId: string) => {
+    if (!confirm("Вы уверены, что хотите удалить этот отзыв?")) return;
 
-    setIsUploadingBackground(true);
     try {
-      const res = await fetch("/api/user/background", {
+      const response = await fetch(`/api/reviews/${reviewId}`, {
         method: "DELETE",
       });
 
-      if (!res.ok) {
-        alert("Ошибка при удалении фона");
-      } else {
-        setBackground(null);
-        window.dispatchEvent(new CustomEvent("backgroundUpdated", { detail: { background: null } }));
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Ошибка при удалении отзыва");
       }
-    } catch {
-      alert("Ошибка при удалении фона");
-    } finally {
-      setIsUploadingBackground(false);
+
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка при удалении отзыва");
     }
   };
-
-  const frameClasses = getFrameClasses(user.profileFrame);
-  const backgroundStyle = getBackgroundStyle(background);
 
   const tabs = [
     { id: "favorites" as const, label: "❤️ Избранное" },
     { id: "watchlist" as const, label: "📋 Смотреть" },
-    { id: "reviews" as const, label: "✍️ Отзывы" },
-    { id: "achievements" as const, label: "🏆 Достижения" },
+    { id: "reviews" as const, label: "✍️ Отзывы и комментарии" },
   ];
 
   return (
-    <div className="min-h-screen bg-[#151C2C]">
+    <div className="min-h-screen bg-[#0b0f14]">
       {/* Cover Section */}
-      <div 
-        className="relative h-[340px]"
-        onMouseEnter={() => setIsHoveringCover(true)}
-        onMouseLeave={() => setIsHoveringCover(false)}
-      >
+      <div className="relative h-[160px] sm:h-[240px] lg:h-[340px]">
         {/* Cover Image */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-[#2A3550] to-[#151C2C]"
-          style={backgroundStyle}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#151C2C]/70 to-[#151C2C]" />
-
-        {/* Кнопка изменения фона */}
-        <div className={`absolute top-4 right-4 z-20 transition-opacity duration-200 ${isHoveringCover ? "opacity-100" : "opacity-0"}`}>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => backgroundInputRef.current?.click()}
-              disabled={isUploadingBackground}
-              className="px-4 py-2 bg-[#FF8400]/90 hover:bg-[#FF8400] text-white font-mono text-[13px] font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 backdrop-blur-sm border border-white/20"
-              title="Изменить фон"
-            >
-              {isUploadingBackground ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Загрузка...
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Изменить фон
-                </>
-              )}
-            </button>
-            
-            {background && (
-              <button
-                type="button"
-                onClick={handleDeleteBackground}
-                disabled={isUploadingBackground}
-                className="px-3 py-2 bg-red-500/90 hover:bg-red-600/90 text-white font-mono text-[13px] font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 backdrop-blur-sm border border-white/20"
-                title="Удалить фон"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        </div>
-
-        <input
-          ref={backgroundInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleBackgroundSelect}
-          className="hidden"
-        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#121821] to-[#0b0f14]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b0f14]/70 to-[#0b0f14]" />
 
         {/* Avatar */}
-        <div className="absolute left-12 bottom-[-30px] z-10">
-          <div className={`rounded-full border-4 border-[#FF8400] ${frameClasses || ""}`} style={{ borderRadius: "50%" }}>
+        <div className="absolute left-4 sm:left-8 lg:left-12 bottom-[-30px] z-10">
+          <div className="rounded-full border-4 border-[#ffb84d]" style={{ borderRadius: "50%" }}>
             <AvatarUpload
               currentAvatar={avatar}
               userName={user.name}
               userEmail={user.email}
-              profileFrame={user.profileFrame}
-              avatarEffect={user.avatarEffect}
               onAvatarChange={setAvatar}
             />
           </div>
@@ -265,37 +181,26 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist }: Profil
       </div>
 
       {/* Profile Info */}
-      <div className="flex items-center justify-between px-12 pt-2 pl-[220px]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-8 lg:px-12 pt-[50px] sm:pt-2 sm:pl-[160px] lg:pl-[220px]">
         <div>
           <div className="flex items-center gap-2">
-            <h1
-              className="font-oswald text-3xl font-bold text-white"
-              style={{
-                color: user.nameColor || undefined,
-                backgroundImage: user.nameColor?.startsWith("gradient")
-                  ? "linear-gradient(45deg, #f59e0b, #ec4899, #8b5cf6)"
-                  : undefined,
-                WebkitBackgroundClip: user.nameColor?.startsWith("gradient") ? "text" : undefined,
-                WebkitTextFillColor: user.nameColor?.startsWith("gradient") ? "transparent" : undefined,
-              }}
-            >
+            <h1 className="font-oswald text-2xl sm:text-3xl font-bold text-white">
               {user.name || "Пользователь"}
             </h1>
-            {user.profileBadge && <span className="text-2xl">{user.profileBadge}</span>}
           </div>
-          <p className="font-mono text-[13px] text-[#8B95A8] mt-1">{user.email}</p>
+          <p className="font-mono text-[13px] text-white/45 mt-1">{user.email}</p>
           <div className="flex items-center gap-4 mt-1">
-            <span className="font-mono text-[12px] text-[#5A6478]">
+            <span className="font-mono text-[12px] text-white/35">
               📅 На сайте с {new Date(user.createdAt).toLocaleDateString("ru-RU", { year: "numeric", month: "long" })}
             </span>
-            <span className="font-mono text-[12px] text-[#5A6478]">
+            <span className="font-mono text-[12px] text-white/35">
               🌍 Россия
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="mt-3 sm:mt-0 flex items-center gap-3">
           <Link href="/profile/edit">
-            <button className="font-mono text-[13px] font-semibold text-white bg-[#FF8400] hover:bg-[#FF9F2E] px-5 py-2.5 rounded-2xl transition-colors">
+            <button className="font-mono text-[13px] font-semibold text-white bg-[#ffb84d] hover:bg-[#ffc56a] px-5 py-2.5 rounded-2xl transition-colors">
               ✏️ Ред. профиль
             </button>
           </Link>
@@ -303,43 +208,39 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist }: Profil
       </div>
 
       {/* Stats Bar */}
-      <div className="flex items-center justify-around px-12 py-6 mt-4 border-t border-b border-[#2A3550]">
+      <div className="flex items-center justify-around px-4 sm:px-8 lg:px-12 py-4 sm:py-6 mt-4 border-t border-b border-white/[0.08] overflow-x-auto gap-4">
         <Link href="/profile/watchlist" className="text-center group">
-          <p className="font-oswald text-2xl font-bold text-white group-hover:text-[#FF8400] transition-colors">{user._count.watchlists}</p>
-          <p className="font-mono text-[11px] text-[#5A6478]">{t("watchlist")}</p>
+          <p className="font-oswald text-2xl font-bold text-white group-hover:text-[#ffb84d] transition-colors">{user._count.watchlists}</p>
+          <p className="font-mono text-[11px] text-white/35">{t("watchlist")}</p>
         </Link>
         <div className="text-center">
           <p className="font-oswald text-2xl font-bold text-white">{user._count.ratings}</p>
-          <p className="font-mono text-[11px] text-[#5A6478]">Оценок</p>
+          <p className="font-mono text-[11px] text-white/35">Оценок</p>
         </div>
         <Link href="/profile/favorites" className="text-center group">
-          <p className="font-oswald text-2xl font-bold text-white group-hover:text-[#FF8400] transition-colors">{user._count.favorites}</p>
-          <p className="font-mono text-[11px] text-[#5A6478]">{t("favorites")}</p>
+          <p className="font-oswald text-2xl font-bold text-white group-hover:text-[#ffb84d] transition-colors">{user._count.favorites}</p>
+          <p className="font-mono text-[11px] text-white/35">{t("favorites")}</p>
         </Link>
         <div className="text-center">
           <p className="font-oswald text-2xl font-bold text-white">{user._count.reviews}</p>
-          <p className="font-mono text-[11px] text-[#5A6478]">Отзывов</p>
-        </div>
-        <div className="text-center">
-          <p className="font-oswald text-2xl font-bold text-[#FF8400]">{user.coins.toLocaleString()}</p>
-          <p className="font-mono text-[11px] text-[#5A6478]">Монет</p>
+          <p className="font-mono text-[11px] text-white/35">Отзывов</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-8 px-12 py-8">
+      <div className="flex flex-col lg:flex-row gap-6 px-4 sm:px-8 lg:px-12 py-6 sm:py-8">
         {/* Left Column */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Tabs */}
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`font-mono text-[13px] font-medium px-4 py-2 rounded-2xl transition-colors ${
+                className={`font-mono text-[13px] font-medium px-3 sm:px-4 py-2 rounded-2xl transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === tab.id
-                    ? "bg-[#FF8400] text-white"
-                    : "text-[#8B95A8] hover:text-white"
+                    ? "bg-[#ffb84d] text-white"
+                    : "text-white/45 hover:text-white"
                 }`}
               >
                 {tab.label}
@@ -352,19 +253,19 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist }: Profil
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-oswald text-xl font-bold text-white">Избранные фильмы</h2>
-                <Link href="/profile/favorites" className="font-mono text-[13px] text-[#FF8400] hover:text-[#FF9F2E]">
+                <Link href="/profile/favorites" className="font-mono text-[13px] text-[#ffb84d] hover:text-[#ffc56a]">
                   Все →
                 </Link>
               </div>
               {recentFavorites.length === 0 ? (
-                <p className="font-mono text-[13px] text-[#5A6478] text-center py-8">{t("empty")}</p>
+                <p className="font-mono text-[13px] text-white/35 text-center py-8">{t("empty")}</p>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {recentFavorites.map((f) => (
                     <Link key={f.movie.id} href={`/movies/${f.movie.id}`} className="group">
-                      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#1A2236]">
+                      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#121821]">
                         {f.movie.poster ? (
-                          <Image
+                          <ProxiedImage
                             src={f.movie.poster}
                             alt={f.movie.title}
                             fill
@@ -372,10 +273,10 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist }: Profil
                             sizes="(max-width: 640px) 50vw, 25vw"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#1E2740] to-[#2A3550] flex items-center justify-center text-2xl">🎬</div>
+                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14] flex items-center justify-center text-2xl">🎬</div>
                         )}
                         <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-                          <h3 className="font-mono text-[12px] font-semibold text-white line-clamp-2 group-hover:text-[#FF8400] transition-colors">{f.movie.title}</h3>
+                          <h3 className="font-mono text-[12px] font-semibold text-white line-clamp-2 group-hover:text-[#ffb84d] transition-colors">{f.movie.title}</h3>
                         </div>
                       </div>
                     </Link>
@@ -389,21 +290,21 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist }: Profil
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-oswald text-xl font-bold text-white">Смотреть позже</h2>
-                <Link href="/profile/watchlist" className="font-mono text-[13px] text-[#FF8400] hover:text-[#FF9F2E]">
+                <Link href="/profile/watchlist" className="font-mono text-[13px] text-[#ffb84d] hover:text-[#ffc56a]">
                   Все →
                 </Link>
               </div>
               {recentWatchlist.length === 0 ? (
-                <p className="font-mono text-[13px] text-[#5A6478] text-center py-8">{t("empty")}</p>
+                <p className="font-mono text-[13px] text-white/35 text-center py-8">{t("empty")}</p>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {recentWatchlist.map((w) => (
                     <Link key={w.movie.id} href={`/movies/${w.movie.id}`} className="group">
-                      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#1A2236]">
+                      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#121821]">
                         {w.movie.poster ? (
                           shouldUseUnoptimized(w.movie.poster) ? <img src={getProxiedImageUrl(w.movie.poster)!} alt={w.movie.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" /> : <Image src={getProxiedImageUrl(w.movie.poster)!} alt={w.movie.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#1E2740] to-[#2A3550] flex items-center justify-center text-2xl">🎬</div>
+                          <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14] flex items-center justify-center text-2xl">🎬</div>
                         )}
                         <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
                           <h3 className="font-mono text-[12px] font-semibold text-white line-clamp-2">{w.movie.title}</h3>
@@ -417,62 +318,167 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist }: Profil
           )}
 
           {activeTab === "reviews" && (
-            <div className="text-center py-12 bg-[#1A2236] rounded-2xl">
-              <p className="font-mono text-[13px] text-[#5A6478]">Отзывы загружаются...</p>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-oswald text-xl font-bold text-white">Мои отзывы и комментарии</h2>
+              </div>
+              {reviews.length === 0 ? (
+                <p className="font-mono text-[13px] text-white/35 text-center py-8">Вы еще не оставляли отзывов или комментариев.</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review) => {
+                    const ratingValue = review.movie.ratings?.[0]?.value;
+                    const isComment = review.type === "comment";
+                    return (
+                      <div key={review.id} className="bg-[#121821] rounded-2xl p-5 border border-white/[0.04] flex gap-4">
+                        {/* Постер фильма */}
+                        <Link href={`/movies/${review.movie.id}`} className="group flex-shrink-0">
+                          <div className="relative w-16 aspect-[2/3] rounded-xl overflow-hidden bg-[#0b0f14]">
+                            {review.movie.poster ? (
+                              <ProxiedImage
+                                src={review.movie.poster}
+                                alt={review.movie.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                sizes="64px"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-[#121821] flex items-center justify-center text-sm">🎬</div>
+                            )}
+                          </div>
+                        </Link>
+                        {/* Содержимое отзыва/комментария */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-4">
+                                <Link href={`/movies/${review.movie.id}`} className="font-oswald text-base font-bold text-white hover:text-[#ffb84d] transition-colors truncate">
+                                  {review.movie.title}
+                                </Link>
+                                {!isComment && editingId !== review.id && (
+                                  <div className="flex gap-2 flex-shrink-0">
+                                    <button
+                                      onClick={() => handleEditStart(review)}
+                                      className="text-xs text-white/40 hover:text-[#ffb84d] transition-colors font-mono"
+                                    >
+                                      ✏️ Ред.
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(review.id)}
+                                      className="text-xs text-white/40 hover:text-red-400 transition-colors font-mono"
+                                    >
+                                      ❌ Удал.
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                {isComment ? (
+                                  <span className="font-mono text-[10px] px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded border border-blue-500/20">
+                                    💬 Комментарий
+                                  </span>
+                                ) : (
+                                  <>
+                                    <span className="font-mono text-[10px] px-2 py-0.5 bg-[#ffb84d]/10 text-[#ffb84d] rounded border border-[#ffb84d]/20">
+                                      ✍️ Отзыв
+                                    </span>
+                                    {ratingValue && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[#ffb84d] text-sm">★</span>
+                                        <span className="font-mono text-xs text-white/80">{ratingValue} / 10</span>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <span className="font-mono text-[11px] text-white/35 whitespace-nowrap">
+                              {new Date(review.createdAt).toLocaleDateString("ru-RU", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+
+                          {editingId === review.id ? (
+                            <form onSubmit={(e) => handleUpdate(e, review.id)} className="mt-2">
+                              <div className="mb-3">
+                                <label className="block text-xs font-medium text-white/45 mb-1">
+                                  Ваша оценка
+                                </label>
+                                <Rating value={editRating} onChange={setEditRating} size="sm" />
+                              </div>
+                              <Textarea
+                                value={editContent}
+                                onChange={(e) => setEditContent(e.target.value)}
+                                rows={3}
+                                className="mb-3"
+                              />
+                              {editError && <p className="text-red-400 text-xs mb-3">{editError}</p>}
+                              <div className="flex gap-2">
+                                <Button type="submit" size="sm" isLoading={isUpdating}>
+                                  Сохранить
+                                </Button>
+                                <Button type="button" variant="ghost" size="sm" onClick={handleEditCancel}>
+                                  Отмена
+                                </Button>
+                              </div>
+                            </form>
+                          ) : (
+                            <p className="font-mono text-[13px] text-white/70 whitespace-pre-wrap">{review.content}</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
-          {activeTab === "achievements" && (
-            <div className="text-center py-12 bg-[#1A2236] rounded-2xl">
-              <p className="font-mono text-[13px] text-[#5A6478]">
-                🏆 {user._count.achievements} достижений разблокировано
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-[320px] flex-shrink-0 space-y-6">
+        <div className="w-full lg:w-[320px] flex-shrink-0 space-y-6">
           {/* Recent Activity */}
-          <div className="bg-[#1A2236] rounded-2xl p-5">
+          <div className="bg-[#121821] rounded-2xl p-5">
             <h3 className="font-oswald text-base font-bold text-white mb-4">Последняя активность</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#2A3550] flex items-center justify-center text-sm">⭐</div>
+                <div className="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-sm">⭐</div>
                 <div>
                   <p className="font-mono text-[12px] text-white">Оценил фильм</p>
-                  <p className="font-mono text-[10px] text-[#5A6478]">Недавно</p>
+                  <p className="font-mono text-[10px] text-white/35">Недавно</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#2A3550] flex items-center justify-center text-sm">❤️</div>
+                <div className="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-sm">❤️</div>
                 <div>
                   <p className="font-mono text-[12px] text-white">Добавил в избранное</p>
-                  <p className="font-mono text-[10px] text-[#5A6478]">Недавно</p>
+                  <p className="font-mono text-[10px] text-white/35">Недавно</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="bg-[#1A2236] rounded-2xl p-5">
+          <div className="bg-[#121821] rounded-2xl p-5">
             <h3 className="font-oswald text-base font-bold text-white mb-4">Быстрые действия</h3>
             <div className="space-y-2">
-              <Link href="/profile/stats" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#2A3550] transition-colors group">
+              <Link href="/profile/stats" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.08] transition-colors group">
                 <span className="text-lg">📊</span>
-                <span className="font-mono text-[12px] text-[#8B95A8] group-hover:text-white transition-colors">{t("stats")}</span>
+                <span className="font-mono text-[12px] text-white/45 group-hover:text-white transition-colors">{t("stats")}</span>
               </Link>
-              <Link href="/challenges" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#2A3550] transition-colors group">
-                <span className="text-lg">🎯</span>
-                <span className="font-mono text-[12px] text-[#8B95A8] group-hover:text-white transition-colors">{t("challenges")}</span>
-              </Link>
-              <Link href="/profile/weekly-report" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#2A3550] transition-colors group">
+              <Link href="/profile/weekly-report" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.08] transition-colors group">
                 <span className="text-lg">📈</span>
-                <span className="font-mono text-[12px] text-[#8B95A8] group-hover:text-white transition-colors">Еженедельный отчёт</span>
+                <span className="font-mono text-[12px] text-white/45 group-hover:text-white transition-colors">Еженедельный отчёт</span>
               </Link>
-              <Link href="/profile/export" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#2A3550] transition-colors group">
+              <Link href="/profile/export" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.08] transition-colors group">
                 <span className="text-lg">📦</span>
-                <span className="font-mono text-[12px] text-[#8B95A8] group-hover:text-white transition-colors">Экспорт/Импорт</span>
+                <span className="font-mono text-[12px] text-white/45 group-hover:text-white transition-colors">Экспорт/Импорт</span>
               </Link>
             </div>
           </div>

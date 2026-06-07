@@ -128,12 +128,11 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
   const endItem = Math.min(currentPage * MOVIES_PER_PAGE, total);
 
   return (
-    <div className="bg-[#151C2C] min-h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between px-12 pt-8 pb-4">
+    <div className="min-h-full bg-[#0b0f14]">
+      <div className="flex flex-col gap-4 px-4 pb-4 pt-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 lg:px-12">
         <div>
-          <h1 className="font-oswald text-4xl font-bold text-white">Каталог фильмов</h1>
-          <p className="font-mono text-[13px] text-[#8B95A8] mt-1">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl">Каталог фильмов</h1>
+          <p className="mt-1 text-sm text-white/45">
             {total > 0 ? `Найдено: ${total} фильмов` : "Фильмы не найдены"}
           </p>
         </div>
@@ -141,19 +140,19 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
       </div>
 
       {/* Filters */}
-      <div className="px-12 py-5">
+      <div className="px-4 py-5 sm:px-8 lg:px-12">
         <MovieFilters genres={genres} />
       </div>
 
       {/* Movie Grid */}
-      <div className="px-12">
+      <div className="px-4 sm:px-8 lg:px-12">
         <MovieGrid movies={movies} />
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-12 py-6 pb-10">
-          <span className="font-mono text-[13px] text-[#5A6478]">
+        <div className="flex flex-col items-center justify-between gap-3 px-4 py-6 pb-10 sm:flex-row sm:px-8 lg:px-12">
+          <span className="hidden text-sm text-white/35 sm:block">
             Страница {currentPage} из {totalPages}
           </span>
           <Pagination
@@ -161,7 +160,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
             totalPages={totalPages}
             baseUrl={baseUrl}
           />
-          <span className="font-mono text-[13px] text-[#5A6478]">
+          <span className="text-sm text-white/35">
             Показано {startItem}–{endItem} из {total}
           </span>
         </div>

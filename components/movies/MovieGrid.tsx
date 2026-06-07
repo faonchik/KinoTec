@@ -31,10 +31,10 @@ export function MovieGrid({ movies, isLoading, emptyMessage = "Фильмы не
   if (movies.length === 0) {
     return (
       <div className="text-center py-16">
-        <svg className="w-16 h-16 mx-auto text-[#2A3550] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="mx-auto mb-4 h-16 w-16 text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
         </svg>
-        <p className="text-[#5A6478] font-mono text-sm">{emptyMessage}</p>
+        <p className="text-white/35 font-mono text-sm">{emptyMessage}</p>
       </div>
     );
   }

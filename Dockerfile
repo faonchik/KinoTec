@@ -4,6 +4,8 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package*.json ./
+# postinstall → prisma generate; schema must exist before npm ci
+COPY prisma ./prisma
 RUN npm ci --legacy-peer-deps
 
 # Stage 2: Builder
@@ -12,19 +14,21 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Генерируем Prisma клиент с retry на случай сетевых проблем
-# Используем явный путь к схеме и несколько попыток
+ENV NEXTJS_DOCKER_BUILD=true
+
+# Сборка Next (без migrate deploy — в build нет доступа к БД)
 RUN for i in 1 2 3; do \
     npx prisma generate --schema=./prisma/schema.prisma && break || \
     (echo "Attempt $i failed, retrying..." && sleep 10); \
-    done
-RUN npm run build
+    done && npx next build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
+
+RUN apk add --no-cache libc6-compat openssl
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -36,8 +40,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # Копируем Prisma для миграций
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+# CLI и движки для `prisma migrate deploy` при старте (в build нет DATABASE_URL / БД)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
+RUN mkdir -p /tmp/.npm && chown nextjs:nodejs /tmp/.npm
 
 USER nextjs
+
+ENV NPM_CONFIG_CACHE=/tmp/.npm
 
 EXPOSE 3000
 
@@ -46,5 +57,4 @@ ENV HOSTNAME "0.0.0.0"
 # Увеличиваем лимит размера заголовков для предотвращения HTTP 431 (64KB)
 ENV NODE_OPTIONS="--max-http-header-size=65536"
 
-CMD ["node", "server.js"]
-
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import tmdb from "@/lib/tmdb";
+import tmdb, { TMDBService } from "@/lib/tmdb";
+import { serializeMovieForAdminJson } from "@/lib/admin/serializeMovie";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -40,22 +41,37 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Фильм не найден" }, { status: 404 });
     }
 
-    // Ищем фильм в TMDB по названию
     const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : undefined;
-    
+
     let tmdbId: number | null = null;
 
+    if (movie.tmdbId?.trim()) {
+      const parsed = parseInt(movie.tmdbId.trim(), 10);
+      if (!Number.isNaN(parsed) && parsed > 0) {
+        tmdbId = parsed;
+      }
+    }
+
+    // Ищем фильм в TMDB по названию, если нет сохранённого TMDB ID
+    if (!tmdbId && !movie.title?.trim()) {
+      return NextResponse.json(
+        { error: "Укажите название фильма или сохраните TMDB ID (импорт / синхронизация из TMDB)." },
+        { status: 400 }
+      );
+    }
+
     // Пробуем поиск по основному названию
-    const searchResults = await tmdb.searchMovies(movie.title);
-    if (searchResults && searchResults.results && searchResults.results.length > 0) {
-      // Если указан год, ищем наиболее подходящий результат
-      if (year) {
-        const matching = searchResults.results.find(
-          (m) => m.release_date && new Date(m.release_date).getFullYear() === year
-        );
-        tmdbId = matching ? matching.id : searchResults.results[0].id;
-      } else {
-        tmdbId = searchResults.results[0].id;
+    if (!tmdbId) {
+      const searchResults = await tmdb.searchMovies(movie.title);
+      if (searchResults && searchResults.results && searchResults.results.length > 0) {
+        if (year) {
+          const matching = searchResults.results.find(
+            (m) => m.release_date && new Date(m.release_date).getFullYear() === year
+          );
+          tmdbId = matching ? matching.id : searchResults.results[0].id;
+        } else {
+          tmdbId = searchResults.results[0].id;
+        }
       }
     }
 
@@ -127,7 +143,7 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
             data: {
               name: tmdbActor.name,
               bio: personDetails?.biography || null,
-              photo: tmdb.getImageUrl(tmdbActor.profile_path),
+              photo: TMDBService.getImageUrl(tmdbActor.profile_path),
               birthDate: personDetails?.birthday ? new Date(personDetails.birthday) : null,
               birthPlace: personDetails?.place_of_birth || null,
               deathDate: personDetails?.deathday ? new Date(personDetails.deathday) : null,
@@ -166,14 +182,12 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       success: true,
       message: `Добавлено актёров: ${added}, пропущено: ${skipped}`,
-      movie: updatedMovie,
+      movie: serializeMovieForAdminJson(updatedMovie as unknown as Record<string, unknown>),
     });
   } catch (error) {
     console.error("Update actors error:", error);
-    return NextResponse.json(
-      { error: "Ошибка при обновлении актёров" },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : "Ошибка при обновлении актёров";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 

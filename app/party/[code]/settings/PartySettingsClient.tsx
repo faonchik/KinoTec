@@ -36,12 +36,12 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
   const [maxUsers, setMaxUsers] = useState(party.maxUsers);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<{ text: string; kind: "ok" | "err" } | null>(null);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    setMessage("");
+    setMessage(null);
 
     try {
       const res = await fetch(`/api/party/${party.code}/settings`, {
@@ -56,14 +56,14 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
       });
 
       if (res.ok) {
-        setMessage("✅ Настройки сохранены");
-        setTimeout(() => setMessage(""), 3000);
+        setMessage({ kind: "ok", text: "Настройки сохранены" });
+        setTimeout(() => setMessage(null), 3000);
       } else {
         const data = await res.json();
-        setMessage(`❌ ${data.error || "Ошибка сохранения"}`);
+        setMessage({ kind: "err", text: data.error || "Ошибка сохранения" });
       }
     } catch {
-      setMessage("❌ Ошибка сети");
+      setMessage({ kind: "err", text: "Ошибка сети" });
     } finally {
       setIsSaving(false);
     }
@@ -82,10 +82,10 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
       if (res.ok) {
         router.push("/party");
       } else {
-        setMessage("❌ Ошибка удаления");
+        setMessage({ kind: "err", text: "Ошибка удаления" });
       }
     } catch {
-      setMessage("❌ Ошибка сети");
+      setMessage({ kind: "err", text: "Ошибка сети" });
     } finally {
       setIsDeleting(false);
     }
@@ -100,7 +100,7 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
       });
       router.refresh();
     } catch {
-      setMessage("❌ Ошибка");
+      setMessage({ kind: "err", text: "Ошибка" });
     }
   };
 
@@ -115,7 +115,7 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-white">⚙️ Настройки комнаты</h1>
+            <h1 className="text-2xl font-bold text-white">Настройки комнаты</h1>
             <p className="text-slate-400">Код: {party.code}</p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Например: Вечерний киносеанс"
-              className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
             />
           </div>
 
@@ -166,9 +166,8 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
                     : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
                 }`}
               >
-                <div className="text-2xl mb-2">🔓</div>
-                <div className="text-white font-medium">Открытая</div>
-                <p className="text-slate-400 text-sm">Любой может войти</p>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-400/90">Открытая</p>
+                <p className="mt-1 text-sm text-slate-400">Вход без пароля</p>
               </button>
 
               <button
@@ -180,9 +179,8 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
                     : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
                 }`}
               >
-                <div className="text-2xl mb-2">🔒</div>
-                <div className="text-white font-medium">Закрытая</div>
-                <p className="text-slate-400 text-sm">Нужен пароль</p>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-red-300/90">Закрытая</p>
+                <p className="mt-1 text-sm text-slate-400">Нужен пароль</p>
               </button>
             </div>
           </div>
@@ -196,7 +194,7 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Введите пароль"
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
               />
             </div>
           )}
@@ -212,7 +210,7 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
               max="50"
               value={maxUsers}
               onChange={(e) => setMaxUsers(parseInt(e.target.value))}
-              className="w-full accent-amber-500"
+              className="w-full accent-[#e50914]"
             />
             <div className="flex justify-between text-slate-500 text-sm">
               <span>2</span>
@@ -221,11 +219,15 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
           </div>
 
           {/* Сообщение */}
-          {message && (
-            <div className={`p-3 rounded-lg ${message.startsWith("✅") ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
-              {message}
+          {message ? (
+            <div
+              className={`rounded-lg p-3 ${
+                message.kind === "ok" ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+              }`}
+            >
+              {message.text}
             </div>
-          )}
+          ) : null}
 
           {/* Кнопки */}
           <div className="flex gap-3">
@@ -238,7 +240,7 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
         {/* Участники */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-white mb-4">
-            👥 Участники ({party.participants.length})
+            Участники ({party.participants.length})
           </h2>
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 divide-y divide-slate-700">
             {party.participants.map((p) => (
@@ -273,14 +275,14 @@ export function PartySettingsClient({ party }: PartySettingsClientProps) {
 
         {/* Опасная зона */}
         <div className="mt-8 pt-8 border-t border-slate-700">
-          <h2 className="text-xl font-semibold text-red-400 mb-4">⚠️ Опасная зона</h2>
+          <h2 className="mb-4 text-xl font-semibold text-red-400">Опасная зона</h2>
           <Button
             variant="danger"
             onClick={handleDelete}
             disabled={isDeleting}
             className="w-full"
           >
-            {isDeleting ? "Удаление..." : "🗑️ Удалить комнату"}
+            {isDeleting ? "Удаление…" : "Удалить комнату"}
           </Button>
         </div>
       </div>

@@ -26,16 +26,27 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
 
-  const applyFilters = () => {
+  const applyFilters = (patch?: {
+    search?: string;
+    genre?: string;
+    year?: string;
+    sort?: string;
+  }) => {
+    const q = patch?.search ?? search;
+    const genre = patch?.genre ?? selectedGenre;
+    const year = patch?.year ?? selectedYear;
+    const sort = patch?.sort ?? sortBy;
+
     const params = new URLSearchParams();
-    
-    if (search) params.set("q", search);
-    if (selectedGenre) params.set("genre", selectedGenre);
-    if (selectedYear) params.set("year", selectedYear);
-    if (sortBy && sortBy !== "popularity") params.set("sort", sortBy);
-    
+
+    if (q.trim()) params.set("q", q.trim());
+    if (genre) params.set("genre", genre);
+    if (year) params.set("year", year);
+    if (sort && sort !== "popularity") params.set("sort", sort);
+
     startTransition(() => {
-      router.push(`/movies?${params.toString()}`);
+      const qs = params.toString();
+      router.push(qs ? `/movies?${qs}` : "/movies");
     });
   };
 
@@ -73,7 +84,11 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
       <div className="relative">
         <select
           value={selectedGenre}
-          onChange={(e) => setSelectedGenre(e.target.value)}
+          onChange={(e) => {
+            const genre = e.target.value;
+            setSelectedGenre(genre);
+            applyFilters({ genre });
+          }}
           className="h-11 bg-[#1A2236] rounded-2xl px-4 pr-10 font-mono text-[13px] text-[#8B95A8] border-none outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FF8400]/50"
         >
           <option value="">Все жанры</option>
@@ -90,7 +105,11 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
       <div className="relative">
         <select
           value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
+          onChange={(e) => {
+            const year = e.target.value;
+            setSelectedYear(year);
+            applyFilters({ year });
+          }}
           className="h-11 bg-[#1A2236] rounded-2xl px-4 pr-10 font-mono text-[13px] text-[#8B95A8] border-none outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FF8400]/50"
         >
           <option value="">Год выхода</option>
@@ -107,7 +126,11 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
       <div className="relative">
         <select
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
+          onChange={(e) => {
+            const sort = e.target.value;
+            setSortBy(sort);
+            applyFilters({ sort });
+          }}
           className="h-11 bg-[#1A2236] rounded-2xl px-4 pr-10 font-mono text-[13px] text-[#8B95A8] border-none outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FF8400]/50"
         >
           <option value="popularity">По популярности</option>
@@ -122,7 +145,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
 
       {/* Apply Button */}
       <button
-        onClick={applyFilters}
+        onClick={() => applyFilters()}
         disabled={isPending}
         className="h-11 bg-[#FF8400] hover:bg-[#FF9F2E] text-white font-mono text-[13px] font-semibold px-6 rounded-2xl transition-colors disabled:opacity-50"
       >

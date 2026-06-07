@@ -1,23 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Google Font Imports */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @layer base {
+  :root {
+    --site-header-height: 64px;
+  }
+
+  html {
+    scroll-padding-top: var(--site-header-height);
+  }
+
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: var(--font-sp-body), Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     touch-action: manipulation;
-    background-color: var(--bg-primary, #0f172a);
+    background-color: var(--cine-bg, #141414);
     color: var(--text-primary, #f1f5f9);
   }
 
@@ -156,25 +164,35 @@
    ============================================ */
 
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent: #f59e0b;
-  --accent-hover: #d97706;
-  --border: #334155;
+  --cine-bg: #141414;
+  --cine-surface: #181818;
+  --cine-accent: #e50914;
+  --cine-accent-hover: #f40612;
+  --cine-muted: rgba(255, 255, 255, 0.55);
+  --bg-primary: #141414;
+  --bg-secondary: #181818;
+  --bg-tertiary: #232323;
+  --text-primary: #f8fafc;
+  --text-secondary: #e5e5e5;
+  --text-muted: #a3a3a3;
+  --accent: #e50914;
+  --accent-hover: #f40612;
+  --border: rgba(255, 255, 255, 0.08);
 }
 
-/* Тёмная (по умолчанию) */
+/* Тёмная (по умолчанию) — Netflix-style */
 .theme-dark {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --accent: #f59e0b;
+  --cine-bg: #141414;
+  --cine-surface: #181818;
+  --cine-accent: #e50914;
+  --cine-accent-hover: #f40612;
+  --cine-muted: rgba(255, 255, 255, 0.55);
+  --bg-primary: #141414;
+  --bg-secondary: #181818;
+  --bg-tertiary: #232323;
+  --text-primary: #f8fafc;
+  --text-secondary: #e5e5e5;
+  --accent: #e50914;
 }
 
 /* Светлая */

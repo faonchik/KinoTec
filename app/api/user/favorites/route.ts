@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+
 
 export async function GET() {
   try {
@@ -62,6 +64,12 @@ export async function POST(request: NextRequest) {
       await prisma.favorite.delete({
         where: { id: existingFavorite.id },
       });
+      try {
+        revalidatePath("/profile");
+        revalidatePath(`/movies/${movieId}`);
+      } catch (e) {
+        console.error("Revalidation error:", e);
+      }
       return NextResponse.json({ action: "removed" });
     } else {
       // Add to favorites
@@ -71,6 +79,12 @@ export async function POST(request: NextRequest) {
           movieId,
         },
       });
+      try {
+        revalidatePath("/profile");
+        revalidatePath(`/movies/${movieId}`);
+      } catch (e) {
+        console.error("Revalidation error:", e);
+      }
       return NextResponse.json({ action: "added" }, { status: 201 });
     }
   } catch (error) {

@@ -1,28 +1,37 @@
+import { outboundFetch } from "@/lib/outbound-http";
+
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
 
-// Кэш для API ключа
-let cachedApiKey: string | null = null;
+/** v3 API Key → query `api_key=`. Read Access Token (JWT) → заголовок `Authorization: Bearer`. */
+type TmdbCredentials = { token: string; useBearer: boolean };
 
-async function getApiKey(): Promise<string> {
-  // Сначала проверяем env
-  if (process.env.TMDB_API_KEY && process.env.TMDB_API_KEY !== "ваш_ключ_здесь") {
-    return process.env.TMDB_API_KEY;
+let cachedCredentials: TmdbCredentials | null = null;
+
+function isPlaceholderKey(raw: string): boolean {
+  const t = raw.trim();
+  return !t || t === "ваш_ключ_здесь" || t === "your_key_here";
+}
+
+async function getTmdbCredentials(): Promise<TmdbCredentials> {
+  if (cachedCredentials) {
+    return cachedCredentials;
   }
 
-  // Используем кэш
-  if (cachedApiKey) {
-    return cachedApiKey;
+  const raw = process.env.TMDB_API_KEY?.trim();
+  if (raw && !isPlaceholderKey(raw)) {
+    const useBearer = raw.startsWith("eyJ");
+    cachedCredentials = { token: raw, useBearer };
+    return cachedCredentials;
   }
 
-  // Получаем ключ через freekeys
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const freekeys = require("freekeys");
     const keys = await freekeys();
-    cachedApiKey = keys.tmdb_key;
-    console.log("✅ TMDB API ключ получен через freekeys");
-    return cachedApiKey!;
+    cachedCredentials = { token: keys.tmdb_key, useBearer: false };
+    console.info("TMDB API key loaded via freekeys");
+    return cachedCredentials;
   } catch (error) {
     console.error("Ошибка получения API ключа:", error);
     throw new Error("Не удалось получить TMDB API ключ");
@@ -85,6 +94,24 @@ export interface TMDBSearchResult {
     backdrop_path: string | null;
     release_date: string;
     vote_average: number;
+    vote_count: number;
+  }[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface TMDBTvSearchResult {
+  page: number;
+  results: {
+    id: number;
+    name: string;
+    original_name: string;
+    overview: string;
+    poster_path: string | null;
+    backdrop_path: string | null;
+    first_air_date: string;
+    vote_average: number;
+    vote_count: number;
   }[];
   total_pages: number;
   total_results: number;
@@ -93,16 +120,27 @@ export interface TMDBSearchResult {
 export class TMDBService {
   private async fetch<T>(endpoint: string, params: Record<string, string> = {}): Promise<T | null> {
     try {
-      const apiKey = await getApiKey();
+      const { token, useBearer } = await getTmdbCredentials();
 
       const searchParams = new URLSearchParams({
-        api_key: apiKey,
         language: "ru-RU",
         ...params,
       });
+      if (!useBearer) {
+        searchParams.set("api_key", token);
+      }
 
-      const response = await fetch(`${TMDB_BASE_URL}${endpoint}?${searchParams}`);
-      
+      const url = `${TMDB_BASE_URL}${endpoint}?${searchParams}`;
+      const headers: Record<string, string> = { Accept: "application/json" };
+      if (useBearer) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await outboundFetch(url, {
+        headers,
+        signal: AbortSignal.timeout(45_000),
+      });
+
       if (!response.ok) {
         throw new Error(`TMDB API error: ${response.status}`);
       }
@@ -117,6 +155,13 @@ export class TMDBService {
   // Поиск фильмов
   async searchMovies(query: string, page = 1): Promise<TMDBSearchResult | null> {
     return this.fetch<TMDBSearchResult>("/search/movie", {
+      query,
+      page: page.toString(),
+    });
+  }
+
+  async searchTv(query: string, page = 1): Promise<TMDBTvSearchResult | null> {
+    return this.fetch<TMDBTvSearchResult>("/search/tv", {
       query,
       page: page.toString(),
     });

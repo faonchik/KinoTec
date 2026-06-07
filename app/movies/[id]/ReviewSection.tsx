@@ -10,11 +10,16 @@ import { CommentSection } from "@/components/reviews/CommentSection";
 
 interface Review {
   id: string;
+  userId: string;
   content: string;
   createdAt: Date;
   user: {
+    id: string;
     name: string | null;
     email: string;
+    ratings?: {
+      value: number;
+    }[];
   };
 }
 
@@ -31,6 +36,88 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
   const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Редактирование отзыва
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [editRating, setEditRating] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  const handleEditStart = (review: Review) => {
+    setEditingId(review.id);
+    setEditContent(review.content);
+    setEditRating(review.user.ratings?.[0]?.value || 0);
+    setEditError("");
+  };
+
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditContent("");
+    setEditRating(0);
+    setEditError("");
+  };
+
+  const handleUpdate = async (e: React.FormEvent, reviewId: string) => {
+    e.preventDefault();
+    setEditError("");
+
+    if (!editContent.trim()) {
+      setEditError("Введите текст отзыва");
+      return;
+    }
+
+    if (editContent.length < 10) {
+      setEditError("Отзыв должен содержать минимум 10 символов");
+      return;
+    }
+
+    if (editRating === 0) {
+      setEditError("Выберите рейтинг");
+      return;
+    }
+
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch(`/api/reviews/${reviewId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: editContent, rating: editRating }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Ошибка при обновлении отзыва");
+      }
+
+      setEditingId(null);
+      router.refresh();
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : "Ошибка при обновлении отзыва");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async (reviewId: string) => {
+    if (!confirm("Вы уверены, что хотите удалить этот отзыв?")) return;
+
+    try {
+      const response = await fetch(`/api/reviews/${reviewId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Ошибка при удалении отзыва");
+      }
+
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка при удалении отзыва");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,13 +163,15 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
     }
   };
 
+  const hasReviewed = reviews.some((r) => r.userId === session?.user?.id);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">
           Отзывы ({reviews.length})
         </h2>
-        {session && !showForm && (
+        {session && !showForm && !hasReviewed && (
           <Button onClick={() => setShowForm(true)}>
             Написать отзыв
           </Button>
@@ -173,20 +262,72 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
                     <p className="font-medium text-white">
                       {review.user.name || "Пользователь"}
                     </p>
-                    <p className="text-sm text-slate-400">
-                      {new Date(review.createdAt).toLocaleDateString("ru-RU", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-sm text-slate-400">
+                        {new Date(review.createdAt).toLocaleDateString("ru-RU", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                      {review.user.ratings?.[0]?.value && (
+                        <span className="text-xs text-amber-400 bg-[#ffb84d]/10 px-2 py-0.5 rounded border border-[#ffb84d]/20 flex items-center gap-1 font-mono">
+                          ★ {review.user.ratings[0].value} / 10
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {session?.user?.id === review.userId && !editingId && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditStart(review)}
+                      className="text-xs text-slate-400 hover:text-[#ffb84d] transition-colors font-mono"
+                    >
+                      ✏️ Ред.
+                    </button>
+                    <button
+                      onClick={() => handleDelete(review.id)}
+                      className="text-xs text-slate-400 hover:text-red-400 transition-colors font-mono"
+                    >
+                      ❌ Удал.
+                    </button>
+                  </div>
+                )}
               </div>
-              <p className="text-slate-300 whitespace-pre-line">{review.content}</p>
-              
-              {/* Комментарии к отзыву */}
-              <CommentSection reviewId={review.id} />
+
+              {editingId === review.id ? (
+                <form onSubmit={(e) => handleUpdate(e, review.id)} className="mt-2">
+                  <div className="mb-4">
+                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                      Ваша оценка
+                    </label>
+                    <Rating value={editRating} onChange={setEditRating} size="sm" />
+                  </div>
+                  <Textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    rows={4}
+                    className="mb-3"
+                  />
+                  {editError && <p className="text-red-400 text-xs mb-3">{editError}</p>}
+                  <div className="flex gap-2">
+                    <Button type="submit" size="sm" isLoading={isUpdating}>
+                      Сохранить
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={handleEditCancel}>
+                      Отмена
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <p className="text-slate-300 whitespace-pre-line">{review.content}</p>
+                  {/* Комментарии к отзыву */}
+                  <CommentSection reviewId={review.id} />
+                </>
+              )}
             </article>
           ))}
         </div>

@@ -1,9 +1,27 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import path from "node:path";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+const projectRoot = path.resolve(__dirname);
+
+const isDockerNextBuild = process.env.NEXTJS_DOCKER_BUILD === "true";
 
 const nextConfig: NextConfig = {
+  // В образе next build без полной БД: ESLint/TS проверяйте локально или в CI
+  eslint: {
+    ignoreDuringBuilds: isDockerNextBuild,
+  },
+  typescript: {
+    ignoreBuildErrors: isDockerNextBuild,
+  },
+  output: "standalone",
+  // Явно фиксируем корень проекта, чтобы Next.js не выбирал родительскую папку по lockfile
+  outputFileTracingRoot: projectRoot,
+  turbopack: {
+    root: projectRoot,
+  },
+
   // Отключаем вывод информации о версии Next.js в заголовках
   poweredByHeader: false,
   

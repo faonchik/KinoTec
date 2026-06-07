@@ -54,8 +54,8 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
         href={getPageUrl(Math.max(1, currentPage - 1))}
         className={`font-mono text-[13px] px-3 py-2 rounded-lg transition-colors ${
           currentPage === 1
-            ? "text-[#3A4560] pointer-events-none"
-            : "text-[#8B95A8] hover:text-white hover:bg-[#2A3550]"
+            ? "text-white/20 pointer-events-none"
+            : "text-white/45 hover:text-white hover:bg-white/[0.08]"
         }`}
       >
         Назад
@@ -68,14 +68,14 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
             href={getPageUrl(page)}
             className={`min-w-[36px] h-9 flex items-center justify-center rounded-lg font-mono text-[13px] font-medium transition-colors ${
               page === currentPage
-                ? "bg-[#FF8400] text-white"
-                : "text-[#8B95A8] hover:text-white hover:bg-[#2A3550]"
+                ? "bg-[#ffb84d] text-[#0b0f14]"
+                : "text-white/45 hover:text-white hover:bg-white/[0.08]"
             }`}
           >
             {page}
           </Link>
         ) : (
-          <span key={index} className="px-1 text-[#5A6478] font-mono text-[13px]">
+          <span key={index} className="px-1 text-white/35 font-mono text-[13px]">
             {page}
           </span>
         )
@@ -86,8 +86,8 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
         href={getPageUrl(Math.min(totalPages, currentPage + 1))}
         className={`font-mono text-[13px] px-3 py-2 rounded-lg transition-colors ${
           currentPage === totalPages
-            ? "text-[#3A4560] pointer-events-none"
-            : "text-[#FF8400] hover:text-[#FF9F2E] hover:bg-[#2A3550]"
+            ? "text-white/20 pointer-events-none"
+            : "text-[#ffb84d] hover:text-[#ffc56a] hover:bg-white/[0.08]"
         }`}
       >
         Далее &gt;

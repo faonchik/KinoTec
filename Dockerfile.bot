@@ -26,4 +26,3 @@ RUN npx tsc
 
 # Запускаем бота
 CMD ["node", "dist/index.js"]
-

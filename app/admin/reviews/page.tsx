@@ -19,7 +19,15 @@ async function getReviews(showPending: boolean) {
     where: showPending ? { isApproved: false } : undefined,
     include: {
       user: { select: { name: true, email: true } },
-      movie: { select: { id: true, title: true } },
+      movie: {
+        select: {
+          id: true,
+          title: true,
+          ratings: {
+            select: { userId: true, value: true },
+          },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -78,24 +86,35 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
         </div>
       ) : (
         <div className="space-y-4">
-          {reviews.map((review) => (
-            <div
-              key={review.id}
-              className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-6"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <Link
-                    href={`/movies/${review.movie.id}`}
-                    className="text-lg font-semibold text-white hover:text-amber-400 transition-colors"
-                  >
-                    {review.movie.title}
-                  </Link>
-                  <p className="text-slate-400 text-sm">
-                    от {review.user.name || review.user.email} •{" "}
-                    {new Date(review.createdAt).toLocaleDateString("ru-RU")}
-                  </p>
-                </div>
+          {reviews.map((review) => {
+            const ratingValue = review.movie.ratings.find(
+              (r) => r.userId === review.userId
+            )?.value;
+            return (
+              <div
+                key={review.id}
+                className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-6"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <Link
+                      href={`/movies/${review.movie.id}`}
+                      className="text-lg font-semibold text-white hover:text-amber-400 transition-colors"
+                    >
+                      {review.movie.title}
+                    </Link>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-slate-400 text-sm">
+                        от {review.user.name || review.user.email} •{" "}
+                        {new Date(review.createdAt).toLocaleDateString("ru-RU")}
+                      </p>
+                      {ratingValue && (
+                        <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 flex items-center gap-1 font-mono">
+                          ★ {ratingValue} / 10
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 <div className="flex items-center gap-2">
                   {review.isApproved ? (
                     <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full">
@@ -113,8 +132,9 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
               
               <ReviewActions reviewId={review.id} isApproved={review.isApproved} />
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
       )}
     </div>
   );

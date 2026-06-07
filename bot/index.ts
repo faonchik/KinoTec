@@ -21,6 +21,7 @@ if (process.env.GROQ_API_KEY) {
 import TelegramBot from "node-telegram-bot-api";
 import Groq from "groq-sdk";
 import { PrismaClient } from "@prisma/client";
+import { ProxyManager } from "./proxy-manager";
 
 // ============================================
 // 🎬 КиноТека Бот - Полноценный помощник
@@ -35,7 +36,9 @@ const ADMIN_ID = parseInt(process.env.TELEGRAM_ADMIN_ID || "809818162");
 const SITE_URL = process.env.SITE_URL || "http://localhost:3000";
 
 // Инициализация
-const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+const proxyManager = new ProxyManager();
+// Polling запускается вручную в async-блоке ниже, после загрузки прокси
+const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
 const prisma = new PrismaClient();
 
 // Ленивая инициализация Groq
@@ -214,6 +217,25 @@ interface UnsplashResponse {
   total: number;
 }
 
+async function searchTMDBImages(query: string): Promise<string[]> {
+  if (!TMDB_API_KEY) return [];
+  try {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(query)}&language=ru-RU&page=1`,
+      { headers: { Authorization: `Bearer ${TMDB_API_KEY}` } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json() as { results: { backdrop_path?: string | null; poster_path?: string | null }[] };
+    const urls: string[] = [];
+    for (const r of data.results || []) {
+      if (r.backdrop_path) urls.push(`https://image.tmdb.org/t/p/w1280${r.backdrop_path}`);
+      else if (r.poster_path) urls.push(`https://image.tmdb.org/t/p/w780${r.poster_path}`);
+      if (urls.length >= 5) break;
+    }
+    return urls;
+  } catch { return []; }
+}
+
 async function searchUnsplashImage(query: string): Promise<UnsplashPhoto | null> {
   if (!UNSPLASH_ACCESS_KEY) {
     console.log("⚠️ Unsplash API key not configured");
@@ -372,10 +394,26 @@ async function generateArticle(chatId: number, category: string, topic: string) 
       articleData = JSON.parse(cleanContent);
     }
 
-    // Поиск изображения через Unsplash
+    // Поиск изображения через Unsplash, fallback на TMDB
     const unsplashPhoto = await searchUnsplashImage(topic);
-    const coverUrl = unsplashPhoto?.urls?.regular || null;
+    let coverUrl: string | null = unsplashPhoto?.urls?.regular || null;
     const photoCredit = unsplashPhoto ? `Photo by ${unsplashPhoto.user.name} on Unsplash` : null;
+
+    if (!coverUrl && TMDB_API_KEY) {
+      try {
+        const tmdbRes = await fetch(
+          `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(topic)}&language=ru-RU&page=1`,
+          { headers: { Authorization: `Bearer ${TMDB_API_KEY}` } }
+        );
+        if (tmdbRes.ok) {
+          const tmdbData = await tmdbRes.json() as { results: { backdrop_path: string | null }[] };
+          const found = tmdbData.results?.find((r) => r.backdrop_path);
+          if (found?.backdrop_path) {
+            coverUrl = `https://image.tmdb.org/t/p/w1280${found.backdrop_path}`;
+          }
+        }
+      } catch { /* ignore */ }
+    }
 
     await bot.editMessageText(
       `📝 *Создание: ${categoryNames[category]}*\n\n✅ AI подключен\n✅ Текст сгенерирован\n✅ Обложка ${coverUrl ? "найдена" : "не найдена"}\n⏳ Сохраняю...`,
@@ -1125,7 +1163,7 @@ async function importMovieFromTMDB(chatId: number, tmdbId: number) {
             const personResponse = await fetch(
               `https://api.themoviedb.org/3/person/${tmdbActor.id}?api_key=${TMDB_API_KEY}&language=ru-RU`
             );
-            const personDetails = await personResponse.json();
+            const personDetails = await personResponse.json() as { biography?: string; birthday?: string; place_of_birth?: string; deathday?: string };
 
             actor = await prisma.actor.create({
               data: {
@@ -1494,7 +1532,7 @@ async function generateCollection(chatId: number, theme: string) {
 🎬 *Фильмы (${addedMovies.length}):*
 ${moviesList || "_Не удалось добавить фильмы_"}
 
-🔗 ${SITE_URL}/collections/${collection.slug}
+🔗 ${SITE_URL}/movies
 `.trim(), {
       parse_mode: "Markdown",
       reply_markup: { inline_keyboard: [[{ text: "📋 В меню", callback_data: "back_to_menu" }]] },
@@ -1904,35 +1942,74 @@ bot.on("callback_query", async (query) => {
 
   // Смена обложки
   if (action.startsWith("change_cover_")) {
-    const articleId = action.replace("change_cover_", "");
+    const parts = action.replace("change_cover_", "").split("_idx_");
+    const articleId = parts[0];
+    const currentIdx = parseInt(parts[1] || "0");
+
     const article = await prisma.article.findUnique({ where: { id: articleId } });
-    
-    if (!article) {
-      bot.sendMessage(chatId, "❌ Статья не найдена");
+    if (!article) { bot.sendMessage(chatId, "❌ Статья не найдена"); return; }
+
+    // Получаем список фото из userStates или ищем заново
+    let photoUrls: string[] = [];
+    const stateKey = `photos_${articleId}`;
+    const cached = userStates.get(chatId);
+    if (cached?.action === stateKey && Array.isArray(cached.data.urls)) {
+      photoUrls = cached.data.urls as string[];
+    } else {
+      bot.sendMessage(chatId, "🖼 Ищу изображения...");
+      const unsplash = await searchUnsplashImage(article.title);
+      if (unsplash) photoUrls.push(unsplash.urls.regular);
+      const tmdbUrls = await searchTMDBImages(article.title);
+      photoUrls.push(...tmdbUrls);
+      photoUrls = [...new Set(photoUrls)].filter(Boolean);
+      if (photoUrls.length > 0) {
+        userStates.set(chatId, { action: stateKey, data: { urls: photoUrls } });
+      }
+    }
+
+    if (photoUrls.length === 0) {
+      bot.sendMessage(chatId, "😔 Не удалось найти изображения для этой темы.");
       return;
     }
 
-    bot.sendMessage(chatId, "🖼 Ищу новое изображение...");
-    
-    const newPhoto = await searchUnsplashImage(article.title);
-    if (newPhoto) {
-      await prisma.article.update({
-        where: { id: articleId },
-        data: { cover: newPhoto.urls.regular },
-      });
-      await bot.sendPhoto(chatId, newPhoto.urls.regular, { 
-        caption: `✅ Новая обложка установлена!\n\n📷 ${newPhoto.user.name} / Unsplash`,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "🔄 Ещё вариант", callback_data: `change_cover_${articleId}` }],
-            [{ text: "✅ Опубликовать", callback_data: `publish_${articleId}` }],
-            [{ text: "📋 В меню", callback_data: "back_to_menu" }],
-          ],
-        },
-      });
-    } else {
-      bot.sendMessage(chatId, "😔 Не удалось найти изображение. Попробуйте позже.");
-    }
+    const idx = currentIdx % photoUrls.length;
+    const photoUrl = photoUrls[idx];
+
+    await bot.sendPhoto(chatId, photoUrl, {
+      caption: `🖼 Вариант ${idx + 1} из ${photoUrls.length}\n\nВыберите это фото или посмотрите следующий вариант.`,
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "✅ Выбрать это фото", callback_data: `set_cover_${articleId}_${idx}` }],
+          [{ text: "➡️ Следующий вариант", callback_data: `change_cover_${articleId}_idx_${idx + 1}` }],
+          [{ text: "✅ Опубликовать без смены", callback_data: `publish_${articleId}` }],
+        ],
+      },
+    });
+    return;
+  }
+
+  // Установка выбранной обложки
+  if (action.startsWith("set_cover_")) {
+    const parts = action.replace("set_cover_", "").split("_");
+    const idx = parseInt(parts[parts.length - 1]);
+    const articleId = parts.slice(0, -1).join("_");
+    const stateKey = `photos_${articleId}`;
+    const cached = userStates.get(chatId);
+    const photoUrls: string[] = Array.isArray(cached?.data?.urls) ? cached.data.urls as string[] : [];
+    const photoUrl = photoUrls[idx] || null;
+
+    if (!photoUrl) { bot.sendMessage(chatId, "❌ Фото не найдено"); return; }
+
+    await prisma.article.update({ where: { id: articleId }, data: { cover: photoUrl } });
+    userStates.delete(chatId);
+    bot.sendMessage(chatId, `✅ Обложка установлена!`, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "✅ Опубликовать", callback_data: `publish_${articleId}` }],
+          [{ text: "🔄 Сменить фото", callback_data: `change_cover_${articleId}` }],
+        ],
+      },
+    });
     return;
   }
 
@@ -1952,6 +2029,9 @@ bot.on("callback_query", async (query) => {
 Напишите ваш вопрос или /menu для выхода.
 `.trim(), { parse_mode: "Markdown" });
     return;
+  }
+  } catch (error) {
+    console.error("Callback query error:", error);
   }
 });
 
@@ -2074,12 +2154,47 @@ bot.on("message", async (msg) => {
 // 🚀 ЗАПУСК
 // ============================================
 
-console.log("🎬 ══════════════════════════════════════");
-console.log("🎬 КиноТека Бот запущен!");
-console.log("🎬 ══════════════════════════════════════");
-console.log(`📱 Admin ID: ${ADMIN_ID}`);
-console.log(`🌐 Site URL: ${SITE_URL}`);
-console.log(`🤖 AI: Groq (Llama 3.3)`);
-console.log(`🎬 TMDB: ${TMDB_API_KEY ? "✅" : "❌"}`);
-console.log(`🖼 Unsplash: ${UNSPLASH_ACCESS_KEY ? "✅" : "❌"}`);
-console.log("🎬 ══════════════════════════════════════");
+(async () => {
+  // Загружаем и тестируем прокси до старта polling
+  await proxyManager.load();
+
+  const agent = proxyManager.getAgent();
+  if (agent) {
+    (bot as any).options.request = { agent };
+    console.log(`🌐 Активный прокси: ${proxyManager.current()}`);
+  }
+
+  // Автоматическая ротация при ошибках соединения
+  const NETWORK_CODES = ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'EHOSTUNREACH', 'EFATAL'];
+
+  bot.on('polling_error', async (error: Error) => {
+    const code = (error as any).code as string | undefined ?? '';
+    const isNetwork =
+      NETWORK_CODES.some((c) => code.includes(c)) ||
+      error.message?.includes('ECONNREFUSED') ||
+      error.message?.includes('getaddrinfo') ||
+      error.message?.includes('timeout');
+
+    if (isNetwork && proxyManager.canRotate()) {
+      const next = proxyManager.next();
+      console.log(`🔄 Ошибка соединения (${code || error.message}). Переключаю прокси → ${next ?? 'прямое соединение'}`);
+      (bot as any).options.request = { agent: proxyManager.getAgent() };
+      try {
+        await bot.stopPolling();
+        await bot.startPolling();
+      } catch { /* ignore */ }
+    }
+  });
+
+  console.log("🎬 ══════════════════════════════════════");
+  console.log("🎬 КиноТека Бот запущен!");
+  console.log("🎬 ══════════════════════════════════════");
+  console.log(`📱 Admin ID: ${ADMIN_ID}`);
+  console.log(`🌐 Site URL: ${SITE_URL}`);
+  console.log(`🤖 AI: Groq (Llama 3.3)`);
+  console.log(`🎬 TMDB: ${TMDB_API_KEY ? "✅" : "❌"}`);
+  console.log(`🖼 Unsplash: ${UNSPLASH_ACCESS_KEY ? "✅" : "❌"}`);
+  console.log("🎬 ══════════════════════════════════════");
+
+  bot.startPolling();
+})();

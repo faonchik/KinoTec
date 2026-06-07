@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { movieSchema } from "@/lib/validations/movie";
+import { serializeMovieForAdminJson } from "@/lib/admin/serializeMovie";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -37,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Фильм не найден" }, { status: 404 });
     }
 
-    return NextResponse.json(movie);
+    return NextResponse.json(serializeMovieForAdminJson(movie as unknown as Record<string, unknown>));
   } catch (error) {
     console.error("Movie fetch error:", error);
     return NextResponse.json({ error: "Ошибка при получении фильма" }, { status: 500 });
@@ -106,7 +107,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(movieWithRelations);
+    return NextResponse.json(
+      serializeMovieForAdminJson(movieWithRelations as unknown as Record<string, unknown>)
+    );
   } catch (error) {
     console.error("Movie update error:", error);
     

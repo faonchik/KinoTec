@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
@@ -15,7 +16,13 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") || "all"; // all, watchlist, favorites, watched
 
   try {
-    const data: Record<string, unknown> = {};
+    interface ExportData {
+      watchlist?: Array<{ type: string; addedAt: Date; movie: any }>;
+      favorites?: Array<{ addedAt: Date; movie: any }>;
+      watched?: Array<{ completed: boolean; lastWatched: Date; movie: any }>;
+      ratings?: Array<{ value: number; createdAt: Date; movie: any }>;
+    }
+    const data: ExportData = {};
 
     if (type === "all" || type === "watchlist") {
       const watchlist = await prisma.watchlist.findMany({

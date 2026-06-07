@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { rateLimits } from "@/lib/security/rateLimit";
 import { sanitizeText } from "@/lib/security/sanitize";
@@ -41,14 +42,13 @@ export async function GET(request: NextRequest) {
     limit = Math.min(Math.max(1, limit), 100);
     offset = Math.max(0, offset);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {};
+    const where: Prisma.MovieWhereInput = {};
 
     if (query) {
       // Разбиваем запрос на слова для более гибкого поиска
       const searchWords = query.trim().split(/\s+/).filter(word => word.length > 0);
       
-      const orConditions: any[] = [
+      const orConditions: Prisma.MovieWhereInput[] = [
         // Поиск по полному запросу
         { title: { contains: query, mode: "insensitive" } },
         { originalTitle: { contains: query, mode: "insensitive" } },

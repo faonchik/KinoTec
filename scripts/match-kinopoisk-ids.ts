@@ -34,17 +34,21 @@ function loadKinopoiskIds(): Set<string> {
 }
 
 // Получаем external_ids из TMDB (включая kinopoisk_id)
-async function getTMDBExternalIds(tmdbId: number): Promise<{ kinopoiskId?: string } | null> {
+async function getTMDBExternalIds(tmdbId: number): Promise<{ kinopoiskId?: string | null } | null> {
   try {
-    const apiKey = process.env.TMDB_API_KEY;
-    if (!apiKey) {
+    const apiKey = process.env.TMDB_API_KEY?.trim();
+    if (!apiKey || apiKey === "ваш_ключ_здесь") {
       console.warn("⚠️  TMDB_API_KEY не настроен");
       return null;
     }
 
-    const response = await fetch(
-      `https://api.themoviedb.org/3/movie/${tmdbId}/external_ids?api_key=${apiKey}`
-    );
+    const useBearer = apiKey.startsWith("eyJ");
+    const qs = new URLSearchParams();
+    if (!useBearer) qs.set("api_key", apiKey);
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (useBearer) headers.Authorization = `Bearer ${apiKey}`;
+
+    const response = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/external_ids?${qs}`, { headers });
 
     if (!response.ok) {
       return null;

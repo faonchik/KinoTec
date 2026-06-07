@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { SeriesComments } from "@/components/comments/SeriesComments";
+import { HeroBackdrop } from "@/components/ui/HeroBackdrop";
 
 interface Actor {
   id: string;
@@ -113,19 +113,8 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Backdrop */}
-      <div className="relative h-[50vh] min-h-[400px]">
-        {series.backdrop ? (
-          <Image
-            src={series.backdrop}
-            alt={series.title}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+      <div className="relative h-[50vh] min-h-[400px] overflow-hidden bg-slate-950">
+        <HeroBackdrop backdrop={series.backdrop} poster={series.poster} />
       </div>
 
       <div className="container mx-auto px-4 -mt-48 relative z-10">

@@ -44,43 +44,47 @@ export function AvatarUpload({
     setError("");
     setIsUploading(true);
 
-    try {
-      // Читаем файл как base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
         const base64String = reader.result as string;
 
-        // Отправляем на сервер
         const res = await fetch("/api/user/avatar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ avatar: base64String }),
         });
 
-        const data = await res.json();
-
+        const contentType = res.headers.get("content-type");
         if (!res.ok) {
-          setError(data.error || "Ошибка при загрузке");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            setError(data.error || "Ошибка при загрузке");
+          } else {
+            setError("Ошибка при загрузке");
+          }
         } else {
-          setAvatar(data.avatar);
-          onAvatarChange?.(data.avatar);
-          // Уведомляем Header о необходимости обновить аватар
-          window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: { avatar: data.avatar } }));
-          setError("");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            setAvatar(data.avatar);
+            onAvatarChange?.(data.avatar);
+            window.dispatchEvent(new CustomEvent("avatarUpdated", { detail: { avatar: data.avatar } }));
+            setError("");
+          }
         }
-      };
-
-      reader.onerror = () => {
-        setError("Ошибка при чтении файла");
+      } catch {
+        setError("Ошибка при загрузке аватара");
+      } finally {
         setIsUploading(false);
-      };
+      }
+    };
 
-      reader.readAsDataURL(file);
+    reader.onerror = () => {
+      setError("Ошибка при чтении файла");
       setIsUploading(false);
-    } catch {
-      setError("Ошибка при загрузке аватара");
-      setIsUploading(false);
-    }
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const handleDelete = async () => {
@@ -153,7 +157,7 @@ export function AvatarUpload({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className="absolute bottom-0 right-0 w-9 h-9 bg-[#FF8400] hover:bg-[#FF9F2E] rounded-full flex items-center justify-center text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed border-2 border-white/20 z-20"
+          className="absolute bottom-0 right-0 w-9 h-9 bg-[#ffb84d] hover:bg-[#ffc56a] rounded-full flex items-center justify-center text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed border-2 border-white/20 z-20"
           title="Изменить аватар"
         >
           {isUploading ? (

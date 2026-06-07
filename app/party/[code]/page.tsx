@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { getMovieEmbedSrc } from "@/lib/player/embedUrl";
 import { PartyClient } from "./PartyClient";
 
 interface PartyPageProps {
@@ -19,6 +20,8 @@ async function getParty(code: string) {
           title: true,
           poster: true,
           originalTitle: true,
+          tmdbId: true,
+          kinopoiskId: true,
         },
       },
       host: {
@@ -95,9 +98,15 @@ export default async function PartyPage({ params }: PartyPageProps) {
     });
   }
 
+  const embedSrc = getMovieEmbedSrc({
+    tmdbId: party.movie.tmdbId,
+    kinopoiskId: party.movie.kinopoiskId,
+  });
+
   return (
     <PartyClient
       party={party}
+      embedSrc={embedSrc}
       currentUserId={session.user.id}
       isHost={party.hostId === session.user.id}
     />

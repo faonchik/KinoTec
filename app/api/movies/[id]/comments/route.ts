@@ -7,6 +7,8 @@ import { sanitizeText, validateContentLength } from "@/lib/security/sanitize";
 import { sanitizeRequestBody } from "@/lib/security/requestSanitizer";
 import { validateId } from "@/lib/security/validation";
 import { securityMiddleware } from "@/lib/security/middleware";
+import { revalidatePath } from "next/cache";
+
 
 // Получить комментарии к фильму
 export async function GET(
@@ -156,6 +158,13 @@ export async function POST(
         },
       },
     });
+
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${id}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
 
     return NextResponse.json({ comment }, { status: 201 });
   } catch (error) {

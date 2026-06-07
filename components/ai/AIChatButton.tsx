@@ -140,7 +140,7 @@ export function AIChatButton() {
 
       {/* Окно чата */}
       {isOpen && (
-        <div ref={chatRef} className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div ref={chatRef} className="fixed bottom-24 right-3 sm:right-6 z-50 w-[calc(100vw-1.5rem)] sm:w-[380px] max-w-[420px] bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           {/* Заголовок */}
           <div className="bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-3">
             <div className="flex items-center gap-3">

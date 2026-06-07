@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
+import { AdminTmdbTools } from "@/components/admin/AdminTmdbTools";
 
 interface Genre {
   id: string;
@@ -23,6 +24,15 @@ export default function NewMoviePage() {
   const [error, setError] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [directors, setDirectors] = useState<Director[]>([]);
+
+  const uniqueGenres = useMemo(() => {
+    const byKey = new Map<string, Genre>();
+    for (const g of genres) {
+      const k = g.name.trim().toLowerCase();
+      if (!byKey.has(k)) byKey.set(k, g);
+    }
+    return [...byKey.values()];
+  }, [genres]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -100,6 +110,10 @@ export default function NewMoviePage() {
           </div>
         )}
 
+        <div className="mb-8 rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+          <AdminTmdbTools />
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Название *"
@@ -158,7 +172,7 @@ export default function NewMoviePage() {
               Жанры
             </label>
             <div className="flex flex-wrap gap-2">
-              {genres.map((genre) => (
+              {uniqueGenres.map((genre) => (
                 <button
                   key={genre.id}
                   type="button"

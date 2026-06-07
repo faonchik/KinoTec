@@ -22,6 +22,7 @@ declare global {
 }
 
 function ReCaptcha({ onChange, onExpired, onError, action = "LOGIN" }: ReCaptchaProps) {
+  void onExpired;
   const [siteKey, setSiteKey] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -100,7 +101,8 @@ function ReCaptcha({ onChange, onExpired, onError, action = "LOGIN" }: ReCaptcha
         execute: typeof window.grecaptcha?.enterprise?.execute,
       });
 
-      if (!window.grecaptcha?.enterprise) {
+      const enterprise = window.grecaptcha?.enterprise;
+      if (!enterprise) {
         console.error("❌ grecaptcha.enterprise недоступен!");
         onError?.();
         onChange(null);
@@ -110,11 +112,11 @@ function ReCaptcha({ onChange, onExpired, onError, action = "LOGIN" }: ReCaptcha
       const executeRecaptcha = async () => {
         try {
           console.log("⏳ Ожидание ready...");
-          window.grecaptcha.enterprise.ready(async () => {
+          enterprise.ready(async () => {
             try {
               console.log("✅ grecaptcha.enterprise.ready вызван");
               console.log("⏳ Выполнение execute с ключом:", siteKey.substring(0, 10) + "...");
-              const newToken = await window.grecaptcha!.enterprise.execute(siteKey, { action });
+              const newToken = await enterprise.execute(siteKey, { action });
               console.log("✅ reCAPTCHA токен получен:", newToken ? `${newToken.substring(0, 20)}...` : "null");
               setToken(newToken);
               onChange(newToken);
@@ -142,7 +144,7 @@ function ReCaptcha({ onChange, onExpired, onError, action = "LOGIN" }: ReCaptcha
 
       // Обновляем токен каждые 2 минуты (токены истекают через 2 минуты)
       const interval = setInterval(() => {
-        if (window.grecaptcha?.enterprise) {
+        if (enterprise) {
           executeRecaptcha();
         }
       }, 110000); // 110 секунд, чтобы обновить до истечения
@@ -158,7 +160,7 @@ function ReCaptcha({ onChange, onExpired, onError, action = "LOGIN" }: ReCaptcha
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Удаляем старые скрипты v2
-      const oldScripts = document.querySelectorAll('script[src*="recaptcha/api.js"]');
+      const oldScripts = document.querySelectorAll('script[src*="recaptcha/api.js"]') as NodeListOf<HTMLScriptElement>;
       oldScripts.forEach(script => {
         console.log("🗑️ Удаляем старый скрипт reCAPTCHA v2:", script.src);
         script.remove();

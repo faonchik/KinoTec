@@ -7,38 +7,19 @@ export const metadata: Metadata = {
   description: "Узнайте о предстоящих премьерах фильмов",
 };
 
-async function getUpcomingMovies() {
-  const now = new Date();
-  const threeMonthsLater = new Date();
-  threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+/** Широкий диапазон дат: календарь и виджеты не пустые при типичном каталоге с разными годами релиза. */
+async function getMoviesForPremiereCalendar() {
+  const start = new Date();
+  start.setFullYear(start.getFullYear() - 20);
+  const end = new Date();
+  end.setFullYear(end.getFullYear() + 3);
 
-  const movies = await prisma.movie.findMany({
+  return prisma.movie.findMany({
     where: {
       releaseDate: {
-        gte: now,
-        lte: threeMonthsLater,
-      },
-    },
-    include: {
-      genres: { include: { genre: true } },
-      director: true,
-    },
-    orderBy: { releaseDate: "asc" },
-  });
-
-  return movies;
-}
-
-async function getRecentReleases() {
-  const now = new Date();
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-  const movies = await prisma.movie.findMany({
-    where: {
-      releaseDate: {
-        gte: oneMonthAgo,
-        lt: now,
+        not: null,
+        gte: start,
+        lte: end,
       },
     },
     include: {
@@ -46,19 +27,15 @@ async function getRecentReleases() {
       director: true,
       ratings: true,
     },
-    orderBy: { releaseDate: "desc" },
-    take: 10,
+    orderBy: { releaseDate: "asc" },
   });
-
-  return movies;
 }
 
 export default async function CalendarPage() {
-  const [upcoming, recent] = await Promise.all([
-    getUpcomingMovies(),
-    getRecentReleases(),
-  ]);
+  const all = await getMoviesForPremiereCalendar();
+  const now = new Date();
+  const upcoming = all.filter((m) => m.releaseDate && m.releaseDate >= now);
+  const recent = all.filter((m) => m.releaseDate && m.releaseDate < now);
 
   return <CalendarClient upcoming={upcoming} recent={recent} />;
 }
-

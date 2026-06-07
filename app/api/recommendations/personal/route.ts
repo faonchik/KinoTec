@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   const session = await getServerSession(authOptions);
   
   if (!session?.user?.id) {
@@ -165,8 +165,12 @@ export async function GET(_request: NextRequest) {
 
     scoredMovies.sort((a, b) => b.score - a.score);
 
-    return NextResponse.json({ 
-      movies: scoredMovies.slice(0, 12).map(({ score: _unused, ...movie }) => movie),
+    return NextResponse.json({
+      movies: scoredMovies.slice(0, 12).map((m) => {
+        const { score, ...movie } = m;
+        void score;
+        return movie;
+      }),
     });
   } catch (error) {
     console.error("Personal recommendations error:", error);

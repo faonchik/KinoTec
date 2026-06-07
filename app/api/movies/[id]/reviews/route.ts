@@ -7,6 +7,8 @@ import { sanitizeText, validateContentLength } from "@/lib/security/sanitize";
 import { validateId } from "@/lib/security/validation";
 import { sanitizeRequestBody } from "@/lib/security/requestSanitizer";
 import { securityMiddleware } from "@/lib/security/middleware";
+import { revalidatePath } from "next/cache";
+
 
 // Получить отзывы фильма
 export async function GET(
@@ -192,31 +194,14 @@ export async function POST(
       },
     });
 
-    // Начисляем монеты за отзыв (10 монет)
-    const movie = await prisma.movie.findUnique({
-      where: { id: movieId },
-      select: { title: true },
-    });
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${movieId}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
 
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: session.user.id },
-        data: {
-          coins: { increment: 10 },
-          totalCoinsEarned: { increment: 10 },
-        },
-      }),
-      prisma.coinTransaction.create({
-        data: {
-          userId: session.user.id,
-          amount: 10,
-          type: "EARN_REVIEW",
-          description: `Отзыв на фильм: ${movie?.title || "Фильм"}`,
-        },
-      }),
-    ]);
-
-    return NextResponse.json({ review, coinsEarned: 10 });
+    return NextResponse.json({ review });
   } catch (error) {
     console.error("Create review error:", error);
     return NextResponse.json({ error: "Ошибка" }, { status: 500 });

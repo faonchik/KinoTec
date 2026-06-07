@@ -2,9 +2,12 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 import { Badge } from "@/components/ui/Badge";
-import { KinoboxPlayer } from "@/components/player/KinoboxPlayer";
+import { SeriesWatchExperienceClient } from "@/components/player/SeriesWatchExperienceClient";
+import { resolveSeriesWatchEmbed } from "@/lib/player/resolveWatchEmbed";
 
 interface WatchSeriesPageProps {
   params: Promise<{ id: string }>;
@@ -75,16 +78,43 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
 
   const year = series.firstAirDate ? new Date(series.firstAirDate).getFullYear() : null;
 
+  const firstSeason = series.seasons[0];
+  const seasonNum = firstSeason?.seasonNumber ?? 1;
+  const episodeNum = firstSeason?.episodes[0]?.episodeNumber ?? 1;
+
+  const { embedSrc, usedTmdbSearch } = await resolveSeriesWatchEmbed({
+    tmdbId: series.tmdbId,
+    title: series.title,
+    originalTitle: series.originalTitle,
+    firstAirDate: series.firstAirDate,
+    season: seasonNum,
+    episode: episodeNum,
+  });
+
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+
+  const hasPlayback = Boolean(embedSrc);
+
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Плеер */}
       <div className="w-full bg-black">
-        <div className="max-w-[1400px] mx-auto">
-          <KinoboxPlayer
-            title={series.originalTitle || series.title}
-            year={year || undefined}
-            className="w-full"
+        <div className="mx-auto max-w-[1400px]">
+          <SeriesWatchExperienceClient
+            seriesId={series.id}
+            title={series.title}
+            embedSrc={embedSrc}
+            season={seasonNum}
+            episode={episodeNum}
+            isAuthenticated={Boolean(userId)}
           />
+          {!hasPlayback && (
+            <p className="px-4 py-3 text-center text-sm text-white/50">
+              Не удалось подобрать плеер для сериала
+              {usedTmdbSearch ? " (поиск TMDB не дал id)." : "."} Укажите tmdbId у сериала или настройте `NEXT_PUBLIC_PLAYER_TV_EMBED_URL`.
+            </p>
+          )}
         </div>
       </div>
 
@@ -254,7 +284,9 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xl">📺</div>
+                        <div className="flex h-full w-full items-center justify-center font-mono text-[10px] text-slate-500">
+                          КТ
+                        </div>
                       )}
                       
                       {/* Play icon on hover */}

@@ -31,6 +31,10 @@ services:
       - NODE_OPTIONS=--max-http-header-size=65536
       # TMDB API (опционально)
       - TMDB_API_KEY=${TMDB_API_KEY:-}
+      # Прокси для TMDB / image.tmdb.org с сервера (РФ и др.)
+      - TMDB_OUTBOUND_PROXY=${TMDB_OUTBOUND_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - HTTP_PROXY=${HTTP_PROXY:-}
       # Groq API (для AI чата)
       - GROQ_API_KEY=${GROQ_API_KEY:-}
       # Email настройки - Yandex Cloud транзакционная почта

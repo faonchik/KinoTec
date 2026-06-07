@@ -10,17 +10,17 @@ export function securityHeaders(request: NextRequest, response: NextResponse = N
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://kinobox.tv", // Добавлены домены Google для reCAPTCHA и Kinobox
-      "style-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com", // Добавлены домены Google для стилей reCAPTCHA
-      "img-src 'self' data: https://image.tmdb.org https://images.unsplash.com https://www.google.com https://www.gstatic.com blob:", // Добавлены домены Google для изображений reCAPTCHA
-      "font-src 'self' data: https://www.gstatic.com", // Добавлен домен Google для шрифтов reCAPTCHA
-      "connect-src 'self' https://api.themoviedb.org https://api.unsplash.com https://api.groq.com https://www.google.com https://kinobox.tv", // Добавлены домены Google для API запросов reCAPTCHA и Kinobox
-      "frame-src 'self' https://kinobox.in https://kinobox.tv https://www.google.com https://tv.kinohub.vip", // Добавлены домены для iframe (reCAPTCHA, Kinobox, Kinohub)
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://kinobox.tv https://*.kinobox.tv",
+      "style-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://kinobox.tv https://*.kinobox.tv",
+      "img-src 'self' data: https://image.tmdb.org https://images.unsplash.com https://www.google.com https://www.gstatic.com blob: https://*.kinobox.tv https://*.kinohub.vip https:",
+      "font-src 'self' data: https://www.gstatic.com https://kinobox.tv https://*.kinobox.tv",
+      "connect-src 'self' https://api.themoviedb.org https://api.unsplash.com https://api.groq.com https://www.google.com https://kinobox.tv https://*.kinobox.tv https://*.kinohub.vip https:",
+      "frame-src 'self' blob: https: https://kinobox.tv https://*.kinobox.tv https://www.google.com https://tv.kinohub.vip https://*.kinohub.vip https://vidsrc.to https://*.vidsrc.to https://vidsrc.xyz https://*.vidsrc.xyz https://vidsrc.in https://*.vidsrc.in https://player.vidsrc.me https://*.player.vidsrc.me https://vsembed.ru https://*.vsembed.ru",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
-      "media-src 'self' blob:",
+      "media-src 'self' blob: https:",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
       "upgrade-insecure-requests",

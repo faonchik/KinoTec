@@ -7,8 +7,7 @@ import { logSecurityEvent } from "./logger";
 export async function checkResourceAccess(
   resourceType: "movie" | "series" | "user" | "collection" | "review" | "comment",
   resourceId: string,
-  userId: string,
-  request?: Request
+  userId: string
 ): Promise<boolean> {
   try {
     switch (resourceType) {

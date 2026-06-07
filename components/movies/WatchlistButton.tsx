@@ -8,9 +8,17 @@ interface WatchlistButtonProps {
   movieId: string;
   size?: "sm" | "md" | "lg";
   showText?: boolean;
+  className?: string;
+  variant?: "default" | "glass";
 }
 
-export function WatchlistButton({ movieId, size = "md", showText = false }: WatchlistButtonProps) {
+export function WatchlistButton({
+  movieId,
+  size = "md",
+  showText = false,
+  className = "",
+  variant = "default",
+}: WatchlistButtonProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const [inWatchlist, setInWatchlist] = useState(false);
@@ -72,15 +80,22 @@ export function WatchlistButton({ movieId, size = "md", showText = false }: Watc
     lg: "w-12 h-12 text-lg",
   };
 
+  const tone =
+    variant === "glass" && !showText
+      ? inWatchlist
+        ? "border border-white/30 bg-amber-500 text-black hover:bg-amber-400"
+        : "border border-white/45 bg-black/30 text-white backdrop-blur-sm hover:bg-black/45 hover:text-white"
+      : inWatchlist
+        ? "bg-amber-500 text-black hover:bg-amber-400"
+        : "bg-slate-700/80 text-slate-300 hover:bg-slate-600 hover:text-white";
+
   return (
     <button
       onClick={handleClick}
       disabled={isLoading}
-      className={`${showText ? "px-4 py-2" : sizeClasses[size]} rounded-full flex items-center justify-center gap-2 transition-all ${
-        inWatchlist
-          ? "bg-amber-500 text-black hover:bg-amber-400"
-          : "bg-slate-700/80 text-slate-300 hover:bg-slate-600 hover:text-white"
-      } ${isLoading ? "opacity-50 cursor-wait" : ""}`}
+      className={`${showText ? "px-4 py-2" : sizeClasses[size]} flex items-center justify-center gap-2 rounded-full transition-all ${tone} ${
+        isLoading ? "cursor-wait opacity-50" : ""
+      } ${className}`}
       title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
     >
       <svg

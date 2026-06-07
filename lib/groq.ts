@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Groq from "groq-sdk";
 
 // Ленивая инициализация клиента
@@ -73,15 +74,16 @@ export async function chat(messages: Message[]): Promise<string> {
     console.error("Groq API error:", error);
     
     // Более информативное сообщение об ошибке
-    if (error instanceof Error) {
+    const err = error as any;
+    if (err instanceof Error || err.message) {
       // Проверяем статус код ошибки
-      if (error.status === 403 || error.message.includes("403") || error.message.includes("Forbidden")) {
+      if (err.status === 403 || err.message?.includes("403") || err.message?.includes("Forbidden")) {
         throw new Error("Доступ к AI сервису запрещён. Проверьте API ключ Groq.");
       }
-      if (error.message.includes("API key") || error.message.includes("authentication")) {
+      if (err.message?.includes("API key") || err.message?.includes("authentication")) {
         throw new Error("Неверный API ключ Groq");
       }
-      if (error.message.includes("rate limit") || error.status === 429) {
+      if (err.message?.includes("rate limit") || err.status === 429) {
         throw new Error("Превышен лимит запросов. Попробуйте позже.");
       }
       throw error;

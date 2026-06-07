@@ -1,7 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -34,6 +35,7 @@ yarn-error.log*
 
 # env files (can opt-in for commiting if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -43,3 +45,16 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db

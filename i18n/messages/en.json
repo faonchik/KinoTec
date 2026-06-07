@@ -26,7 +26,14 @@
     "minutesAgo": "{minutes} min ago",
     "duration": "Duration",
     "durationMinutes": "Duration (min)",
-    "selectLanguage": "Select language"
+    "selectLanguage": "Select language",
+    "searchMinHint": "Enter at least 2 characters",
+    "searching": "Searching…",
+    "searchNoResults": "No results found",
+    "searchAdvanced": "Advanced search",
+    "typeMovie": "Movie",
+    "typeActor": "Actor",
+    "typeDirector": "Director"
   },
   "nav": {
     "home": "Home",
@@ -35,7 +42,6 @@
     "actors": "Actors",
     "directors": "Directors",
     "collections": "Collections",
-    "challenges": "Challenges",
     "calendar": "Premieres",
     "watchParty": "Watch Party",
     "blog": "Blog",
@@ -66,8 +72,11 @@
     "ctaDescription": "Create your movie collections, leave reviews, get personalized recommendations",
     "signUp": "Sign Up",
     "viewCatalog": "View Catalog",
-    "readMore": "Read More",
+    "readMore": "More Info",
+    "play": "Play",
     "addToFavorites": "Add to Favorites",
+    "emptyCatalogTitle": "Nothing to watch yet",
+    "emptyCatalogDescription": "Connect your database and import movies — or browse the catalog when data is available.",
     "articleCategories": {
       "NEWS": "News",
       "INTERVIEW": "Interview",
@@ -153,24 +162,74 @@
     "loginToComment": "Sign in to leave a comment"
   },
   "auth": {
+    "common": {
+      "backToHome": "← Back to home",
+      "loading": "Loading…",
+      "emailPlaceholder": "example@email.com",
+      "passwordPlaceholder": "••••••••",
+      "genericError": "Something went wrong"
+    },
     "signIn": {
-      "title": "Sign In",
+      "title": "Sign in",
+      "subtitle": "Sign in to pick up where you left off.",
       "email": "Email",
       "password": "Password",
-      "submit": "Sign In",
-      "error": "Invalid email or password",
-      "noAccount": "Don't have an account?",
-      "createOne": "Create one"
+      "forgotPassword": "Forgot?",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "invalidCredentials": "Invalid email or password",
+      "errorOnSignIn": "Something went wrong while signing in",
+      "registeredHint": "Your account is ready. Sign in with your email and password.",
+      "noAccount": "No account?",
+      "signUpLink": "Create account"
     },
     "signUp": {
-      "title": "Sign Up",
+      "title": "Sign up",
+      "subtitle": "Create an account to rate movies, manage lists, and join the community.",
       "name": "Name",
+      "namePlaceholder": "Your name",
       "email": "Email",
       "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "submit": "Sign Up",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "submitting": "Creating account…",
       "hasAccount": "Already have an account?",
-      "signIn": "Sign In"
+      "signIn": "Sign in",
+      "errorMismatch": "Passwords do not match",
+      "errorMinLength": "Password must be at least 6 characters",
+      "errorGeneric": "Registration failed",
+      "errorOnSignUp": "Something went wrong during registration"
+    },
+    "forgotPassword": {
+      "title": "Reset access",
+      "subtitle": "Enter your account email — we will send a reset link if the account exists.",
+      "email": "Email",
+      "footerRemember": "Remembered your password?",
+      "signIn": "Sign in",
+      "submit": "Send instructions",
+      "sending": "Sending…",
+      "successBody": "If an account exists for that email, we sent instructions. Check your spam folder if nothing arrived.",
+      "backToSignIn": "Back to sign in",
+      "errorOnSend": "Something went wrong while sending the request"
+    },
+    "resetPassword": {
+      "title": "New password",
+      "subtitle": "Choose a strong password and confirm it — then sign in again.",
+      "footerRemember": "Remember your old password?",
+      "signIn": "Sign in",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "placeholderMin8": "At least 8 characters",
+      "placeholderRepeat": "Repeat password",
+      "submit": "Save new password",
+      "saving": "Saving…",
+      "tokenMissing": "Reset token is missing",
+      "tokenMissingBody": "The reset link is invalid or expired. Request a new reset from your email or start over.",
+      "requestNew": "Request password reset",
+      "successRedirect": "Password updated. Redirecting to sign in…",
+      "errorMin8": "Password must be at least 8 characters",
+      "errorMismatch": "Passwords do not match",
+      "errorOnReset": "Something went wrong while resetting the password"
     }
   },
   "profile": {
@@ -187,8 +246,6 @@
     "empty": "Empty",
     "stats": "Statistics",
     "statsDescription": "Your watch history",
-    "challenges": "Challenges",
-    "challengesDescription": "Take the challenge",
     "feed": "Feed",
     "feedDescription": "Friends activity",
     "party": "Watch Party",
@@ -219,19 +276,6 @@
     "collectionPrefix": "Movie Collection:",
     "moviesInCollection": "{count} movies in collection"
   },
-  "challenges": {
-    "title": "Challenges",
-    "description": "Take movie challenges, watch films and earn points!",
-    "accepted": "Accepted",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "all": "All",
-    "myActive": "My Active",
-    "completedChallenges": "Completed",
-    "empty": "Challenges coming soon",
-    "noActive": "You have no active challenges",
-    "noCompleted": "You have no completed challenges"
-  },
   "shortcuts": {
     "navigation": "Navigation",
     "home": "Home",
@@ -261,6 +305,9 @@
     "moviesCount": "{count} movies in watchlist",
     "backToProfile": "← Back to profile",
     "findMovies": "Find movies"
+  },
+  "watchPage": {
+    "availableFilms": "Available to watch"
   },
   "notFound": {
     "title": "404",

@@ -7,6 +7,8 @@ import { ratingSchema } from "@/lib/security/validation";
 import { validateId } from "@/lib/security/validation";
 import { sanitizeRequestBody } from "@/lib/security/requestSanitizer";
 import { securityMiddleware } from "@/lib/security/middleware";
+import { revalidatePath } from "next/cache";
+
 
 // Получить оценку пользователя
 export async function GET(
@@ -151,6 +153,13 @@ export async function POST(
       },
     });
 
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${movieId}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
+
     return NextResponse.json({ success: true, rating: rating.value });
   } catch (error) {
     console.error("Rating error:", error);
@@ -180,8 +189,21 @@ export async function DELETE(
       },
     });
 
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${movieId}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
+
     return NextResponse.json({ success: true, rating: null });
   } catch {
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${movieId}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
     return NextResponse.json({ success: true, rating: null });
   }
 }

@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
         revenue: tmdbMovie.revenue ? BigInt(tmdbMovie.revenue) : null,
         country: tmdbMovie.production_countries.map((c) => c.name).join(", ") || null,
         popularity: tmdbMovie.vote_average * 10,
+        tmdbId: String(tmdbId),
         directorId,
         genres: {
           create: genreIds.map((genreId) => ({ genreId })),

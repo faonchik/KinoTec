@@ -3,10 +3,22 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import {
+  AuthPageLayout,
+  authInputClass,
+  authLabelClass,
+  authPrimaryButtonClass,
+  authLinkClass,
+  authAlertErrorClass,
+  authAlertSuccessClass,
+} from "@/components/auth/AuthPageLayout";
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("auth.resetPassword");
+  const tc = useTranslations("auth.common");
   const token = searchParams.get("token");
 
   const [password, setPassword] = useState("");
@@ -17,26 +29,26 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
-      setError("Токен сброса пароля отсутствует");
+      setError(t("tokenMissing"));
     }
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (!token) {
-      setError("Токен сброса пароля отсутствует");
+      setError(t("tokenMissing"));
       return;
     }
 
     if (password.length < 8) {
-      setError("Пароль должен содержать минимум 8 символов");
+      setError(t("errorMin8"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Пароли не совпадают");
+      setError(t("errorMismatch"));
       return;
     }
 
@@ -54,7 +66,7 @@ function ResetPasswordForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Произошла ошибка");
+        setError(data.error || tc("genericError"));
       } else {
         setSuccess(true);
         setTimeout(() => {
@@ -62,7 +74,7 @@ function ResetPasswordForm() {
         }, 2000);
       }
     } catch {
-      setError("Произошла ошибка при сбросе пароля");
+      setError(t("errorOnReset"));
     } finally {
       setIsLoading(false);
     }
@@ -70,17 +82,12 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="space-y-6">
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-red-400 text-sm text-center">
-            Токен сброса пароля отсутствует. Пожалуйста, запросите новый.
-          </p>
+      <div className="flex flex-col gap-8">
+        <div className={authAlertErrorClass}>
+          <p>{t("tokenMissingBody")}</p>
         </div>
-        <Link
-          href="/auth/forgot-password"
-          className="block w-full text-center py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-all"
-        >
-          Запросить сброс пароля
+        <Link href="/auth/forgot-password" className={authPrimaryButtonClass}>
+          {t("requestNew")}
         </Link>
       </div>
     );
@@ -88,110 +95,99 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="space-y-6">
-        <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-          <p className="text-green-400 text-sm text-center">
-            Пароль успешно изменен! Перенаправление на страницу входа...
-          </p>
-        </div>
+      <div className={authAlertSuccessClass}>
+        <p>{t("successRedirect")}</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-red-400 text-sm text-center">{error}</p>
+    <form onSubmit={handleSubmit} className="block w-full">
+      <div className="flex flex-col gap-8">
+        {error ? (
+          <div className={authAlertErrorClass}>
+            <p>{error}</p>
+          </div>
+        ) : null}
+
+        <div>
+          <label htmlFor="password" className={authLabelClass}>
+            {t("newPassword")}
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={authInputClass}
+            placeholder={t("placeholderMin8")}
+            autoComplete="new-password"
+            required
+            disabled={isLoading}
+            minLength={8}
+          />
         </div>
-      )}
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
-          Новый пароль
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-          placeholder="Минимум 8 символов"
-          autoComplete="new-password"
-          required
-          disabled={isLoading}
-          minLength={8}
-        />
+        <div>
+          <label htmlFor="confirmPassword" className={authLabelClass}>
+            {t("confirmPassword")}
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className={authInputClass}
+            placeholder={t("placeholderRepeat")}
+            autoComplete="new-password"
+            required
+            disabled={isLoading}
+            minLength={8}
+          />
+        </div>
+
+        <button type="submit" disabled={isLoading} className={authPrimaryButtonClass}>
+          {isLoading ? (
+            <>
+              <svg className="h-5 w-5 shrink-0 animate-spin" viewBox="0 0 24 24" aria-hidden>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              {t("saving")}
+            </>
+          ) : (
+            t("submit")
+          )}
+        </button>
       </div>
-
-      <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-300 mb-2">
-          Подтвердите пароль
-        </label>
-        <input
-          id="confirmPassword"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-          placeholder="Повторите пароль"
-          autoComplete="new-password"
-          required
-          disabled={isLoading}
-          minLength={8}
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Сброс пароля...
-          </span>
-        ) : (
-          "Сбросить пароль"
-        )}
-      </button>
     </form>
   );
 }
 
 export default function ResetPasswordPage() {
+  const t = useTranslations("auth.resetPassword");
+  const tc = useTranslations("auth.common");
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white">
-              Установка нового пароля
-            </h1>
-            <p className="text-slate-400 mt-2">
-              Введите новый пароль для вашего аккаунта
-            </p>
-          </div>
-
-          <Suspense fallback={<div className="text-center text-slate-400">Загрузка...</div>}>
-            <ResetPasswordForm />
-          </Suspense>
-
-          <div className="mt-6 text-center">
-            <p className="text-slate-400">
-              Вспомнили пароль?{" "}
-              <Link href="/auth/signin" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
-                Войти
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AuthPageLayout
+      title={t("title")}
+      subtitle={t("subtitle")}
+      footer={
+        <>
+          {t("footerRemember")}{" "}
+          <Link href="/auth/signin" className={authLinkClass}>
+            {t("signIn")}
+          </Link>
+        </>
+      }
+    >
+      <Suspense fallback={<div className="py-10 text-center font-mono text-[13px] text-white/40">{tc("loading")}</div>}>
+        <ResetPasswordForm />
+      </Suspense>
+    </AuthPageLayout>
   );
 }
-

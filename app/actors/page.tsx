@@ -51,16 +51,16 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
   const { actors, total, totalPages } = await getActors(page, params.q);
 
   return (
-    <div className="min-h-screen bg-[#151C2C]">
+    <div className="min-h-screen bg-[#0b0f14]">
       {/* Divider */}
-      <div className="h-px bg-[#2A3550]" />
+      <div className="h-px bg-white/[0.08]" />
 
       {/* Content */}
       <div className="px-14 py-12">
         {/* Title Section */}
         <div className="mb-2">
           <h1 className="font-oswald text-4xl font-bold text-white">Актёры</h1>
-          <p className="font-mono text-[13px] text-[#8B95A8] mt-2 max-w-2xl">
+          <p className="font-mono text-[13px] text-white/45 mt-2 max-w-2xl">
             Откройте для себя талантливых актёров. Загляните в их фильмографию и биографию.
           </p>
         </div>
@@ -68,7 +68,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
         {/* Search */}
         <div className="mt-6 mb-8">
           <form action="/actors" method="GET" className="relative w-full">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5A6478]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/35" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -76,7 +76,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
               type="text"
               defaultValue={params.q || ""}
               placeholder="Поиск актёров..."
-              className="w-full h-12 bg-[#1A2236] rounded-2xl pl-12 pr-4 font-mono text-[13px] text-white placeholder-[#5A6478] border border-[#2A3550] outline-none focus:ring-1 focus:ring-[#FF8400]/50 transition-all"
+              className="w-full h-12 bg-[#121821] rounded-2xl pl-12 pr-4 font-mono text-[13px] text-white placeholder:text-white/35 border border-white/[0.08] outline-none focus:ring-1 focus:ring-[#ffb84d]/50 transition-all"
             />
           </form>
         </div>
@@ -84,11 +84,11 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
         {/* Info + Sort row */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <span className="font-mono text-[13px] text-[#5A6478]">
+            <span className="font-mono text-[13px] text-white/35">
               Всего: {total} актёров
             </span>
           </div>
-          <button className="flex items-center gap-2 bg-[#FF8400] hover:bg-[#FF9F2E] text-white font-mono text-[13px] font-semibold px-5 py-2.5 rounded-2xl transition-colors">
+          <button className="flex items-center gap-2 bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold px-5 py-2.5 rounded-2xl transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
             </svg>
@@ -104,7 +104,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
               href={`/actors/${actor.id}`}
               className="group"
             >
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#1A2236] mb-3">
+              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#121821] mb-3">
                 {actor.photo ? (() => {
                   const url = getProxiedImageUrl(actor.photo);
                   return shouldUseUnoptimized(url) ? (
@@ -113,7 +113,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
                     <Image src={url!} alt={actor.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                   );
                 })() : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#1E2740] to-[#2A3550] flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-br from-[#121821] to-[#0b0f14] flex items-center justify-center">
                     <svg className="w-16 h-16 text-[#3A4560]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -123,11 +123,11 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
                 <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
 
-              <h3 className="font-mono text-[14px] font-semibold text-white group-hover:text-[#FF8400] transition-colors">
+              <h3 className="font-mono text-[14px] font-semibold text-white group-hover:text-[#ffb84d] transition-colors">
                 {actor.name}
               </h3>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="font-mono text-[11px] text-[#5A6478]">
+                <span className="font-mono text-[11px] text-white/35">
                   {actor._count.movies} {actor._count.movies === 1 ? "фильм" : "фильмов"}
                 </span>
               </div>

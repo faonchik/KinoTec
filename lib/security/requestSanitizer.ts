@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Комплексная санитизация запросов
 
 import { sanitizeObjectForPrototypePollution, hasDangerousKeys } from "./prototypePollution";

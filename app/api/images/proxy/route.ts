@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { optimizeTmdbImageUrl } from "@/lib/images";
 import { validateUrl } from "@/lib/security/ssrf";
+import { outboundFetch } from "@/lib/outbound-http";
 
 // Кэш для изображений (в памяти, для production лучше использовать Redis)
 const imageCache = new Map<string, { data: Buffer; contentType: string; timestamp: number }>();
@@ -14,14 +16,15 @@ export async function GET(request: NextRequest) {
   }
 
   // Декодируем URL
-  const decodedUrl = decodeURIComponent(url);
+  const decodedUrl = optimizeTmdbImageUrl(decodeURIComponent(url));
   console.log("Proxying image:", decodedUrl);
 
   // Проверяем кэш
   const cached = imageCache.get(decodedUrl);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     console.log("Cache HIT for:", decodedUrl);
-    return new NextResponse(cached.data, {
+    const blob = new Blob([Uint8Array.from(cached.data)], { type: cached.contentType });
+    return new NextResponse(blob, {
       headers: {
         "Content-Type": cached.contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
@@ -41,12 +44,8 @@ export async function GET(request: NextRequest) {
   try {
     console.log("Fetching image from:", decodedUrl);
     // Загружаем изображение с TMDB
-    const response = await fetch(decodedUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; KinoTec/1.0)",
-      },
-      // Увеличиваем таймаут для медленных соединений
-      signal: AbortSignal.timeout(30000), // 30 секунд
+    const response = await outboundFetch(decodedUrl, {
+      signal: AbortSignal.timeout(45000),
     });
 
     if (!response.ok) {
@@ -78,14 +77,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-          return new NextResponse(imageBuffer, {
-            headers: {
-              "Content-Type": contentType,
-              "Cache-Control": "public, max-age=31536000, immutable",
-              "X-Cache": "MISS",
-              "Vary": "Accept",
-            },
-          });
+    const blob = new Blob([Uint8Array.from(imageBuffer)], { type: contentType });
+    return new NextResponse(blob, {
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "X-Cache": "MISS",
+        "Vary": "Accept",
+      },
+    });
   } catch (error) {
     console.error("Error proxying image:", error);
     return NextResponse.json(

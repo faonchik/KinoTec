@@ -1,7 +1,7 @@
 import { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/Badge";
 import { RatingDisplay } from "@/components/ui/Rating";
@@ -9,13 +9,14 @@ import { MovieCard } from "@/components/movies/MovieCard";
 import { ReviewSection } from "./ReviewSection";
 import { MovieActions } from "./MovieActions";
 import { MovieComments } from "@/components/comments/MovieComments";
-import { getProxiedImageUrl, shouldUseUnoptimized } from "@/lib/images";
+import { HeroBackdrop } from "@/components/ui/HeroBackdrop";
+import { ProxiedImage } from "@/components/ui/ProxiedImage";
 
 interface MoviePageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getMovie(id: string) {
+const getMovie = cache(async (id: string) => {
   const movie = await prisma.movie.findUnique({
     where: { id },
     include: {
@@ -28,7 +29,16 @@ async function getMovie(id: string) {
       },
       reviews: {
         where: { isApproved: true },
-        include: { user: true },
+        include: {
+          user: {
+            include: {
+              ratings: {
+                where: { movieId: id },
+                select: { value: true },
+              },
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
       },
       ratings: true,
@@ -39,7 +49,7 @@ async function getMovie(id: string) {
   if (!movie) notFound();
 
   return movie;
-}
+});
 
 async function getSimilarMovies(movieId: string, genreIds: string[]) {
   return await prisma.movie.findMany({
@@ -96,54 +106,26 @@ export default async function MoviePage({ params }: MoviePageProps) {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative min-h-[60vh]">
-        {movie.backdrop && (
-          <>
-            <Image
-              src={movie.backdrop}
-              alt={movie.title}
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-900/50" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/50" />
-          </>
-        )}
+      <div className="relative min-h-[60vh] overflow-hidden bg-[#0b0f14]">
+        <HeroBackdrop
+          backdrop={movie.backdrop}
+          poster={movie.poster}
+          extraSources={movie.photos.map((p) => p.url)}
+        />
 
         <div className="relative container mx-auto px-4 py-12">
           <div className="flex flex-col md:flex-row gap-8">
             {/* Poster */}
             <div className="flex-shrink-0 w-64 mx-auto md:mx-0">
               {movie.poster ? (
-                (() => {
-                  const proxiedUrl = getProxiedImageUrl(movie.poster);
-                  const isProxied = shouldUseUnoptimized(proxiedUrl);
-                  if (isProxied && proxiedUrl) {
-                    return (
-                      <img
-                        src={proxiedUrl}
-                        alt={movie.title}
-                        width={256}
-                        height={384}
-                        className="rounded-xl shadow-2xl w-64 h-96 object-cover"
-                        loading="eager"
-                      />
-                    );
-                  }
-                  return (
-                <Image
-                      src={proxiedUrl || movie.poster}
+                <ProxiedImage
+                  src={movie.poster}
                   alt={movie.title}
                   width={256}
                   height={384}
-                  className="rounded-xl shadow-2xl"
+                  className="h-96 w-64 rounded-xl object-cover shadow-2xl"
                   priority
-                  sizes="(max-width: 768px) 100vw, 256px"
-                  quality={85}
                 />
-                  );
-                })()
               ) : (
                 <div className="w-64 h-96 bg-slate-800 rounded-xl flex items-center justify-center">
                   <svg className="w-16 h-16 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,31 +220,13 @@ export default async function MoviePage({ params }: MoviePageProps) {
                 className="group bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 hover:border-amber-500/50 transition-all text-center"
               >
                 {ma.actor.photo ? (
-                  (() => {
-                    const proxiedUrl = getProxiedImageUrl(ma.actor.photo);
-                    const isProxied = shouldUseUnoptimized(proxiedUrl);
-                    if (isProxied && proxiedUrl) {
-                      return (
-                        <img
-                          src={proxiedUrl}
-                          alt={ma.actor.name}
-                          width={100}
-                          height={100}
-                          className="w-24 h-24 rounded-full object-cover mx-auto mb-2"
-                          loading="lazy"
-                        />
-                      );
-                    }
-                    return (
-                  <Image
-                        src={proxiedUrl || ma.actor.photo}
+                  <ProxiedImage
+                    src={ma.actor.photo}
                     alt={ma.actor.name}
-                    width={100}
-                    height={100}
-                    className="w-20 h-20 rounded-full mx-auto object-cover"
+                    width={96}
+                    height={96}
+                    className="mx-auto mb-2 h-24 w-24 rounded-full object-cover"
                   />
-                    );
-                  })()
                 ) : (
                   <div className="w-20 h-20 rounded-full mx-auto bg-slate-700 flex items-center justify-center">
                     <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

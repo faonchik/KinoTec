@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { movieSchema } from "@/lib/validations/movie";
+import { serializeMovieForAdminJson } from "@/lib/admin/serializeMovie";
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(movie, { status: 201 });
+    return NextResponse.json(serializeMovieForAdminJson(movie as unknown as Record<string, unknown>), { status: 201 });
   } catch (error) {
     console.error("Movie creation error:", error);
     return NextResponse.json(
@@ -70,7 +71,9 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(movies);
+    return NextResponse.json(
+      movies.map((m) => serializeMovieForAdminJson(m as unknown as Record<string, unknown>))
+    );
   } catch (error) {
     console.error("Movies fetch error:", error);
     return NextResponse.json(

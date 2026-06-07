@@ -6,27 +6,48 @@ const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
 
 let API_KEY = "";
+let USE_BEARER = false;
+
+function isPlaceholderKey(raw: string): boolean {
+  const t = raw.trim();
+  return !t || t === "ваш_ключ_здесь" || t === "your_key_here";
+}
 
 async function getApiKey() {
   if (API_KEY) return API_KEY;
-  
-  // Динамический импорт для ESM совместимости
+
+  const envKey = process.env.TMDB_API_KEY?.trim();
+  if (envKey && !isPlaceholderKey(envKey)) {
+    API_KEY = envKey;
+    USE_BEARER = envKey.startsWith("eyJ");
+    console.log(USE_BEARER ? "✅ TMDB: Read Access Token (Bearer)" : "✅ TMDB: API Key (query)");
+    return API_KEY;
+  }
+
   const freekeys = (await import("freekeys")).default;
   const keys = await freekeys();
   API_KEY = keys.tmdb_key;
-  console.log("✅ TMDB API ключ получен");
+  USE_BEARER = false;
+  console.log("✅ TMDB API ключ получен через freekeys");
   return API_KEY;
 }
 
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
-  const apiKey = await getApiKey();
+  await getApiKey();
   const searchParams = new URLSearchParams({
-    api_key: apiKey,
     language: "ru-RU",
     ...params,
   });
-  
-  const response = await fetch(`${TMDB_BASE_URL}${endpoint}?${searchParams}`);
+  if (!USE_BEARER) {
+    searchParams.set("api_key", API_KEY);
+  }
+
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (USE_BEARER) {
+    headers.Authorization = `Bearer ${API_KEY}`;
+  }
+
+  const response = await fetch(`${TMDB_BASE_URL}${endpoint}?${searchParams}`, { headers });
   if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
   return response.json();
 }

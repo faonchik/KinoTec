@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { checkAndUpdateChallenges } from "@/lib/challenges";
 
 export async function POST(
   request: NextRequest,
@@ -95,34 +94,10 @@ export async function POST(
       }
     }
 
-    // Проверяем и обновляем челленджи, начисляем монеты
-    const challengeResult = await checkAndUpdateChallenges(session.user.id, movieId);
-
-    // Начисляем монеты за просмотр (2 монеты)
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: session.user.id },
-        data: {
-          coins: { increment: 2 },
-          totalCoinsEarned: { increment: 2 },
-        },
-      }),
-      prisma.coinTransaction.create({
-        data: {
-          userId: session.user.id,
-          amount: 2,
-          type: "EARN_RATING",
-          description: "Просмотр фильма",
-        },
-      }),
-    ]);
-
     return NextResponse.json({ 
       success: true,
       watchedCount,
       newAchievements: achievementCodes,
-      completedChallenges: challengeResult.completedChallenges,
-      coinsEarned: challengeResult.totalCoinsEarned + 2,
     });
   } catch {
     return NextResponse.json(

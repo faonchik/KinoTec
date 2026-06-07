@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Защита от Prototype Pollution
 
 // Проверка на попытки загрязнения прототипа

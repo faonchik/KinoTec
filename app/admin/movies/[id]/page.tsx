@@ -1,12 +1,13 @@
- "use client";
+"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import type { MovieFormData } from "@/lib/validations/movie";
+import { AdminTmdbTools } from "@/components/admin/AdminTmdbTools";
 
 interface Genre {
   id: string;
@@ -30,6 +31,15 @@ export default function EditMoviePage() {
   const [success, setSuccess] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [directors, setDirectors] = useState<Director[]>([]);
+
+  const uniqueGenres = useMemo(() => {
+    const byKey = new Map<string, Genre>();
+    for (const g of genres) {
+      const k = g.name.trim().toLowerCase();
+      if (!byKey.has(k)) byKey.set(k, g);
+    }
+    return [...byKey.values()];
+  }, [genres]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -202,6 +212,10 @@ export default function EditMoviePage() {
           </div>
         )}
 
+        <div className="mb-8 rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+          <AdminTmdbTools movieId={movieId} />
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Название *"
@@ -260,7 +274,7 @@ export default function EditMoviePage() {
               Жанры
             </label>
             <div className="flex flex-wrap gap-2">
-              {genres.map((genre) => (
+              {uniqueGenres.map((genre) => (
                 <button
                   key={genre.id}
                   type="button"

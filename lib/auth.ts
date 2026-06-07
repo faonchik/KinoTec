@@ -55,8 +55,7 @@ export const authOptions: NextAuthOptions = {
             "AUTH_FAILURE",
             "medium",
             `Failed login attempt for email: ${normalizedEmail}`,
-            { email: normalizedEmail },
-            undefined as any // Request недоступен в authorize
+            { email: normalizedEmail }
           );
           // Используем унифицированное сообщение
           throw new Error(EnumerationMessages.INVALID_CREDENTIALS);

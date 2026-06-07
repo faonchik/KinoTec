@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { outboundFetchInit } from "@/lib/outbound-http";
 
 const TMDB_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMAGE = "https://image.tmdb.org/t/p";
@@ -13,12 +14,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const apiKey = process.env.TMDB_API_KEY;
-    if (!apiKey) {
+    const raw = process.env.TMDB_API_KEY?.trim();
+    if (!raw || raw === "ваш_ключ_здесь" || raw === "your_key_here") {
       return NextResponse.json({ error: "TMDB_API_KEY not set" }, { status: 500 });
     }
 
-    const isBearer = apiKey.startsWith("eyJ");
+    const isBearer = raw.startsWith("eyJ");
     const body = await request.json().catch(() => ({}));
     const limit = body.limit || 20;
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
         // Поиск по tmdbId или по названию
         if (movie.tmdbId) {
-          tmdbMovie = await fetchTMDB(`/movie/${movie.tmdbId}`, apiKey, isBearer);
+          tmdbMovie = await fetchTMDB(`/movie/${movie.tmdbId}`, raw, isBearer);
         }
 
         if (!tmdbMovie) {
@@ -54,12 +55,12 @@ export async function POST(request: NextRequest) {
           if (movie.releaseDate) {
             params.year = new Date(movie.releaseDate).getFullYear().toString();
           }
-          const searchResult = await fetchTMDB("/search/movie", apiKey, isBearer, params);
+          const searchResult = await fetchTMDB("/search/movie", raw, isBearer, params);
 
           if (searchResult?.results?.length > 0) {
             tmdbMovie = searchResult.results[0];
           } else if (movie.originalTitle && movie.originalTitle !== movie.title) {
-            const searchResult2 = await fetchTMDB("/search/movie", apiKey, isBearer, { query: movie.title });
+            const searchResult2 = await fetchTMDB("/search/movie", raw, isBearer, { query: movie.title });
             if (searchResult2?.results?.length > 0) {
               tmdbMovie = searchResult2.results[0];
             }
@@ -122,7 +123,11 @@ async function fetchTMDB(
   const headers: Record<string, string> = { Accept: "application/json" };
   if (isBearer) headers["Authorization"] = `Bearer ${apiKey}`;
 
-  const res = await fetch(url, { headers });
+  const res = await fetch(url, {
+    headers,
+    signal: AbortSignal.timeout(45_000),
+    ...outboundFetchInit(),
+  });
   if (!res.ok) return null;
   return res.json();
 }

@@ -10,11 +10,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "primary", size = "md", isLoading, className = "", children, disabled, ...props }, ref) => {
     const variants = {
-      primary: "bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 shadow-lg shadow-amber-500/25",
-      secondary: "bg-slate-700 text-white hover:bg-slate-600",
-      danger: "bg-red-600 text-white hover:bg-red-700",
-      ghost: "bg-transparent text-slate-300 hover:bg-slate-700/50 hover:text-white",
-      outline: "border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white",
+      primary: "rounded-sm bg-[#e50914] font-semibold text-white shadow-[0_8px_24px_rgba(229,9,20,0.35)] hover:bg-[#f40612] hover:shadow-[0_10px_28px_rgba(229,9,20,0.45)] ring-1 ring-white/10",
+      secondary: "rounded-sm border border-white/[0.15] bg-white/[0.08] text-white hover:bg-white/[0.12]",
+      danger: "bg-red-600 text-white hover:bg-red-700 rounded-sm",
+      ghost: "rounded-sm bg-transparent text-white/70 hover:bg-white/[0.08] hover:text-white",
+      outline: "rounded-sm border-2 border-white/40 text-white hover:bg-white/10",
     };
 
     const sizes = {
@@ -28,7 +28,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={`
           inline-flex items-center justify-center gap-2 font-medium rounded-lg
-          transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900
+          transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#e50914]/50 focus:ring-offset-2 focus:ring-offset-[#141414]
           disabled:opacity-50 disabled:cursor-not-allowed
           ${variants[variant]}
           ${sizes[size]}

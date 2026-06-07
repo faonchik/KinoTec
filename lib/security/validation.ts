@@ -30,9 +30,9 @@ export const searchSchema = z.object({
   limit: z.number().int().min(1).max(100).optional().default(20),
 });
 
-// Валидация ID (CUID формат)
+// Валидация ID (CUID формат или slug-подобные ID из сида)
 export function validateId(id: string): boolean {
-  return /^c[a-z0-9]{24}$/.test(id);
+  return /^c[a-z0-9]{24}$/.test(id) || /^[a-zA-Z0-9_-]{3,50}$/.test(id);
 }
 
 // Валидация email

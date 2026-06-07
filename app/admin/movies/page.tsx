@@ -99,8 +99,8 @@ export default async function AdminMoviesPage({ searchParams }: AdminMoviesPageP
       </form>
 
       {/* Movies Table */}
-      <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden">
-        <table className="w-full">
+      <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead className="bg-slate-800">
             <tr>
               <th className="text-left p-4 text-slate-400 font-medium">Фильм</th>

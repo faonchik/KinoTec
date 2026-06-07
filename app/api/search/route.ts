@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
@@ -31,8 +32,7 @@ export async function GET(request: NextRequest) {
     
     // Поиск фильмов
     if (type === "all" || type === "movies") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const orConditions: any[] = [
+      const orConditions: Prisma.MovieWhereInput[] = [
         // Поиск по полному запросу
         { title: { contains: query, mode: "insensitive" } },
         { originalTitle: { contains: query, mode: "insensitive" } },
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
         );
       });
 
-      const movieWhere: any = {
+      const movieWhere: Prisma.MovieWhereInput = {
         OR: orConditions,
       };
 
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
 
     // Поиск актёров
     if (type === "all" || type === "actors") {
-      const actorOrConditions: any[] = [
+      const actorOrConditions: Prisma.ActorWhereInput[] = [
         { name: { contains: query, mode: "insensitive" } },
         { name: { startsWith: query, mode: "insensitive" } },
       ];
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
 
     // Поиск режиссёров
     if (type === "all" || type === "directors") {
-      const directorOrConditions: any[] = [
+      const directorOrConditions: Prisma.DirectorWhereInput[] = [
         { name: { contains: query, mode: "insensitive" } },
         { name: { startsWith: query, mode: "insensitive" } },
       ];

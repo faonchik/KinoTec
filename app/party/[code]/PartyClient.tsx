@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { KinoboxPlayer } from "@/components/player/KinoboxPlayer";
+import { MovieEmbedPlayer } from "@/components/player/MovieEmbedPlayer";
 
 interface User {
   id: string;
@@ -28,6 +28,8 @@ interface Party {
     title: string;
     poster: string | null;
     originalTitle: string | null;
+    tmdbId: string | null;
+    kinopoiskId: string | null;
   };
   host: User;
   participants: Array<{ user: User }>;
@@ -36,11 +38,12 @@ interface Party {
 
 interface PartyClientProps {
   party: Party;
+  embedSrc: string | null;
   currentUserId: string;
   isHost: boolean;
 }
 
-export function PartyClient({ party, currentUserId }: PartyClientProps) {
+export function PartyClient({ party, embedSrc, currentUserId }: PartyClientProps) {
   const [messages, setMessages] = useState<Message[]>(party.messages);
   const [newMessage, setNewMessage] = useState("");
   const [participants, setParticipants] = useState(party.participants);
@@ -153,13 +156,13 @@ export function PartyClient({ party, currentUserId }: PartyClientProps) {
               <span className="text-amber-400 font-mono font-bold">{party.code}</span>
             </div>
             <Button variant="secondary" size="sm" onClick={copyCode}>
-              {copied ? "✓" : "📋"}
+              {copied ? "Скопировано" : "Копировать"}
             </Button>
             <Button variant="secondary" size="sm" onClick={shareLink}>
-              🔗
+              Ссылка
             </Button>
             <Button variant="danger" size="sm" onClick={leaveParty}>
-              🚪
+              Выйти
             </Button>
           </div>
         </div>
@@ -167,7 +170,8 @@ export function PartyClient({ party, currentUserId }: PartyClientProps) {
         <div className="grid lg:grid-cols-[1fr_350px] gap-4">
           {/* Плеер */}
           <div>
-            <KinoboxPlayer
+            <MovieEmbedPlayer
+              src={embedSrc}
               title={party.movie.originalTitle || party.movie.title}
               className="w-full rounded-xl"
             />
@@ -177,8 +181,7 @@ export function PartyClient({ party, currentUserId }: PartyClientProps) {
           <div className="flex flex-col h-[calc(100vh-200px)]">
             {/* Участники */}
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 mb-4">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <span>👥</span>
+              <h3 className="text-white font-semibold mb-3">
                 Участники ({participants.length})
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -206,7 +209,9 @@ export function PartyClient({ party, currentUserId }: PartyClientProps) {
                       </div>
                     )}
                     <span className="text-sm">{p.user.name}</span>
-                    {p.user.id === party.host.id && <span>👑</span>}
+                    {p.user.id === party.host.id && (
+                      <span className="text-[10px] font-semibold uppercase text-amber-400/90">хост</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -215,9 +220,7 @@ export function PartyClient({ party, currentUserId }: PartyClientProps) {
             {/* Чат */}
             <div className="flex-1 bg-slate-800/50 rounded-xl border border-slate-700/50 flex flex-col overflow-hidden">
               <div className="p-3 border-b border-slate-700/50">
-                <h3 className="text-white font-semibold flex items-center gap-2">
-                  <span>💬</span> Чат
-                </h3>
+                <h3 className="text-white font-semibold">Чат</h3>
               </div>
 
               {/* Сообщения */}

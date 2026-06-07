@@ -4,12 +4,26 @@ import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import {
+  AuthPageLayout,
+  authInputClass,
+  authLabelClass,
+  authLabelTextClass,
+  authPrimaryButtonClass,
+  authLinkClass,
+  authAlertErrorClass,
+  authAlertSuccessClass,
+} from "@/components/auth/AuthPageLayout";
 
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("auth.signIn");
+  const tc = useTranslations("auth.common");
   const callbackUrl = searchParams?.get("callbackUrl") || "/";
-  
+  const justRegistered = searchParams?.get("registered") === "true";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,7 +36,6 @@ function SignInForm() {
     setIsLoading(true);
 
     try {
-      // Выполняем вход через next-auth
       const result = await signIn("credentials", {
         email,
         password,
@@ -30,115 +43,115 @@ function SignInForm() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        setError(t("invalidCredentials"));
       } else {
         router.push(callbackUrl);
         router.refresh();
       }
     } catch {
-      setError("Произошла ошибка при входе");
+      setError(t("errorOnSignIn"));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-red-400 text-sm text-center">{error}</p>
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="block w-full">
+      <div className="flex flex-col gap-8">
+        {justRegistered ? (
+          <div className={authAlertSuccessClass}>
+            <p>{t("registeredHint")}</p>
+          </div>
+        ) : null}
+        {error ? (
+          <div className={authAlertErrorClass}>
+            <p>{error}</p>
+          </div>
+        ) : null}
 
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-          placeholder="example@email.com"
-          autoComplete="email"
-          required
-        />
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label htmlFor="password" className="block text-sm font-medium text-slate-300">
-            Пароль
+        <div>
+          <label htmlFor="email" className={authLabelClass}>
+            {t("email")}
           </label>
-          <Link
-            href="/auth/forgot-password"
-            className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-          >
-            Забыли пароль?
-          </Link>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={authInputClass}
+            placeholder={tc("emailPlaceholder")}
+            autoComplete="email"
+            required
+          />
         </div>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-          placeholder="••••••••"
-          autoComplete="current-password"
-          required
-        />
-      </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Вход...
-          </span>
-        ) : (
-          "Войти"
-        )}
-      </button>
+        <div>
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <label htmlFor="password" className={authLabelTextClass}>
+              {t("password")}
+            </label>
+            <Link href="/auth/forgot-password" className={`${authLinkClass} text-[12px] font-medium`}>
+              {t("forgotPassword")}
+            </Link>
+          </div>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={authInputClass}
+            placeholder={tc("passwordPlaceholder")}
+            autoComplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" disabled={isLoading} className={authPrimaryButtonClass}>
+          {isLoading ? (
+            <>
+              <svg className="h-5 w-5 shrink-0 animate-spin" viewBox="0 0 24 24" aria-hidden>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
+        </button>
+      </div>
     </form>
   );
 }
 
 export default function SignInPage() {
+  const t = useTranslations("auth.signIn");
+  const tc = useTranslations("auth.common");
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white">
-              Вход в КиноТеку
-            </h1>
-            <p className="text-slate-400 mt-2">
-              Введите свои данные для входа
-            </p>
-          </div>
-
-          <Suspense fallback={<div className="text-center text-slate-400">Загрузка...</div>}>
-            <SignInForm />
-          </Suspense>
-
-          <div className="mt-6 text-center">
-            <p className="text-slate-400">
-              Нет аккаунта?{" "}
-              <Link href="/auth/signup" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
-                Зарегистрироваться
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AuthPageLayout
+      title={t("title")}
+      subtitle={t("subtitle")}
+      footer={
+        <>
+          {t("noAccount")}{" "}
+          <Link href="/auth/signup" className={authLinkClass}>
+            {t("signUpLink")}
+          </Link>
+        </>
+      }
+    >
+      <Suspense
+        fallback={
+          <div className="py-10 text-center font-mono text-[13px] text-white/40">{tc("loading")}</div>
+        }
+      >
+        <SignInForm />
+      </Suspense>
+    </AuthPageLayout>
   );
 }

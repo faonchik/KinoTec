@@ -176,9 +176,10 @@ async function main() {
   // Создаем фильмы
   const inception = await prisma.movie.upsert({
     where: { id: "inception" },
-    update: {},
+    update: { tmdbId: "27205" },
     create: {
       id: "inception",
+      tmdbId: "27205",
       title: "Начало",
       originalTitle: "Inception",
       description: "Кобб — талантливый вор, лучший в опасном искусстве извлечения: он крадет ценные секреты из глубин подсознания во время сна, когда человеческий разум наиболее уязвим. Редкие способности Кобба сделали его ценным игроком в мире корпоративного шпионажа, но они же превратили его в беглеца и лишили всего, что он любил.",
@@ -198,9 +199,10 @@ async function main() {
 
   const interstellar = await prisma.movie.upsert({
     where: { id: "interstellar" },
-    update: {},
+    update: { tmdbId: "157336" },
     create: {
       id: "interstellar",
+      tmdbId: "157336",
       title: "Интерстеллар",
       originalTitle: "Interstellar",
       description: "Когда засуха, пыльные бури и вымирание растений приводят человечество к продовольственному кризису, команда исследователей и учёных отправляется через червоточину в космос в поисках нового дома для человечества.",
@@ -220,9 +222,10 @@ async function main() {
 
   const dune = await prisma.movie.upsert({
     where: { id: "dune" },
-    update: {},
+    update: { tmdbId: "438631" },
     create: {
       id: "dune",
+      tmdbId: "438631",
       title: "Дюна",
       originalTitle: "Dune",
       description: "Атрейдесы прибывают на планету Арракис, чтобы контролировать добычу меланжа — самого ценного ресурса во вселенной. Однако их ждёт предательство и борьба за выживание.",
@@ -242,9 +245,10 @@ async function main() {
 
   const pulpFiction = await prisma.movie.upsert({
     where: { id: "pulp-fiction" },
-    update: {},
+    update: { tmdbId: "680" },
     create: {
       id: "pulp-fiction",
+      tmdbId: "680",
       title: "Криминальное чтиво",
       originalTitle: "Pulp Fiction",
       description: "Несколько связанных историй из криминального мира Лос-Анджелеса: два наёмных убийцы философствуют о жизни, боксёр вынужден нарушить уговор с мафией, а гангстер и его жена переживают необычное свидание.",
@@ -264,9 +268,10 @@ async function main() {
 
   const darkKnight = await prisma.movie.upsert({
     where: { id: "dark-knight" },
-    update: {},
+    update: { tmdbId: "155" },
     create: {
       id: "dark-knight",
+      tmdbId: "155",
       title: "Тёмный рыцарь",
       originalTitle: "The Dark Knight",
       description: "Бэтмен продолжает войну с преступностью. При поддержке лейтенанта Гордона и прокурора Харви Дента, он стремится уничтожить организованную преступность в Готэме. Но появляется новый злодей — Джокер.",
@@ -286,9 +291,10 @@ async function main() {
 
   const bladeRunner = await prisma.movie.upsert({
     where: { id: "blade-runner-2049" },
-    update: {},
+    update: { tmdbId: "335984" },
     create: {
       id: "blade-runner-2049",
+      tmdbId: "335984",
       title: "Бегущий по лезвию 2049",
       originalTitle: "Blade Runner 2049",
       description: "Молодой офицер K обнаруживает тайну, которая может ввергнуть в хаос то, что осталось от общества. Это открытие заставляет его отправиться на поиски Рика Декарда, бывшего блейдраннера, который пропал 30 лет назад.",
@@ -391,6 +397,34 @@ async function main() {
   ]);
 
   console.log("✅ Жанры связаны с фильмами");
+
+  const futurePremiere = await prisma.movie.upsert({
+    where: { id: "seed-future-premiere" },
+    update: { releaseDate: new Date("2026-09-15") },
+    create: {
+      id: "seed-future-premiere",
+      title: "Демо: будущая премьера",
+      originalTitle: "Seed future premiere",
+      description:
+        "Вспомогательная карточка для календаря премьер. Удалите после импорта из TMDB.",
+      poster: "https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg",
+      backdrop: "https://image.tmdb.org/t/p/original/ilRyazdMJwN05exqhwK4tMKBYZs.jpg",
+      releaseDate: new Date("2026-09-15"),
+      runtime: 120,
+      country: "США",
+      status: MovieStatus.RELEASED,
+      popularity: 10,
+      directorId: villeneuve.id,
+    },
+  });
+
+  await prisma.movieGenre.upsert({
+    where: {
+      movieId_genreId: { movieId: futurePremiere.id, genreId: genreMap["sci-fi"] },
+    },
+    update: {},
+    create: { movieId: futurePremiere.id, genreId: genreMap["sci-fi"] },
+  });
 
   // Связываем актеров с фильмами
   await Promise.all([
@@ -554,6 +588,73 @@ async function main() {
   });
 
   console.log("✅ Избранное и списки просмотра созданы");
+
+  const collWeekly = await prisma.collection.upsert({
+    where: { slug: "sci-fi-picks-week" },
+    update: {},
+    create: {
+      title: "Фантастика недели (редакция)",
+      slug: "sci-fi-picks-week",
+      description: "Рекомендованная подборка редакции.",
+      isPublic: true,
+      isFeatured: true,
+      order: 1,
+      userId: null,
+    },
+  });
+
+  const collAuthor = await prisma.collection.upsert({
+    where: { slug: "admin-author-picks" },
+    update: {},
+    create: {
+      title: "Авторский выбор администратора",
+      slug: "admin-author-picks",
+      description: "Личные рекомендации от редакции КиноТеки.",
+      isPublic: true,
+      isFeatured: false,
+      order: 0,
+      userId: admin.id,
+    },
+  });
+
+  const collThematic = await prisma.collection.upsert({
+    where: { slug: "nolan-worlds" },
+    update: {},
+    create: {
+      title: "Миры Нолана",
+      slug: "nolan-worlds",
+      description: "Тематическая подборка фильмов Кристофера Нолана.",
+      isPublic: true,
+      isFeatured: false,
+      order: 2,
+      userId: null,
+    },
+  });
+
+  const collectionMovieRows = [
+    { collectionId: collWeekly.id, movieId: inception.id, order: 0 },
+    { collectionId: collWeekly.id, movieId: interstellar.id, order: 1 },
+    { collectionId: collAuthor.id, movieId: inception.id, order: 0 },
+    { collectionId: collAuthor.id, movieId: darkKnight.id, order: 1 },
+    { collectionId: collThematic.id, movieId: inception.id, order: 0 },
+    { collectionId: collThematic.id, movieId: darkKnight.id, order: 1 },
+    { collectionId: collThematic.id, movieId: interstellar.id, order: 2 },
+  ];
+
+  for (const row of collectionMovieRows) {
+    await prisma.collectionMovie.upsert({
+      where: {
+        collectionId_movieId: {
+          collectionId: row.collectionId,
+          movieId: row.movieId,
+        },
+      },
+      update: { order: row.order },
+      create: row,
+    });
+  }
+
+  console.log("✅ Подборки созданы");
 
   // Заполняем магазин кастомизации
   console.log("🛒 Создание предметов магазина...");

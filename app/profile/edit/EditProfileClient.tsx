@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
-import { BackgroundUpload } from "@/components/profile/BackgroundUpload";
 import { Button } from "@/components/ui/Button";
 
 interface User {
@@ -13,14 +12,6 @@ interface User {
   email: string;
   bio: string | null;
   avatar: string | null;
-  profileFrame: string | null;
-  profileBadge: string | null;
-  nameColor: string | null;
-  avatarEffect: string | null;
-  chatBubble: string | null;
-  emojiPack: string | null;
-  profileBackground: string | null;
-  theme: string | null;
 }
 
 interface EditProfileClientProps {
@@ -32,7 +23,6 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
   const [name, setName] = useState(initialUser.name || "");
   const [bio, setBio] = useState(initialUser.bio || "");
   const [avatar, setAvatar] = useState<string | null>(initialUser.avatar);
-  const [background, setBackground] = useState<string | null>(initialUser.profileBackground);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -82,13 +72,13 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
   };
 
   return (
-    <div className="min-h-screen bg-[#151C2C]">
+    <div className="min-h-screen bg-[#0b0f14]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="font-oswald text-3xl font-bold text-white mb-2">Редактирование профиля</h1>
-            <p className="font-mono text-[13px] text-[#8B95A8]">Измените информацию о себе</p>
+            <p className="font-mono text-[13px] text-white/45">Измените информацию о себе</p>
           </div>
           <Link href="/profile">
             <Button variant="secondary">Назад к профилю</Button>
@@ -110,17 +100,8 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Background Section */}
-          <div className="bg-[#1A2236] rounded-2xl p-6">
-            <h2 className="font-oswald text-xl font-bold text-white mb-4">Фон профиля</h2>
-            <BackgroundUpload
-              currentBackground={background}
-              onBackgroundChange={setBackground}
-            />
-          </div>
-
           {/* Avatar Section */}
-          <div className="bg-[#1A2236] rounded-2xl p-6">
+          <div className="bg-[#121821] rounded-2xl p-6">
             <h2 className="font-oswald text-xl font-bold text-white mb-4">Аватар</h2>
             <div className="flex items-start gap-6">
               <div className="flex-shrink-0">
@@ -128,13 +109,11 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
                   currentAvatar={avatar}
                   userName={name || initialUser.email}
                   userEmail={initialUser.email}
-                  profileFrame={initialUser.profileFrame}
-                  avatarEffect={initialUser.avatarEffect}
                   onAvatarChange={setAvatar}
                 />
               </div>
               <div className="flex-1">
-                <p className="font-mono text-[13px] text-[#8B95A8]">
+                <p className="font-mono text-[13px] text-white/45">
                   Загрузите новое изображение для вашего профиля. Рекомендуемый размер: 400x400 пикселей.
                 </p>
               </div>
@@ -142,11 +121,11 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
           </div>
 
           {/* Basic Info */}
-          <div className="bg-[#1A2236] rounded-2xl p-6">
+          <div className="bg-[#121821] rounded-2xl p-6">
             <h2 className="font-oswald text-xl font-bold text-white mb-4">Основная информация</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block font-mono text-[13px] text-[#8B95A8] mb-2">
+                <label htmlFor="email" className="block font-mono text-[13px] text-white/45 mb-2">
                   Email
                 </label>
                 <input
@@ -154,13 +133,13 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
                   id="email"
                   value={initialUser.email}
                   disabled
-                  className="w-full px-4 py-2.5 bg-[#2A3550] border border-[#3A4560] rounded-xl text-white font-mono text-[13px] cursor-not-allowed opacity-60"
+                  className="w-full px-4 py-2.5 bg-white/[0.08] border border-white/[0.12] rounded-xl text-white font-mono text-[13px] cursor-not-allowed opacity-60"
                 />
-                <p className="font-mono text-[11px] text-[#5A6478] mt-1">Email нельзя изменить</p>
+                <p className="font-mono text-[11px] text-white/35 mt-1">Email нельзя изменить</p>
               </div>
 
               <div>
-                <label htmlFor="name" className="block font-mono text-[13px] text-[#8B95A8] mb-2">
+                <label htmlFor="name" className="block font-mono text-[13px] text-white/45 mb-2">
                   Имя
                 </label>
                 <input
@@ -170,15 +149,15 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
                   onChange={(e) => setName(e.target.value)}
                   maxLength={50}
                   placeholder="Введите ваше имя"
-                  className="w-full px-4 py-2.5 bg-[#2A3550] border border-[#3A4560] rounded-xl text-white font-mono text-[13px] focus:outline-none focus:border-[#FF8400] transition-colors"
+                  className="w-full px-4 py-2.5 bg-white/[0.08] border border-white/[0.12] rounded-xl text-white font-mono text-[13px] focus:outline-none focus:border-[#ffb84d] transition-colors"
                 />
-                <p className="font-mono text-[11px] text-[#5A6478] mt-1">
+                <p className="font-mono text-[11px] text-white/35 mt-1">
                   {name.length}/50 символов
                 </p>
               </div>
 
               <div>
-                <label htmlFor="bio" className="block font-mono text-[13px] text-[#8B95A8] mb-2">
+                <label htmlFor="bio" className="block font-mono text-[13px] text-white/45 mb-2">
                   О себе
                 </label>
                 <textarea
@@ -188,9 +167,9 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
                   maxLength={500}
                   rows={5}
                   placeholder="Расскажите о себе..."
-                  className="w-full px-4 py-2.5 bg-[#2A3550] border border-[#3A4560] rounded-xl text-white font-mono text-[13px] focus:outline-none focus:border-[#FF8400] transition-colors resize-none"
+                  className="w-full px-4 py-2.5 bg-white/[0.08] border border-white/[0.12] rounded-xl text-white font-mono text-[13px] focus:outline-none focus:border-[#ffb84d] transition-colors resize-none"
                 />
-                <p className="font-mono text-[11px] text-[#5A6478] mt-1">
+                <p className="font-mono text-[11px] text-white/35 mt-1">
                   {bio.length}/500 символов
                 </p>
               </div>

@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { advancedRateLimit, keyGenerators } from "./advancedRateLimit";
 import { logSecurityEvent, getClientIp } from "./logger";
 import { validateRequestSize } from "./requestValidation";
-import { validateUrl } from "./ssrf";
 
 // Применение всех проверок безопасности к запросу
 export async function securityMiddleware(
@@ -108,26 +107,6 @@ export async function securityMiddleware(
         };
       }
     }
-  }
-
-  // 4. Проверка URL на SSRF
-  const urlCheck = validateUrl(request.url, request);
-  if (!urlCheck.valid) {
-    logSecurityEvent(
-      "SUSPICIOUS_ACTIVITY",
-      "critical",
-      `SSRF attempt detected: ${request.url}`,
-      { ip, url: request.url },
-      request
-    );
-    return {
-      allowed: false,
-      response: NextResponse.json(
-        { error: "Forbidden" },
-        { status: 403 }
-      ),
-      error: urlCheck.error,
-    };
   }
 
   return { allowed: true };

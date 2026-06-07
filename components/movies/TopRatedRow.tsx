@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { getProxiedImageUrl, shouldUseUnoptimized } from "@/lib/images";
 
 interface Movie {
   id: string;
@@ -46,10 +47,9 @@ export function TopRatedRow({ movies }: TopRatedRowProps) {
     <div className="relative w-full">
       <div className="flex items-center" style={{ height: 340 }}>
         {movies.map((movie, index) => {
-          // Простая проверка для определения типа URL
           const posterUrl = movie.poster || null;
-          const isProxied = posterUrl ? (posterUrl.includes("image.tmdb.org") || posterUrl.includes("/api/images/proxy")) : false;
-          const proxiedUrl = posterUrl;
+          const proxiedUrl = posterUrl ? getProxiedImageUrl(posterUrl) : null;
+          const isProxied = shouldUseUnoptimized(proxiedUrl);
           const isHovered = hoveredIndex === index;
           const isElevated = elevatedIndex === index;
 
@@ -62,7 +62,7 @@ export function TopRatedRow({ movies }: TopRatedRowProps) {
             <Link
               key={movie.id}
               href={`/movies/${movie.id}`}
-              className="relative flex-shrink-0 rounded-2xl overflow-hidden bg-[#1E2740] cursor-pointer"
+              className="relative flex-shrink-0 cursor-pointer overflow-hidden rounded-sm bg-[#181818] ring-1 ring-white/[0.08]"
               style={{
                 width: isHovered ? 260 : 240,
                 height: 340,
@@ -72,9 +72,9 @@ export function TopRatedRow({ movies }: TopRatedRowProps) {
                 transform: `translateX(${shift}px)`,
                 transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, outline 0.35s ease",
                 boxShadow: isHovered
-                  ? "0 8px 30px rgba(255, 132, 0, 0.25), 0 4px 15px rgba(0,0,0,0.5)"
+                  ? "0 8px 30px rgba(229, 9, 20, 0.35), 0 4px 15px rgba(0,0,0,0.55)"
                   : "none",
-                outline: isHovered ? "2px solid rgba(255, 132, 0, 0.6)" : "2px solid transparent",
+                outline: isHovered ? "2px solid rgba(229, 9, 20, 0.65)" : "2px solid transparent",
                 outlineOffset: -2,
               }}
               onMouseEnter={() => handleMouseEnter(index)}
@@ -98,14 +98,14 @@ export function TopRatedRow({ movies }: TopRatedRowProps) {
                   />
                 )
               ) : (
-                <div className="w-full h-full bg-gradient-to-b from-[#1E2740] to-[#2A3550] flex items-center justify-center text-5xl">
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-[#232323] to-[#141414] text-5xl">
                   🎬
                 </div>
               )}
 
               {/* Number badge */}
-              <div className="absolute top-3 left-3 w-8 h-8 bg-[#FF8400] rounded-2xl flex items-center justify-center z-10">
-                <span className="font-oswald text-sm font-bold text-[#111]">{index + 1}</span>
+              <div className="absolute left-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-sm bg-[#e50914] shadow-md">
+                <span className="font-display text-sm font-bold text-white">{index + 1}</span>
               </div>
 
               {/* Bottom gradient + title */}

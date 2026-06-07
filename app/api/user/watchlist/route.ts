@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+
 
 const watchlistSchema = z.object({
   movieId: z.string(),
@@ -75,6 +77,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${movieId}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
+
     return NextResponse.json(watchlistItem, { status: 201 });
   } catch (error) {
     console.error("Watchlist add error:", error);
@@ -107,6 +116,13 @@ export async function DELETE(request: NextRequest) {
         },
       },
     });
+
+    try {
+      revalidatePath("/profile");
+      revalidatePath(`/movies/${movieId}`);
+    } catch (e) {
+      console.error("Revalidation error:", e);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
