@@ -693,8 +693,8 @@ function CloseIcon(props: SVGProps<SVGSVGElement>) {
 }
 function HeartIcon({ filled, ...props }: SVGProps<SVGSVGElement> & { filled?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" {...props}>
-      <path d="M12 21s-7-4.35-10-8.5C-.5 7.5 2 4 6.5 4 9 4 11 5 12 6.5 13 5 15 4 17.5 4 22 4 24.5 7.5 22 12.5 12 21z" />
+    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} {...props}>
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
     </svg>
   );
 }

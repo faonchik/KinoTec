@@ -191,7 +191,7 @@ export function AvatarUpload({
   const effectClasses = getAvatarEffectClasses(avatarEffect);
 
   return (
-    <div className="relative">
+    <div className="relative flex flex-col items-center justify-center">
       <div className={`relative inline-block rounded-full ${frameClasses} ${effectClasses}`}>
         {avatar ? (
           <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 relative">

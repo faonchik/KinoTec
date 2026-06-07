@@ -169,7 +169,7 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews 
 
         {/* Avatar */}
         <div className="absolute left-4 sm:left-8 lg:left-12 bottom-[-30px] z-10">
-          <div className="rounded-full border-4 border-[#ffb84d]" style={{ borderRadius: "50%" }}>
+          <div className="rounded-full border-4 border-[#ffb84d] w-[104px] h-[104px] flex items-center justify-center flex-shrink-0 bg-[#141414]" style={{ borderRadius: "50%" }}>
             <AvatarUpload
               currentAvatar={avatar}
               userName={user.name}
