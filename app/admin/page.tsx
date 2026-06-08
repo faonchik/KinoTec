@@ -63,15 +63,15 @@ export default async function AdminPage() {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="font-oswald text-3xl font-bold text-white">Панель администратора</h1>
           <p className="font-mono text-[13px] text-white/35 mt-1">
             Добро пожаловать, {session.user.name || session.user.email}
           </p>
         </div>
-        <Link href="/admin/tmdb">
-          <button className="flex items-center gap-2 bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold px-5 py-2.5 rounded-2xl transition-colors">
+        <Link href="/admin/tmdb" className="shrink-0">
+          <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold px-5 py-2.5 rounded-2xl transition-colors">
             🌐 Добавить фильм
           </button>
         </Link>
@@ -80,7 +80,7 @@ export default async function AdminPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {statCards.map((card) => (
-          <div key={card.label} className={`bg-gradient-to-r ${card.color} bg-[#121821] rounded-2xl p-5 border border-white/[0.08]/50`}>
+          <div key={card.label} className={`bg-gradient-to-r ${card.color} bg-[#121821] rounded-2xl p-5 border border-white/[0.08]`}>
             <div className="flex items-center justify-between mb-3">
               <span className="font-mono text-[12px] text-white/45">{card.label}</span>
               <span className="text-xl">{card.icon}</span>

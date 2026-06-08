@@ -111,16 +111,16 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
   const currentSeason = series.seasons[selectedSeason];
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#141414]">
       {/* Backdrop */}
-      <div className="relative h-[50vh] min-h-[400px] overflow-hidden bg-slate-950">
+      <div className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[400px] overflow-hidden bg-[#141414]">
         <HeroBackdrop backdrop={series.backdrop} poster={series.poster} />
       </div>
 
-      <div className="container mx-auto px-4 -mt-48 relative z-10">
-        <div className="grid lg:grid-cols-[300px_1fr] gap-8">
-          {/* Постер */}
-          <div>
+      <div className="container mx-auto px-4 -mt-24 sm:-mt-48 relative z-10">
+        <div className="grid md:grid-cols-[240px_1fr] lg:grid-cols-[300px_1fr] gap-6 sm:gap-8">
+          {/* Постер (показываем только на планшетах и ПК) */}
+          <div className="hidden md:block">
             <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-2xl">
               {series.poster ? (
                 <Image
@@ -130,36 +130,36 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-slate-800 flex items-center justify-center text-6xl">
+                <div className="w-full h-full bg-[#1e1e1e] flex items-center justify-center text-6xl">
                   📺
                 </div>
               )}
             </div>
 
-            {/* Рейтинг */}
-            <div className="mt-4 bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+            {/* Рейтинг (для десктопа под постером) */}
+            <div className="mt-4 bg-[#1e1e1e]/60 rounded-xl p-4 border border-white/[0.08]">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-slate-400">Рейтинг</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-3xl text-amber-400">★</span>
-                  <span className="text-2xl text-white font-bold">{avgRating || "—"}</span>
-                  <span className="text-slate-500">/ 10</span>
+                <span className="text-white/50 text-sm">Рейтинг</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-2xl text-amber-400">★</span>
+                  <span className="text-xl text-white font-bold">{avgRating || "—"}</span>
+                  <span className="text-white/30 text-sm">/ 10</span>
                 </div>
               </div>
 
               {/* Оценить */}
               {session && (
                 <div>
-                  <p className="text-sm text-slate-400 mb-2">Ваша оценка:</p>
-                  <div className="flex gap-1">
+                  <p className="text-xs text-white/50 mb-2">Ваша оценка:</p>
+                  <div className="flex gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                       <button
                         key={value}
                         onClick={() => handleRate(value)}
-                        className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                        className={`w-7 h-7 rounded text-xs font-medium transition-colors shrink-0 ${
                           userRating === value
-                            ? "bg-amber-500 text-white"
-                            : "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                            ? "bg-[#ffb84d] text-black font-bold"
+                            : "bg-[#282828] text-white/60 hover:bg-[#333333] hover:text-white"
                         }`}
                       >
                         {value}
@@ -173,6 +173,43 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
 
           {/* Информация */}
           <div>
+            {/* Постер и рейтинг для мобильных устройств */}
+            <div className="flex md:hidden gap-4 mb-6 bg-[#1e1e1e]/60 border border-white/[0.06] p-3.5 rounded-2xl">
+              <div className="relative w-20 aspect-[2/3] rounded-lg overflow-hidden flex-shrink-0 shadow-lg">
+                {series.poster ? (
+                  <Image src={series.poster} alt={series.title} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#282828] flex items-center justify-center text-2xl">📺</div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0 flex flex-col justify-center">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="text-xl text-amber-400">★</span>
+                  <span className="text-lg text-white font-bold">{avgRating || "—"}</span>
+                  <span className="text-white/40 text-xs">/ 10</span>
+                </div>
+                {session && (
+                  <div>
+                    <p className="text-[11px] text-white/50 mb-1.5">Ваша оценка:</p>
+                    <div className="flex gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+                        <button
+                          key={value}
+                          onClick={() => handleRate(value)}
+                          className={`w-7 h-7 rounded text-xs font-medium transition-colors shrink-0 ${
+                            userRating === value
+                              ? "bg-[#ffb84d] text-black font-bold"
+                              : "bg-[#282828] text-white/60 hover:bg-[#333333]"
+                          }`}
+                        >
+                          {value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="flex items-start gap-3 mb-4">
               <span className={`px-3 py-1 rounded-full text-sm text-white ${statusLabels[series.status]?.color || "bg-slate-500"}`}>
                 {statusLabels[series.status]?.label || series.status}
@@ -209,7 +246,7 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
 
             {/* Описание */}
             {series.description && (
-              <p className="text-slate-300 leading-relaxed mb-8">{series.description}</p>
+              <p className="text-white/80 leading-relaxed mb-8">{series.description}</p>
             )}
 
             {/* Кнопки действий */}
@@ -217,7 +254,7 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
               {/* Кнопка просмотра */}
               <Link
                 href={`/watch/series/${series.id}`}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-500 hover:to-red-600 transition-all shadow-lg hover:shadow-red-500/25"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#ffb84d] text-[#141414] font-semibold rounded-lg hover:bg-[#ffc56a] transition-all shadow-lg hover:shadow-[#ffb84d]/25"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
@@ -231,7 +268,7 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                   href={series.trailer}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-3 bg-[#282828] hover:bg-[#333333] text-white font-medium rounded-lg transition-all"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -250,7 +287,7 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                     <Link
                       key={sa.actor.id}
                       href={`/actors/${sa.actor.id}`}
-                      className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-[#1e1e1e] hover:bg-[#282828] rounded-lg transition-colors border border-white/[0.04]"
                     >
                       {sa.actor.photo ? (
                         <Image
@@ -261,14 +298,14 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                           className="rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center text-sm">
+                        <div className="w-8 h-8 bg-[#333333] rounded-full flex items-center justify-center text-sm">
                           {sa.actor.name[0]}
                         </div>
                       )}
                       <div>
-                        <p className="text-white text-sm">{sa.actor.name}</p>
+                        <p className="text-white text-sm font-medium">{sa.actor.name}</p>
                         {sa.character && (
-                          <p className="text-slate-500 text-xs">{sa.character}</p>
+                          <p className="text-white/40 text-xs">{sa.character}</p>
                         )}
                       </div>
                     </Link>
@@ -285,15 +322,15 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
             <h2 className="text-2xl font-bold text-white mb-6">Сезоны и эпизоды</h2>
 
             {/* Табы сезонов */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {series.seasons.map((season, idx) => (
                 <button
                   key={season.id}
                   onClick={() => setSelectedSeason(idx)}
                   className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                     selectedSeason === idx
-                      ? "bg-amber-500 text-white"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      ? "bg-[#ffb84d] text-black font-semibold shadow-md"
+                      : "bg-[#1e1e1e] text-white/70 hover:bg-[#282828] hover:text-white"
                   }`}
                 >
                   {season.name || `Сезон ${season.seasonNumber}`}
@@ -307,11 +344,11 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                 {currentSeason.episodes.map((ep) => (
                   <div
                     key={ep.id}
-                    className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 hover:border-slate-600 transition-colors"
+                    className="bg-[#1e1e1e]/60 rounded-xl p-4 border border-white/[0.06] hover:border-white/15 transition-colors"
                   >
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       {ep.stillPath && (
-                        <div className="relative w-40 aspect-video rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="relative w-full sm:w-40 aspect-video rounded-lg overflow-hidden flex-shrink-0 shadow-md">
                           <Image
                             src={ep.stillPath}
                             alt={ep.name}
@@ -322,15 +359,15 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                       )}
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-amber-400 font-medium">
+                          <span className="text-[#ffb84d] font-semibold">
                             {ep.episodeNumber}.
                           </span>
                           <h3 className="text-white font-medium">{ep.name}</h3>
                         </div>
                         {ep.overview && (
-                          <p className="text-slate-400 text-sm line-clamp-2">{ep.overview}</p>
+                          <p className="text-white/60 text-sm line-clamp-2">{ep.overview}</p>
                         )}
-                        <div className="flex gap-4 mt-2 text-sm text-slate-500">
+                        <div className="flex gap-4 mt-2.5 text-xs text-white/40 font-mono">
                           {ep.airDate && (
                             <span>{new Date(ep.airDate).toLocaleDateString("ru")}</span>
                           )}
@@ -351,7 +388,7 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
             <h2 className="text-2xl font-bold text-white mb-6">Отзывы</h2>
             <div className="space-y-4">
               {series.reviews.map((review) => (
-                <div key={review.id} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                <div key={review.id} className="bg-[#1e1e1e]/60 rounded-xl p-4 border border-white/[0.06]">
                   <div className="flex items-center gap-3 mb-3">
                     {review.user.avatar ? (
                       <Image
@@ -359,21 +396,21 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                         alt={review.user.name || ""}
                         width={40}
                         height={40}
-                        className="rounded-full"
+                        className="rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-[#282828] rounded-full flex items-center justify-center text-white/80 font-bold">
                         {review.user.name?.[0] || "?"}
                       </div>
                     )}
                     <div>
                       <p className="text-white font-medium">{review.user.name}</p>
-                      <p className="text-slate-500 text-sm">
+                      <p className="text-white/45 text-xs">
                         {new Date(review.createdAt).toLocaleDateString("ru")}
                       </p>
                     </div>
                   </div>
-                  <p className="text-slate-300">{review.content}</p>
+                  <p className="text-white/85 leading-relaxed">{review.content}</p>
                 </div>
               ))}
             </div>
@@ -387,7 +424,7 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {similar.map((s) => (
                 <Link key={s.id} href={`/series/${s.id}`} className="group">
-                  <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-slate-800">
+                  <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#1e1e1e]">
                     {s.poster ? (
                       <Image
                         src={s.poster}
@@ -396,10 +433,10 @@ export function SeriesDetailClient({ series, similar }: SeriesDetailClientProps)
                         className="object-cover group-hover:scale-105 transition-transform"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl">📺</div>
+                      <div className="w-full h-full flex items-center justify-center text-4xl bg-[#1e1e1e]">📺</div>
                     )}
                   </div>
-                  <h3 className="text-white mt-2 group-hover:text-amber-400 transition-colors line-clamp-2">
+                  <h3 className="text-white/95 mt-2 group-hover:text-[#ffb84d] transition-colors line-clamp-2 text-sm font-medium">
                     {s.title}
                   </h3>
                 </Link>

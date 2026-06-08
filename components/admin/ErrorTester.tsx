@@ -54,7 +54,7 @@ export function ErrorTester() {
   };
 
   return (
-    <div className="bg-[#121821] rounded-2xl p-6 border border-white/[0.08]/50 shadow-xl">
+    <div className="bg-[#121821] rounded-2xl p-6 border border-white/[0.08] shadow-xl">
       <div className="flex items-center gap-2.5 mb-4">
         <span className="text-xl">🛠️</span>
         <h2 className="font-oswald text-lg font-bold text-white">Инструменты тестирования интерфейса ошибок</h2>
@@ -64,10 +64,10 @@ export function ErrorTester() {
       </p>
 
       {/* Buttons Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         <button
           onClick={() => triggerToast("error")}
-          className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-400 text-xs font-mono transition-all duration-300 gap-1.5"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-400 text-[10px] sm:text-xs font-mono transition-all duration-300 gap-1.5"
         >
           <span className="text-lg">⚠️</span>
           <span>Ошибочный Toast</span>
@@ -75,7 +75,7 @@ export function ErrorTester() {
 
         <button
           onClick={() => triggerToast("warning")}
-          className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 text-xs font-mono transition-all duration-300 gap-1.5"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 text-[10px] sm:text-xs font-mono transition-all duration-300 gap-1.5"
         >
           <span className="text-lg">🔔</span>
           <span>Предупреждение</span>
@@ -83,7 +83,7 @@ export function ErrorTester() {
 
         <button
           onClick={() => triggerModal("critical")}
-          className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-rose-500/25 bg-rose-500/5 hover:bg-rose-500/10 text-rose-300 text-xs font-mono transition-all duration-300 gap-1.5"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-xl border border-rose-500/25 bg-rose-500/5 hover:bg-rose-500/10 text-rose-300 text-[10px] sm:text-xs font-mono transition-all duration-300 gap-1.5"
         >
           <span className="text-lg">🛑</span>
           <span>Критический модал</span>
@@ -91,7 +91,7 @@ export function ErrorTester() {
 
         <button
           onClick={() => triggerModal("security")}
-          className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-400 text-xs font-mono transition-all duration-300 gap-1.5"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-400 text-[10px] sm:text-xs font-mono transition-all duration-300 gap-1.5"
         >
           <span className="text-lg">🛡️</span>
           <span>Security Block</span>
@@ -99,7 +99,7 @@ export function ErrorTester() {
 
         <button
           onClick={() => triggerModal("bsod")}
-          className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-blue-400 text-xs font-mono transition-all duration-300 gap-1.5 col-span-2 md:col-span-1"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-blue-400 text-[10px] sm:text-xs font-mono transition-all duration-300 gap-1.5 col-span-2 sm:col-span-1 md:col-span-1"
         >
           <span className="text-lg">💥</span>
           <span>Синий экран (BSOD)</span>

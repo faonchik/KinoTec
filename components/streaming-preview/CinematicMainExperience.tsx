@@ -211,7 +211,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   {hero.description ?? "Погрузитесь в историю, где каждый кадр — кино."}
                 </p>
                 <div className="mt-8 flex flex-col gap-5">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-1.5 sm:gap-4 w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
                     <motion.button
                       type="button"
                       whileHover={{ scale: 1.03 }}
@@ -220,9 +220,9 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                         setMiniPlayer(hero);
                         setDetail(null);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-[#ffb84d] sm:px-8 px-5 sm:py-3.5 py-2.5 text-xs sm:text-sm font-semibold text-[#141414] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)]"
+                      className="inline-flex items-center gap-1 rounded-full bg-[#ffb84d] sm:px-8 px-4 sm:py-3.5 py-2 text-xs sm:text-sm font-semibold text-[#141414] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)] shrink-0"
                     >
-                      <PlaySolidIcon className="h-5 w-5" />
+                      <PlaySolidIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                       Смотреть
                     </motion.button>
                     <motion.button
@@ -230,34 +230,34 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setDetail(hero)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.08] sm:px-7 px-4 sm:py-3.5 py-2.5 text-xs sm:text-sm font-medium text-white backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.12]"
+                      className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/[0.08] sm:px-7 px-3.5 sm:py-3.5 py-2 text-xs sm:text-sm font-medium text-white backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.12] shrink-0"
                     >
-                      <InfoIcon className="h-5 w-5 text-white/80" />
+                      <InfoIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white/80" />
                       Детали
                     </motion.button>
                     <button
                       type="button"
                       onClick={() => toggleWatchlist(hero.id)}
-                      className={`inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border transition ${
+                      className={`inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full border transition shrink-0 ${
                         watchlist.has(hero.id)
                           ? "border-[#ffb84d]/50 bg-[#ffb84d]/15 text-[#ffb84d]"
                           : "border-white/15 bg-black/25 text-white/70 hover:text-white"
                       }`}
                       aria-label="В список"
                     >
-                      <BookmarkIcon className="h-5 w-5" filled={watchlist.has(hero.id)} />
+                      <BookmarkIcon className="h-4 w-4 sm:h-5 sm:w-5" filled={watchlist.has(hero.id)} />
                     </button>
                     <button
                       type="button"
                       onClick={() => toggleFavorite(hero.id)}
-                      className={`inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border transition ${
+                      className={`inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full border transition shrink-0 ${
                         favorites.has(hero.id)
                           ? "border-rose-400/50 bg-rose-500/15 text-rose-300"
                           : "border-white/15 bg-black/25 text-white/70 hover:text-white"
                       }`}
                       aria-label="Избранное"
                     >
-                      <HeartIcon className="h-5 w-5" filled={favorites.has(hero.id)} />
+                      <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" filled={favorites.has(hero.id)} />
                     </button>
                   </div>
                   {hero.demoProgress > 0 && (

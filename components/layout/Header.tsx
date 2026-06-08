@@ -8,7 +8,6 @@ import { createPortal } from "react-dom";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { NotificationsButton } from "@/components/notifications/NotificationsButton";
 import { FilmStripMark } from "@/components/layout/FilmStripMark";
 import { HeaderSearch } from "@/components/layout/HeaderSearch";
@@ -286,7 +285,6 @@ export function Header() {
         </div>
 
         <div className="relative z-[2] flex shrink-0 items-center justify-end gap-2 sm:gap-3">
-          <ThemeSwitcher />
           <div className="hidden sm:block">
             <LanguageSwitcher currentLocale={locale} />
           </div>
