@@ -36,7 +36,7 @@ export default async function HttpVersionNotSupportedPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125zM12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
             </svg>
           </div>
-          
+
           <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-[0.4em] text-[#c29b68] bg-[#100f0d] px-3 border border-amber-800/20 rounded-full py-0.5">
             EST. 1920
           </span>
@@ -46,7 +46,7 @@ export default async function HttpVersionNotSupportedPage() {
         <h1 className="font-oswald text-3xl font-bold text-[#e8d2b4] tracking-wide uppercase">
           {t("title")}
         </h1>
-        
+
         {/* Subtitle */}
         <h2 className="font-mono text-xs text-[#c29b68] uppercase tracking-wider mt-1.5">
           {t("subtitle")}

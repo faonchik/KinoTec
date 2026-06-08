@@ -26,6 +26,21 @@ export async function middleware(req: NextRequest) {
     return securityHeaders(req, applyCorsHeaders(req, response));
   }
 
+  // 1. Проверка на устаревший браузер (Internet Explorer) -> 505
+  const userAgent = req.headers.get("user-agent") || "";
+  const isObsoleteBrowser = userAgent.includes("MSIE") || userAgent.includes("Trident/");
+  if (isObsoleteBrowser && pathname !== "/505") {
+    const redirectUrl = new URL("/505", req.url);
+    return securityHeaders(req, NextResponse.redirect(redirectUrl));
+  }
+
+  // 2. Проверка на режим обслуживания (Maintenance Mode) -> 503
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+  if (isMaintenanceMode && pathname !== "/503" && pathname !== "/admin" && !pathname.startsWith("/admin/")) {
+    const redirectUrl = new URL("/503", req.url);
+    return securityHeaders(req, NextResponse.redirect(redirectUrl));
+  }
+
   const publicPaths = [
     "/",
     "/movies",
@@ -45,6 +60,13 @@ export async function middleware(req: NextRequest) {
     "/about",
     "/privacy",
     "/terms",
+    "/401",
+    "/403",
+    "/404-preview",
+    "/405",
+    "/500-preview",
+    "/503",
+    "/505",
   ];
 
   // Проверяем, является ли путь публичным
@@ -89,8 +111,15 @@ export async function middleware(req: NextRequest) {
 
   // Проверка доступа к административной панели
   if (pathname.startsWith("/admin")) {
-    if (!token || (token.role !== "ADMIN" && token.role !== "MODERATOR")) {
-      const redirectUrl = new URL("/", req.url);
+    if (!token) {
+      // Если не вошел - отправляем на вход
+      const signInUrl = new URL("/auth/signin", req.url);
+      signInUrl.searchParams.set("callbackUrl", pathname);
+      return securityHeaders(req, NextResponse.redirect(signInUrl));
+    }
+    if (token.role !== "ADMIN" && token.role !== "MODERATOR") {
+      // Если вошел, но нет прав - на 403 Forbidden
+      const redirectUrl = new URL("/403", req.url);
       return securityHeaders(req, NextResponse.redirect(redirectUrl));
     }
   }
