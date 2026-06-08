@@ -97,7 +97,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
   const hasPlayback = Boolean(embedSrc);
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#141414]">
       {/* Плеер */}
       <div className="w-full bg-black">
         <div className="mx-auto max-w-[1400px]">
@@ -108,6 +108,11 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             season={seasonNum}
             episode={episodeNum}
             isAuthenticated={Boolean(userId)}
+            playerTmdbId={series.tmdbId ? String(series.tmdbId) : null}
+            playerKinopoiskId={series.kinopoiskId}
+            releaseYear={series.firstAirDate ? new Date(series.firstAirDate).getFullYear() : null}
+            poster={series.poster}
+            backdrop={series.backdrop}
           />
           {!hasPlayback && (
             <p className="px-4 py-3 text-center text-sm text-white/50">
@@ -127,7 +132,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
               <div>
                 <h1 className="text-3xl font-bold text-white mb-2">{series.title}</h1>
                 {series.originalTitle && series.originalTitle !== series.title && (
-                  <p className="text-slate-400 text-lg">{series.originalTitle}</p>
+                  <p className="text-white/45 text-lg">{series.originalTitle}</p>
                 )}
               </div>
               
@@ -140,7 +145,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             </div>
 
             {/* Мета */}
-            <div className="flex flex-wrap items-center gap-4 text-slate-400 mb-6">
+            <div className="flex flex-wrap items-center gap-4 text-white/45 mb-6">
               {year && <span>{year}</span>}
               {series.country && <span>{series.country}</span>}
               {series.episodeRuntime && <span>{series.episodeRuntime} мин/эпизод</span>}
@@ -150,7 +155,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
               {series.status && (
                 <span className={`px-2 py-1 rounded text-xs ${
                   series.status === "RETURNING" ? "bg-green-500/20 text-green-400" :
-                  series.status === "ENDED" ? "bg-slate-500/20 text-slate-400" :
+                  series.status === "ENDED" ? "bg-white/[0.08] text-white/60" :
                   "bg-yellow-500/20 text-yellow-400"
                 }`}>
                   {series.status === "RETURNING" ? "Продолжается" :
@@ -175,7 +180,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             {series.description && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-white mb-3">Описание</h2>
-                <p className="text-slate-300 leading-relaxed">{series.description}</p>
+                <p className="text-white/80 leading-relaxed">{series.description}</p>
               </div>
             )}
 
@@ -185,20 +190,20 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                 <h2 className="text-xl font-semibold text-white mb-4">Сезоны</h2>
                 <div className="space-y-4">
                   {series.seasons.map((season) => (
-                    <div key={season.id} className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
+                    <div key={season.id} className="bg-[#1e1e1e]/60 rounded-xl p-4 border border-white/[0.06]">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-semibold text-white">
                           {season.name || `Сезон ${season.seasonNumber}`}
                         </h3>
-                        <span className="text-slate-400 text-sm">
+                        <span className="text-white/45 text-sm">
                           {season.episodes.length} {season.episodes.length === 1 ? "эпизод" : season.episodes.length < 5 ? "эпизода" : "эпизодов"}
                         </span>
                       </div>
                       {season.overview && (
-                        <p className="text-slate-400 text-sm mb-3 line-clamp-2">{season.overview}</p>
+                        <p className="text-white/60 text-sm mb-3 line-clamp-2">{season.overview}</p>
                       )}
                       {season.airDate && (
-                        <p className="text-slate-500 text-xs">
+                        <p className="text-white/35 text-xs">
                           Премьера: {new Date(season.airDate).toLocaleDateString("ru-RU", {
                             year: "numeric",
                             month: "long",
@@ -221,7 +226,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                     <Link
                       key={sa.actor.id}
                       href={`/actors/${sa.actor.id}`}
-                      className="flex items-center gap-2 px-3 py-2 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-[#1e1e1e]/60 hover:bg-[#282828] border border-white/[0.04] rounded-lg transition-colors"
                     >
                       {sa.actor.photo ? (
                         <Image
@@ -232,14 +237,14 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs">
+                        <div className="w-8 h-8 rounded-full bg-[#282828] flex items-center justify-center text-xs">
                           {sa.actor.name[0]}
                         </div>
                       )}
                       <div>
                         <p className="text-white text-sm">{sa.actor.name}</p>
                         {sa.character && (
-                          <p className="text-slate-500 text-xs">{sa.character}</p>
+                          <p className="text-white/40 text-xs">{sa.character}</p>
                         )}
                       </div>
                     </Link>
@@ -251,7 +256,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             {/* Кнопка на страницу сериала */}
             <Link
               href={`/series/${series.id}`}
-              className="inline-flex items-center gap-2 text-slate-400 hover:text-amber-400 transition-colors"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-amber-400 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -273,9 +278,9 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                   <Link
                     key={rec.id}
                     href={`/watch/series/${rec.id}`}
-                    className="flex gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors group"
+                    className="flex gap-3 p-2 rounded-lg hover:bg-[#1e1e1e]/60 transition-colors group"
                   >
-                    <div className="relative w-16 aspect-[2/3] flex-shrink-0 rounded overflow-hidden bg-slate-800">
+                    <div className="relative w-16 aspect-[2/3] flex-shrink-0 rounded overflow-hidden bg-[#1e1e1e]">
                       {rec.poster ? (
                         <Image
                           src={rec.poster}
@@ -284,7 +289,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                           className="object-cover"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center font-mono text-[10px] text-slate-500">
+                        <div className="flex h-full w-full items-center justify-center font-mono text-[10px] text-white/40">
                           КТ
                         </div>
                       )}
@@ -301,7 +306,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                       <h3 className="text-white text-sm font-medium line-clamp-2 group-hover:text-amber-400 transition-colors">
                         {rec.title}
                       </h3>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                      <div className="flex items-center gap-2 mt-1 text-xs text-white/40">
                         {recRating && (
                           <span className="text-amber-400">★ {recRating}</span>
                         )}
