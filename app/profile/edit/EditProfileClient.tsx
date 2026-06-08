@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
+import { BackgroundUpload } from "@/components/profile/BackgroundUpload";
 import { Button } from "@/components/ui/Button";
 
 interface User {
@@ -12,6 +13,7 @@ interface User {
   email: string;
   bio: string | null;
   avatar: string | null;
+  profileBackground: string | null;
 }
 
 interface EditProfileClientProps {
@@ -118,6 +120,14 @@ export function EditProfileClient({ user: initialUser }: EditProfileClientProps)
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Background Section */}
+          <div className="bg-[#121821] rounded-2xl p-6">
+            <h2 className="font-oswald text-xl font-bold text-white mb-4">Задний фон профиля</h2>
+            <BackgroundUpload
+              currentBackground={initialUser.profileBackground}
+            />
           </div>
 
           {/* Basic Info */}

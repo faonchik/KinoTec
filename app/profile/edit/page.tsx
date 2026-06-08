@@ -19,6 +19,7 @@ async function getUserData(userId: string) {
       email: true,
       bio: true,
       avatar: true,
+      profileBackground: true,
     },
   });
 

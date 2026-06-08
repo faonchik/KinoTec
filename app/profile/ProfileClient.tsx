@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import { getProxiedImageUrl, shouldUseUnoptimized } from "@/lib/images";
 import { Rating } from "@/components/ui/Rating";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
+import { getBackgroundStyle } from "@/lib/customization";
 
 interface User {
   id: string;
@@ -18,6 +19,7 @@ interface User {
   email: string;
   avatar: string | null;
   createdAt: Date;
+  profileBackground?: string | null;
   _count: {
     reviews: number;
     ratings: number;
@@ -68,8 +70,18 @@ interface ProfileClientProps {
 export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews }: ProfileClientProps) {
   const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(user.avatar);
+  const [background, setBackground] = useState<string | null>(user.profileBackground || null);
   const [activeTab, setActiveTab] = useState<"favorites" | "watchlist" | "reviews">("favorites");
   const t = useTranslations("profile");
+
+  useEffect(() => {
+    const handleBgUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setBackground(customEvent.detail?.background ?? null);
+    };
+    window.addEventListener("backgroundUpdated", handleBgUpdate);
+    return () => window.removeEventListener("backgroundUpdated", handleBgUpdate);
+  }, []);
 
   // Редактирование отзывов
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -159,12 +171,21 @@ export function ProfileClient({ user, recentFavorites, recentWatchlist, reviews 
     { id: "reviews" as const, label: "✍️ Отзывы и комментарии" },
   ];
 
+  const backgroundStyle = getBackgroundStyle(background);
+
   return (
     <div className="min-h-screen bg-[#141414]">
       {/* Cover Section */}
       <div className="relative h-[160px] sm:h-[240px] lg:h-[340px]">
         {/* Cover Image */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#121821] to-[#141414]" />
+        {background ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+            style={backgroundStyle}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-[#121821] to-[#141414]" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#141414]/70 to-[#141414]" />
 
         {/* Avatar */}
