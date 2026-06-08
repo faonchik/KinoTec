@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { ErrorTester } from "@/components/admin/ErrorTester";
 
 export const metadata: Metadata = {
   title: "Админ-панель",
@@ -87,6 +88,11 @@ export default async function AdminPage() {
             <p className="font-oswald text-3xl font-bold text-white">{card.value.toLocaleString()}</p>
           </div>
         ))}
+      </div>
+
+      {/* Error Testing Section */}
+      <div className="mb-8">
+        <ErrorTester />
       </div>
 
       {/* Table: Recent Movies */}
