@@ -4,7 +4,8 @@ import type { CSSProperties, SVGProps } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { previewMoviePageHref, previewWatchPageHref } from "@/lib/streaming-preview/previewLinks";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { HeroBackdrop } from "@/components/ui/HeroBackdrop";
 import { ProxiedImage } from "@/components/ui/ProxiedImage";
 import type { StreamingPreviewMovie, StreamingPreviewPayload } from "./types";
@@ -50,6 +51,11 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
   const [miniPlayer, setMiniPlayer] = useState<StreamingPreviewMovie | null>(null);
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const hero = data.hero;
   const heroVideo = hero && isDirectVideo(hero.videoUrl) ? hero.videoUrl : hero && isDirectVideo(hero.trailer) ? hero.trailer : null;
@@ -205,7 +211,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   {hero.description ?? "Погрузитесь в историю, где каждый кадр — кино."}
                 </p>
                 <div className="mt-8 flex flex-col gap-5">
-                  <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                     <motion.button
                       type="button"
                       whileHover={{ scale: 1.03 }}
@@ -214,7 +220,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                         setMiniPlayer(hero);
                         setDetail(null);
                       }}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#ffb84d] px-8 py-3.5 text-sm font-semibold text-[#141414] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)]"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#ffb84d] sm:px-8 px-5 sm:py-3.5 py-2.5 text-xs sm:text-sm font-semibold text-[#141414] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)]"
                     >
                       <PlaySolidIcon className="h-5 w-5" />
                       Смотреть
@@ -224,7 +230,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setDetail(hero)}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-7 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.12]"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.08] sm:px-7 px-4 sm:py-3.5 py-2.5 text-xs sm:text-sm font-medium text-white backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.12]"
                     >
                       <InfoIcon className="h-5 w-5 text-white/80" />
                       Детали
@@ -232,7 +238,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                     <button
                       type="button"
                       onClick={() => toggleWatchlist(hero.id)}
-                      className={`inline-flex h-12 w-12 items-center justify-center rounded-full border transition ${
+                      className={`inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border transition ${
                         watchlist.has(hero.id)
                           ? "border-[#ffb84d]/50 bg-[#ffb84d]/15 text-[#ffb84d]"
                           : "border-white/15 bg-black/25 text-white/70 hover:text-white"
@@ -244,7 +250,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                     <button
                       type="button"
                       onClick={() => toggleFavorite(hero.id)}
-                      className={`inline-flex h-12 w-12 items-center justify-center rounded-full border transition ${
+                      className={`inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border transition ${
                         favorites.has(hero.id)
                           ? "border-rose-400/50 bg-rose-500/15 text-rose-300"
                           : "border-white/15 bg-black/25 text-white/70 hover:text-white"
@@ -327,112 +333,124 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
         </div>
       </div>
 
-      <AnimatePresence>
-        {detail && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-[70] bg-black/55 backdrop-blur-[2px]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setDetail(null)}
-            />
-            <motion.aside
-              className="fixed right-0 top-0 z-[75] flex h-full w-full max-w-lg flex-col border-l border-white/[0.08] shadow-2xl"
-              style={{
-                background: `linear-gradient(200deg, ${SP_SURFACE} 0%, ${SP_BG} 100%)`,
-              }}
-              initial={{ x: "105%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "105%" }}
-              transition={{ type: "spring", stiffness: 320, damping: 36 }}
-            >
-              <div className="relative h-56 w-full shrink-0 sm:h-64">
-                {detail.backdrop || detail.poster ? (
-                  <ProxiedImage
-                    src={detail.backdrop || detail.poster}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="512px"
-                  />
-                ) : (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a2435] to-[#0d1219] text-5xl opacity-40"
-                    aria-hidden
-                  >
-                    🎬
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121821] to-transparent" />
-                <button
-                  type="button"
-                  onClick={() => setDetail(null)}
-                  className="absolute right-4 top-4 rounded-full border border-white/20 bg-black/40 p-2 text-white backdrop-blur-md"
-                >
-                  <CloseIcon className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-5 pb-10 pt-2">
-                <h2 className="font-[family-name:var(--font-sp-display)] text-2xl font-semibold leading-tight">
-                  {detail.title}
-                </h2>
-                <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/50">
-                  {detail.genreNames.map((g) => (
-                    <span key={g} className="rounded-md bg-white/[0.06] px-2 py-1">
-                      {g}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-5 text-sm leading-relaxed text-white/65">
-                  {detail.description ?? "Описание появится позже."}
-                </p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link
-                    href={previewWatchPageHref(detail.id)}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#ffb84d] px-6 py-2.5 text-sm font-semibold text-black"
-                  >
-                    <PlaySolidIcon className="h-4 w-4" />
-                    Воспроизвести
-                  </Link>
+      {mounted && createPortal(
+        <AnimatePresence>
+          {detail && (
+            <>
+              <motion.div
+                className="fixed inset-0 z-[1040] bg-black/55 backdrop-blur-[2px]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setDetail(null)}
+              />
+              <motion.aside
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={{ left: 0, right: 0.8 }}
+                onDragEnd={(event, info) => {
+                  // Если свайпнули вправо более чем на 100px или с высокой скоростью
+                  if (info.offset.x > 100 || info.velocity.x > 500) {
+                    setDetail(null);
+                  }
+                }}
+                className="fixed right-0 top-0 z-[1050] flex h-full w-full max-w-lg flex-col border-l border-white/[0.08] shadow-2xl touch-pan-y"
+                style={{
+                  background: `linear-gradient(200deg, ${SP_SURFACE} 0%, ${SP_BG} 100%)`,
+                }}
+                initial={{ x: "105%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "105%" }}
+                transition={{ type: "spring", stiffness: 320, damping: 36 }}
+              >
+                <div className="relative h-56 w-full shrink-0 sm:h-64">
+                  {detail.backdrop || detail.poster ? (
+                    <ProxiedImage
+                      src={detail.backdrop || detail.poster}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="512px"
+                    />
+                  ) : (
+                    <div
+                      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a2435] to-[#0d1219] text-5xl opacity-40"
+                      aria-hidden
+                    >
+                      🎬
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121821] to-transparent" />
                   <button
                     type="button"
-                    onClick={() => toggleWatchlist(detail.id)}
-                    className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white/80"
+                    onClick={() => setDetail(null)}
+                    className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/40 p-2 text-white backdrop-blur-md z-30 hover:bg-black/60 transition-colors"
                   >
-                    {watchlist.has(detail.id) ? "В watchlist" : "+ Watchlist"}
+                    <ArrowLeftIcon className="h-5 w-5" />
                   </button>
                 </div>
-                <h3 className="mt-10 font-[family-name:var(--font-sp-display)] text-lg font-semibold text-white/90">
-                  Похожее
-                </h3>
-                <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {similar.map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => setDetail(m)}
-                      className="group relative aspect-[2/3] overflow-hidden rounded-xl ring-1 ring-white/10"
+                <div className="flex-1 overflow-y-auto px-5 pb-10 pt-2">
+                  <h2 className="font-[family-name:var(--font-sp-display)] text-2xl font-semibold leading-tight">
+                    {detail.title}
+                  </h2>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/50">
+                    {detail.genreNames.map((g) => (
+                      <span key={g} className="rounded-md bg-white/[0.06] px-2 py-1">
+                        {g}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-5 text-sm leading-relaxed text-white/65">
+                    {detail.description ?? "Описание появится позже."}
+                  </p>
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    <Link
+                      href={previewWatchPageHref(detail.id)}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#ffb84d] px-6 py-2.5 text-sm font-semibold text-black"
                     >
-                      <ProxiedImage
-                        src={m.poster || m.backdrop}
-                        alt=""
-                        fill
-                        className="object-cover transition duration-500 group-hover:scale-105"
-                        sizes="120px"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
-                      <p className="absolute bottom-1 left-1 right-1 truncate text-center text-[10px] font-medium text-white">
-                        {m.title}
-                      </p>
+                      <PlaySolidIcon className="h-4 w-4" />
+                      Воспроизвести
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => toggleWatchlist(detail.id)}
+                      className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white/80"
+                    >
+                      {watchlist.has(detail.id) ? "В watchlist" : "+ Watchlist"}
                     </button>
-                  ))}
+                  </div>
+                  <h3 className="mt-10 font-[family-name:var(--font-sp-display)] text-lg font-semibold text-white/90">
+                    Похожее
+                  </h3>
+                  <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {similar.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setDetail(m)}
+                        className="group relative aspect-[2/3] overflow-hidden rounded-xl ring-1 ring-white/10"
+                      >
+                        <ProxiedImage
+                          src={m.poster || m.backdrop}
+                          alt=""
+                          fill
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                          sizes="120px"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
+                        <p className="absolute bottom-1 left-1 right-1 truncate text-center text-[10px] font-medium text-white">
+                          {m.title}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <AnimatePresence>
         {miniPlayer && (
@@ -518,6 +536,11 @@ function CarouselRow({
   onOpenDetail: (m: StreamingPreviewMovie) => void;
   rowIndex: number;
 }) {
+  const [hasHover, setHasHover] = useState(false);
+  useEffect(() => {
+    setHasHover(window.matchMedia("(hover: hover)").matches);
+  }, []);
+
   const cardFrame =
     "relative h-[234px] w-[156px] overflow-hidden rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.12] sm:h-[276px] sm:w-[184px] lg:h-[300px] lg:w-[200px]";
 
@@ -553,7 +576,7 @@ function CarouselRow({
           >
             <div className="relative">
               <motion.div
-                whileHover={{ y: -8 }}
+                whileHover={hasHover ? { y: -8 } : undefined}
                 transition={{ type: "spring", stiffness: 420, damping: 28 }}
                 className="relative"
               >
@@ -684,10 +707,11 @@ function InfoIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-function CloseIcon(props: SVGProps<SVGSVGElement>) {
+function ArrowLeftIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
-      <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
     </svg>
   );
 }
@@ -705,3 +729,13 @@ function BookmarkIcon({ filled, ...props }: SVGProps<SVGSVGElement> & { filled?:
     </svg>
   );
 }
+
+function CloseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  );
+}
+

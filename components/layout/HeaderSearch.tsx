@@ -113,7 +113,7 @@ export function HeaderSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full max-w-xl items-center gap-3 rounded-sm border border-white/[0.12] bg-black/40 py-2.5 pl-4 pr-4 text-left text-sm text-white/50 shadow-inner transition hover:border-white/25 hover:text-white/80"
+        className="flex w-full max-w-xl items-center gap-3 rounded-full border border-white/[0.12] bg-black/40 py-2.5 pl-4 pr-4 text-left text-sm text-white/50 shadow-inner transition hover:border-white/25 hover:text-white/80"
         aria-haspopup="dialog"
         aria-expanded={open}
       >

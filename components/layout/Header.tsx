@@ -79,11 +79,9 @@ export function Header() {
     const roBar = new ResizeObserver(measureBar);
     roBar.observe(bar);
     window.addEventListener("resize", measureBar);
-    window.addEventListener("scroll", measureBar, { passive: true });
     return () => {
       roBar.disconnect();
       window.removeEventListener("resize", measureBar);
-      window.removeEventListener("scroll", measureBar);
     };
   }, [isMobileMenuOpen, isUserMenuOpen, status, session?.user?.id]);
 
@@ -161,6 +159,21 @@ export function Header() {
     { name: t("profile"), href: "/profile" },
   ];
 
+  const adminNavigation = [
+    { name: "📊 Дашборд", href: "/admin" },
+    { name: "🎬 Фильмы", href: "/admin/movies" },
+    { name: "🎭 Актёры", href: "/admin/actors" },
+    { name: "🎬 Режиссёры", href: "/admin/directors" },
+    { name: "🏷️ Жанры", href: "/admin/genres" },
+    { name: "👥 Пользователи", href: "/admin/users" },
+    { name: "💬 Отзывы", href: "/admin/reviews" },
+    { name: "📝 Статьи", href: "/admin/articles" },
+    { name: "🌐 Импорт TMDB", href: "/admin/tmdb" },
+    { name: "← На главную", href: "/" },
+  ];
+
+  const currentNav = isAdmin ? adminNavigation : navigation;
+
   const userMenuPanel =
     session && isUserMenuOpen ? (
       <div
@@ -236,7 +249,7 @@ export function Header() {
     <header
       ref={headerRef}
       className={`site-header fixed left-0 right-0 top-0 z-[950] overflow-visible border-b border-white/[0.08] bg-[#141414] shadow-[0_1px_0_rgba(0,0,0,0.45)] ${
-        isAdmin ? "sm:left-[260px]" : "sm:left-[76px] lg:left-[212px]"
+        isAdmin ? "md:left-[260px] left-0" : "sm:left-[76px] lg:left-[212px]"
       }`}
     >
       <div ref={headerBarRef} className="flex items-center gap-3 overflow-visible px-3 py-3 sm:px-5 lg:px-8">
@@ -288,7 +301,7 @@ export function Header() {
                 ref={userMenuButtonRef}
                 type="button"
                 onClick={() => setIsUserMenuOpen((open) => !open)}
-                className="relative z-[120] flex items-center gap-2 rounded-full border border-white/[0.12] bg-[#181818]/95 py-1 pl-1 pr-2.5 shadow-md transition hover:border-white/25 sm:pr-3"
+                className="relative z-[120] flex items-center gap-2 rounded-full border border-white/[0.12] bg-[#181818]/95 p-0.5 shadow-md transition hover:border-white/25 lg:py-1 lg:pl-1 lg:pr-3"
                 aria-expanded={isUserMenuOpen}
                 aria-haspopup="menu"
               >
@@ -367,7 +380,7 @@ export function Header() {
                   <LanguageSwitcher currentLocale={locale} />
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  {navigation.map((item) => (
+                  {currentNav.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}

@@ -23,7 +23,7 @@ export default function AdminSidebar({ username }: AdminSidebarProps) {
   ];
 
   return (
-    <aside className="w-[260px] bg-[#1a1a1a] border-r border-white/[0.08] py-6 flex-shrink-0 flex flex-col justify-between h-screen sticky top-0 z-20">
+    <aside className="hidden md:flex w-[260px] bg-[#1a1a1a] border-r border-white/[0.08] py-6 flex-shrink-0 flex-col justify-between h-screen sticky top-0 z-20">
       <div>
         <div className="px-6 mb-6">
           <Link href="/" className="font-oswald text-xl font-bold text-[#ffb84d] tracking-wider flex items-center gap-2">
