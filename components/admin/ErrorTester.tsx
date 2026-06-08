@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 type ModalType = "critical" | "security" | "ratelimit" | "bsod";
 
@@ -103,6 +104,83 @@ export function ErrorTester() {
           <span className="text-lg">💥</span>
           <span>Синий экран (BSOD)</span>
         </button>
+      </div>
+
+      {/* Divider */}
+      <div className="h-[1px] bg-white/[0.08] my-6" />
+
+      {/* Error Pages Preview Grid */}
+      <div className="flex items-center gap-2.5 mb-4">
+        <span className="text-xl">🖥️</span>
+        <h2 className="font-oswald text-lg font-bold text-white">Индивидуальные страницы ошибок (HTTP status pages)</h2>
+      </div>
+      <p className="font-mono text-[11px] text-white/35 mb-5 leading-relaxed">
+        Нажмите на карточки ниже, чтобы перейти на соответствующую стилизованную страницу ошибки и проверить локализацию и верстку.
+      </p>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-3">
+        <Link
+          href="/401"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-[#ffb84d]/5 hover:border-[#ffb84d]/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">🔑</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-[#ffb84d] transition-colors">401</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">Unauthorized</span>
+        </Link>
+
+        <Link
+          href="/403"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-red-500/5 hover:border-red-500/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">🛡️</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-red-400 transition-colors">403</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">Forbidden</span>
+        </Link>
+
+        <Link
+          href="/404-preview"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-amber-500/5 hover:border-amber-500/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">🔍</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-[#ffb84d] transition-colors">404</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">Not Found</span>
+        </Link>
+
+        <Link
+          href="/405"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-amber-600/5 hover:border-amber-600/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">🚫</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-amber-500 transition-colors">405</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">Method</span>
+        </Link>
+
+        <Link
+          href="/500-preview"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-rose-500/5 hover:border-rose-500/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">💥</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-rose-400 transition-colors">500</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">Server Error</span>
+        </Link>
+
+        <Link
+          href="/503"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-purple-500/5 hover:border-purple-500/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">📺</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-purple-400 transition-colors">503</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">Maintenance</span>
+        </Link>
+
+        <Link
+          href="/505"
+          className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-[#c29b68]/5 hover:border-[#c29b68]/30 text-white transition-all duration-300 text-center select-none group cursor-pointer hover:scale-[1.03]"
+        >
+          <span className="text-lg mb-1 group-hover:scale-110 transition-transform">📽️</span>
+          <span className="font-oswald text-[13px] font-bold text-white group-hover:text-[#e8d2b4] transition-colors">505</span>
+          <span className="font-mono text-[8px] text-white/35 uppercase tracking-wider mt-0.5">HTTP Version</span>
+        </Link>
       </div>
 
       {/* --- TOAST SIMULATOR --- */}

@@ -313,6 +313,41 @@
     "title": "404",
     "message": "This page could not be found",
     "backHome": "Back to Home"
+  },
+  "errors": {
+    "backHome": "Back to Home",
+    "401": {
+      "title": "Entry Forbidden Without Ticket",
+      "subtitle": "Authorization Required (401)",
+      "message": "To view this page, you must be logged into your account. Please present your ticket at the entrance.",
+      "signIn": "Sign In"
+    },
+    "403": {
+      "title": "Access Blocked",
+      "subtitle": "Access Forbidden (403)",
+      "message": "KinoTeka security service has restricted access to this section. You do not have sufficient privileges."
+    },
+    "405": {
+      "title": "Operation Rejected",
+      "subtitle": "Method Not Allowed (405)",
+      "message": "The request was sent in an invalid format. Film reel playback attempt resulted in a failure."
+    },
+    "500": {
+      "title": "Session Interrupted",
+      "subtitle": "Server Error (500)",
+      "message": "Something went wrong during playback on the server. Click retry to attempt loading again.",
+      "retry": "Restart"
+    },
+    "503": {
+      "title": "Technical Maintenance",
+      "subtitle": "Service Unavailable (503)",
+      "message": "The projection room is undergoing scheduled maintenance. Cinema machines are being oiled. Please check back later."
+    },
+    "505": {
+      "title": "Projector Too Vintage",
+      "subtitle": "HTTP Version Not Supported (505)",
+      "message": "Your browser is trying to use an outdated protocol. Time to upgrade to the talkies movie era!"
+    }
   }
 }
 
