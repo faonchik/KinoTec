@@ -14,6 +14,7 @@ type SeriesWatchExperienceClientProps = {
   playerTmdbId?: string | null;
   playerKinopoiskId?: string | null;
   releaseYear?: number | null;
+
   poster?: string | null;
   backdrop?: string | null;
 };
@@ -126,7 +127,7 @@ export function SeriesWatchExperienceClient({
             kinopoiskId={playerKinopoiskId?.trim() || undefined}
             tmdbId={playerTmdbId?.trim() || undefined}
             title={title}
-            year={releaseYear ?? undefined}
+
             className="w-full rounded-none md:rounded-xl"
             onFallback={onKinoboxFallback}
           />
