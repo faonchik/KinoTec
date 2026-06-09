@@ -1,0 +1,95 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tape Operator</title>
+    <link rel="icon" href="assets/favicon.png">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Anonymously track page views with Plausible Analytics -->
+    <script defer data-domain="tapeop.dev" src="https://analytics.kirlovon.dev/js/script.manual.js"></script>
+</head>
+
+<body>
+    <div id="container">
+
+        <!-- Player window -->
+        <div id="player">
+            <div id="header">
+                <div id="title">...</div>
+                <button id="watched-movies-toggle" type="button" aria-haspopup="listbox" aria-expanded="false" disabled>
+                    <span id="watched-movies-count"></span>
+                    <span id="watched-movies-arrow" aria-hidden="true"></span>
+                </button>
+                <div id="logo">
+                    <img src="assets/logo.svg" alt="Tape Operator Logo">
+                </div>
+                <div id="watched-movies-panel" class="hidden">
+                    <input id="watched-movies-search" type="search" placeholder="Search by name" autocomplete="off">
+                    <div id="watched-movies-list"></div>
+                </div>
+            </div>
+            <div id="content">
+                <img src="assets/loading.svg" alt="Loading...">
+            </div>
+            <div id="sources"></div>
+            <div id="footer">
+                <div>
+                    Made with ♥ by <a href="https://github.com/Kirlovon" target="_blank">Kirlovon</a>.
+                    Powered by <a href="https://github.com/Kirlovon/Tape-Operator" target="_blank">Tape Operator</a>.
+                </div>
+                <div>
+                    <a href="https://github.com/Kirlovon/Tape-Operator/issues" target="_blank">Bug Report ↗</a>
+                    <span id="version">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background image -->
+    <div id="background"></div>
+
+    <!-- Templates -->
+    <template id="initialization-error-message">
+        <div class="message error">
+            <p>
+                Произошла ошибка во время запуска плеера. Проверьте консоль разработчика и сообщите об ошибке по <a href="https://github.com/Kirlovon/Tape-Operator/issues" target="_blank">этой ссылке ↗</a>.
+                Я постараюсь быстро все исправить! 🙂
+            </p>
+        </div>
+    </template>
+
+    <template id="script-error-message">
+        <div class="message error">
+            <p>
+                Похоже что плеер так и не был инициализирован. Проверьте, установлена ли у вас актуальная версия скрипта <a href="https://github.com/Kirlovon/Tape-Operator/raw/main/userscript/tape-operator.user.js">Tape Operator ↗</a>.
+            </p>
+        </div>
+    </template>
+
+    <template id="script-outdated-message">
+        <div class="message warning">
+            <p>
+                Похоже что у вас установлена устаревшая версия скрипта - <b class="script-version"></b>.
+                Рекомендуем обновить скрипт, перейдя по <a href="https://github.com/Kirlovon/Tape-Operator/raw/main/userscript/tape-operator.user.js" target="_blank">этой ссылке ↗</a>.
+            </p>
+        </div>
+    </template>
+
+    <template id="server-unavailable-message">
+        <div class="message error">
+            <p>
+               Похоже что сервер в данный момент недоступен. Попробуйте обновить страницу или попробовать позже. Приносим свои извинения. 🥲
+            </p>
+        </div>
+    </template>
+
+    <!-- Player code -->
+    <script src="config.js"></script>
+    <script src="utils.js"></script>
+    <script src="player.js"></script>
+</body>
+
+</html>

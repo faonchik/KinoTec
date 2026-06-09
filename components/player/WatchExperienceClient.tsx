@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { VideoPlayer } from "@/components/player/VideoPlayer";
 import { MovieEmbedPlayer } from "@/components/player/MovieEmbedPlayer";
-import { KinoboxPlayer } from "@/components/player/KinoboxPlayer";
+import { TapeOperatorPlayer } from "@/components/player/TapeOperatorPlayer";
 import { isUsableDirectVideoUrlForNativePlayer } from "@/lib/player/directVideoUrl";
 
 type WatchExperienceClientProps = {
@@ -192,7 +192,7 @@ export function WatchExperienceClient({
             onComplete={handleComplete}
           />
         ) : useKinobox && !kinoboxBroken && !preferIframeOverKinobox ? (
-          <KinoboxPlayer
+          <TapeOperatorPlayer
             key={`${playerKinopoiskId ?? ""}-${playerTmdbId ?? ""}`}
             kinopoiskId={playerKinopoiskId?.trim() || undefined}
             tmdbId={playerTmdbId?.trim() || undefined}

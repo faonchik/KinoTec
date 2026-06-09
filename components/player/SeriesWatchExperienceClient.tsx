@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MovieEmbedPlayer } from "@/components/player/MovieEmbedPlayer";
-import { KinoboxPlayer } from "@/components/player/KinoboxPlayer";
+import { TapeOperatorPlayer } from "@/components/player/TapeOperatorPlayer";
 
 type SeriesWatchExperienceClientProps = {
   seriesId: string;
@@ -121,7 +121,7 @@ export function SeriesWatchExperienceClient({
 
       <div className="mx-auto max-w-[1920px] relative z-10">
         {useKinobox && !kinoboxBroken && !preferIframeOverKinobox ? (
-          <KinoboxPlayer
+          <TapeOperatorPlayer
             key={`${playerKinopoiskId ?? ""}-${playerTmdbId ?? ""}`}
             kinopoiskId={playerKinopoiskId?.trim() || undefined}
             tmdbId={playerTmdbId?.trim() || undefined}
