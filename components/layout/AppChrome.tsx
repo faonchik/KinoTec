@@ -57,7 +57,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
           <Header />
           <main className="relative z-0 min-w-0 flex-1 overflow-x-hidden [isolation:isolate]">{children}</main>
-          <Footer />
+          <div className="mt-auto"><Footer /></div>
         </div>
       </div>
       <AIChatButton />

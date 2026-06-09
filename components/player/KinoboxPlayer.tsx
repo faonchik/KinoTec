@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from "react";
+import { LoadingOverlay } from "@/components/ui/LoadingOverlay";
 
 /** Сторонний kinobox.min.js часто вставляет оверлеи/ссылки на YouTube; клик по «чёрному» уводил с сайта. */
 function isYoutubeNavigationHref(href: string): boolean {
@@ -197,14 +198,7 @@ export function KinoboxPlayer({
         if (e.button === 1) blockYoutubeLinkTakeover(e);
       }}
     >
-      {isLoading && (
-        <div className="absolute inset-0 bg-[#0D1420] flex items-center justify-center z-10 pointer-events-none">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#ffb84d] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="font-mono text-[13px] text-white/45">Загрузка плеера...</p>
-          </div>
-        </div>
-      )}
+      {isLoading && <LoadingOverlay />}
       <div
         id={rootIdRef.current}
         ref={containerRef}
