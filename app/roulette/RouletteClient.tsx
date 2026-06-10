@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 
 interface Genre {
@@ -25,6 +26,7 @@ interface RouletteClientProps {
 }
 
 export function RouletteClient({ genres }: RouletteClientProps) {
+  const t = useTranslations("roulette");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -55,34 +57,44 @@ export function RouletteClient({ genres }: RouletteClientProps) {
     fetchMovies();
   }, [selectedGenre, selectedYear]);
 
-  const spin = () => {
+  const spin = useCallback(() => {
     if (movies.length === 0 || isSpinning) return;
 
     setIsSpinning(true);
     setResult(null);
 
-    // Анимация выбора
+    // Анимация с замедлением
     let count = 0;
     const totalSpins = 20 + Math.floor(Math.random() * 10);
-    const interval = setInterval(() => {
+    let lastMovie: Movie | null = null;
+
+    const doSpin = () => {
       const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+      lastMovie = randomMovie;
       setResult(randomMovie);
       count++;
 
       if (count >= totalSpins) {
-        clearInterval(interval);
         setIsSpinning(false);
-        
         // Добавляем в историю
-        setHistory((prev) => {
-          const newHistory = [randomMovie, ...prev.filter((m) => m.id !== randomMovie.id)];
-          return newHistory.slice(0, 5);
-        });
+        if (lastMovie) {
+          const m = lastMovie;
+          setHistory((prev) => {
+            const newHistory = [m, ...prev.filter((h) => h.id !== m.id)];
+            return newHistory.slice(0, 5);
+          });
+        }
+      } else {
+        // Exponential slowdown
+        const delay = 60 + Math.pow(count, 1.8) * 3;
+        setTimeout(doSpin, delay);
       }
-    }, 100 + count * 10);
-  };
+    };
 
-  const years = Array.from({ length: 30 }, (_, i) => 2024 - i);
+    doSpin();
+  }, [movies, isSpinning]);
+
+  const years = Array.from({ length: 30 }, (_, i) => 2025 - i);
 
   const getAvgRating = (ratings: { value: number }[]) => {
     if (!ratings?.length) return null;
@@ -95,10 +107,40 @@ export function RouletteClient({ genres }: RouletteClientProps) {
         {/* Заголовок */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4">
-            <span className="text-gradient">🎲 КиноРулетка</span>
+            <span className="text-gradient">
+              <svg className={`inline-block w-12 h-12 mr-3 -mt-2 transition-transform duration-1000 ${isSpinning ? "animate-spin" : ""}`} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" stroke="url(#roulette-grad)" strokeWidth="3" fill="none" />
+                <circle cx="24" cy="24" r="17" stroke="#1e293b" strokeWidth="2" fill="#0f172a" />
+                
+                {/* Slices */}
+                <path d="M24 7 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M24 41 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M7 24 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M41 24 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M12 12 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M36 36 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M12 36 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                <path d="M36 12 L24 24" stroke="url(#roulette-grad)" strokeWidth="1.5" />
+                
+                {/* Inner ring */}
+                <circle cx="24" cy="24" r="12" stroke="url(#roulette-grad)" strokeWidth="1" strokeDasharray="3 3" fill="none" />
+                <circle cx="24" cy="24" r="5" fill="#ffb84d" />
+                
+                {/* Ball */}
+                <circle cx="33" cy="15" r="2.5" fill="#ffffff" />
+                
+                <defs>
+                  <linearGradient id="roulette-grad" x1="0" y1="0" x2="48" y2="48">
+                    <stop offset="0%" stopColor="#ffb84d" />
+                    <stop offset="100%" stopColor="#e50914" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              {t("title")}
+            </span>
           </h1>
           <p className="text-slate-400 text-lg">
-            Не можете выбрать фильм? Доверьтесь судьбе!
+            {t("subtitle")}
           </p>
         </div>
 
@@ -107,13 +149,13 @@ export function RouletteClient({ genres }: RouletteClientProps) {
           <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-white text-sm font-medium mb-2">Жанр</label>
+                <label className="block text-white text-sm font-medium mb-2">{t("genre")}</label>
                 <select
                   value={selectedGenre}
                   onChange={(e) => setSelectedGenre(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
                 >
-                  <option value="">Любой жанр</option>
+                  <option value="">{t("anyGenre")}</option>
                   {genres.map((genre) => (
                     <option key={genre.id} value={genre.slug}>
                       {genre.name}
@@ -123,13 +165,13 @@ export function RouletteClient({ genres }: RouletteClientProps) {
               </div>
 
               <div>
-                <label className="block text-white text-sm font-medium mb-2">Год</label>
+                <label className="block text-white text-sm font-medium mb-2">{t("year")}</label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
                 >
-                  <option value="">Любой год</option>
+                  <option value="">{t("anyYear")}</option>
                   {years.map((year) => (
                     <option key={year} value={year}>
                       {year}
@@ -140,7 +182,7 @@ export function RouletteClient({ genres }: RouletteClientProps) {
             </div>
 
             <p className="text-slate-500 text-sm mt-3 text-center">
-              {isLoading ? "Загрузка..." : `Доступно фильмов: ${movies.length}`}
+              {isLoading ? t("loading") : t("available", { count: movies.length })}
             </p>
           </div>
         </div>
@@ -188,13 +230,17 @@ export function RouletteClient({ genres }: RouletteClientProps) {
                 )}
 
                 {!isSpinning && (
-                  <p className="text-slate-500 text-sm mt-4">Нажмите чтобы посмотреть</p>
+                  <p className="text-slate-500 text-sm mt-4">{t("clickToView")}</p>
                 )}
               </Link>
             ) : (
               <div className="text-center py-8">
-                <div className="text-6xl mb-4">🎲</div>
-                <p className="text-slate-400">Нажмите кнопку чтобы выбрать фильм</p>
+                <svg className="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="24" cy="24" r="22" stroke="#ffb84d" strokeWidth="2" fill="none" opacity="0.4" />
+                  <circle cx="24" cy="24" r="16" stroke="#ffb84d" strokeWidth="1.5" fill="none" strokeDasharray="6 4" opacity="0.3" />
+                  <circle cx="24" cy="24" r="4" fill="#ffb84d" opacity="0.5" />
+                </svg>
+                <p className="text-slate-400">{t("pressToChoose")}</p>
               </div>
             )}
           </div>
@@ -207,14 +253,14 @@ export function RouletteClient({ genres }: RouletteClientProps) {
             disabled={isSpinning || movies.length === 0}
             className="px-12 py-4 text-xl"
           >
-            {isSpinning ? "🎲 Крутится..." : "🎲 Крутить!"}
+            {isSpinning ? t("spinning") : t("spin")}
           </Button>
         </div>
 
         {/* История */}
         {history.length > 0 && (
           <div className="max-w-3xl mx-auto">
-            <h3 className="text-xl font-bold text-white mb-4 text-center">📜 История</h3>
+            <h3 className="text-xl font-bold text-white mb-4 text-center">{t("history")}</h3>
             <div className="flex justify-center gap-4 flex-wrap">
               {history.map((movie) => (
                 <Link

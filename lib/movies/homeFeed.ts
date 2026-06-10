@@ -24,7 +24,7 @@ export const getPopularMovies = unstable_cache(
   async () => {
     try {
       const movies = await prisma.movie.findMany({
-        take: 5,
+        take: 50,
         orderBy: { popularity: "desc" },
         include: {
           genres: { include: { genre: true } },
@@ -45,7 +45,7 @@ export const getLatestMovies = unstable_cache(
   async () => {
     try {
       const movies = await prisma.movie.findMany({
-        take: 6,
+        take: 50,
         orderBy: { createdAt: "desc" },
         include: {
           genres: { include: { genre: true } },
@@ -66,7 +66,7 @@ export const getTopRatedMovies = unstable_cache(
   async () => {
     try {
       const movies = await prisma.movie.findMany({
-        take: 50,
+        take: 100,
         include: {
           genres: { include: { genre: true } },
           ratings: {
@@ -84,7 +84,7 @@ export const getTopRatedMovies = unstable_cache(
             : 0,
         }))
         .sort((a, b) => b.avgRating - a.avgRating)
-        .slice(0, 10);
+        .slice(0, 50);
 
       return serializeBigInt(result);
     } catch (error) {
@@ -209,7 +209,7 @@ export async function getPersonalRecommendations(userId: string) {
         genres: { include: { genre: true } },
         ratings: true,
       },
-      take: 6,
+      take: 20,
       orderBy: { popularity: "desc" },
     });
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -22,6 +23,7 @@ interface Notification {
 
 export function NotificationsButton() {
   const { data: session } = useSession();
+  const t = useTranslations("notifications");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -117,14 +119,14 @@ export function NotificationsButton() {
           />
           <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 max-h-[500px] overflow-hidden flex flex-col">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-              <h3 className="font-semibold text-white">Уведомления</h3>
+              <h3 className="font-semibold text-white">{t("title")}</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
                   disabled={loading}
                   className="text-sm text-amber-400 hover:text-amber-300 transition-colors disabled:opacity-50"
                 >
-                  Прочитать все
+                  {t("markAllRead")}
                 </button>
               )}
             </div>
@@ -132,7 +134,7 @@ export function NotificationsButton() {
             <div className="overflow-y-auto flex-1">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center text-slate-400">
-                  Нет уведомлений
+                  {t("empty")}
                 </div>
               ) : (
                 <div className="divide-y divide-slate-700">
@@ -153,7 +155,7 @@ export function NotificationsButton() {
                 className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                Все уведомления
+                {t("viewAll")}
               </Link>
             </div>
           </div>
@@ -170,6 +172,7 @@ function NotificationItem({
   notification: Notification;
   onMarkAsRead: () => void;
 }) {
+  const t = useTranslations("notifications");
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -178,10 +181,10 @@ function NotificationItem({
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (minutes < 1) return "только что";
-    if (minutes < 60) return `${minutes} мин назад`;
-    if (hours < 24) return `${hours} ч назад`;
-    if (days < 7) return `${days} дн назад`;
+    if (minutes < 1) return t("justNow");
+    if (minutes < 60) return t("minutesAgo", { minutes });
+    if (hours < 24) return t("hoursAgo", { hours });
+    if (days < 7) return t("daysAgo", { days });
     return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
   };
 

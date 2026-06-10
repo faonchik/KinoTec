@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import tmdb, { TMDBService } from "@/lib/tmdb";
+import { notifyAllUsers } from "@/lib/notifications/createNotification";
 
 export async function POST(request: NextRequest) {
   try {
@@ -137,6 +138,17 @@ export async function POST(request: NextRequest) {
           order: tmdbActor.order,
         },
       });
+    }
+
+    try {
+      await notifyAllUsers({
+        type: "NEW_RELEASE",
+        title: "Новый фильм на платформе!",
+        message: `Добавлен новый фильм: "${movie.title}"`,
+        link: `/movies/${movie.id}`,
+      });
+    } catch (err) {
+      console.error("Error creating tmdb import notification:", err);
     }
 
     return NextResponse.json({

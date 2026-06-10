@@ -154,6 +154,7 @@ export function Header() {
     { name: t("directors"), href: "/directors" },
     { name: t("blog"), href: "/blog" },
     { name: t("watchParty"), href: "/party" },
+    { name: t("roulette"), href: "/roulette" },
     { name: t("calendar"), href: "/calendar" },
     { name: t("profile"), href: "/profile" },
   ];

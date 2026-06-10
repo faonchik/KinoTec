@@ -45,6 +45,7 @@
     "calendar": "Премьеры",
     "watchParty": "Смотреть вместе",
     "blog": "Блог",
+    "roulette": "Рулетка",
     "profile": "Профиль",
     "admin": "Админ-панель",
     "signIn": "Войти",
@@ -308,6 +309,31 @@
   },
   "watchPage": {
     "availableFilms": "Доступно к просмотру"
+  },
+  "roulette": {
+    "title": "КиноРулетка",
+    "subtitle": "Не можете выбрать фильм? Доверьтесь судьбе!",
+    "genre": "Жанр",
+    "year": "Год",
+    "anyGenre": "Любой жанр",
+    "anyYear": "Любой год",
+    "loading": "Загрузка...",
+    "available": "Доступно фильмов: {count}",
+    "spinning": "🎲 Крутится...",
+    "spin": "🎲 Крутить!",
+    "clickToView": "Нажмите чтобы посмотреть",
+    "pressToChoose": "Нажмите кнопку чтобы выбрать фильм",
+    "history": "📜 История"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "markAllRead": "Прочитать все",
+    "empty": "Нет уведомлений",
+    "viewAll": "Все уведомления",
+    "justNow": "только что",
+    "minutesAgo": "{minutes} мин назад",
+    "hoursAgo": "{hours} ч назад",
+    "daysAgo": "{days} дн назад"
   },
   "notFound": {
     "title": "404",

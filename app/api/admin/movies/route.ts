@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { movieSchema } from "@/lib/validations/movie";
 import { serializeMovieForAdminJson } from "@/lib/admin/serializeMovie";
+import { notifyAllUsers } from "@/lib/notifications/createNotification";
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,6 +51,17 @@ export async function POST(request: NextRequest) {
         genres: { include: { genre: true } },
       },
     });
+
+    try {
+      await notifyAllUsers({
+        type: "NEW_RELEASE",
+        title: "Новый фильм на платформе!",
+        message: `Добавлен новый фильм: "${movie.title}"`,
+        link: `/movies/${movie.id}`,
+      });
+    } catch (err) {
+      console.error("Error creating new release notification:", err);
+    }
 
     return NextResponse.json(serializeMovieForAdminJson(movie as unknown as Record<string, unknown>), { status: 201 });
   } catch (error) {

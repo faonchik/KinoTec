@@ -61,7 +61,7 @@ export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayl
     rows.push({
       key: "popular",
       title: t("popular"),
-      movies: padRowWithDemoMovies(popularMapped, 5),
+      movies: padRowWithDemoMovies(popularMapped, 24),
     });
   }
 
@@ -70,7 +70,7 @@ export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayl
       key: "topRated",
       title: t("topRatedTitle"),
       subtitle: t("topRatedDescription"),
-      movies: padRowWithDemoMovies(topMapped, 5),
+      movies: padRowWithDemoMovies(topMapped, 20),
     });
   }
 
@@ -79,7 +79,7 @@ export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayl
       key: "personal",
       title: "✨ Для вас",
       subtitle: "Рекомендации на основе ваших просмотров",
-      movies: padRowWithDemoMovies(personalMapped, 5),
+      movies: padRowWithDemoMovies(personalMapped, 20),
     });
   }
 
@@ -87,7 +87,7 @@ export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayl
     key: "recent",
     title: t("recent"),
     subtitle: t("recentDescription"),
-    movies: padRowWithDemoMovies(latestMapped, 5),
+    movies: padRowWithDemoMovies(latestMapped, 20),
   });
 
   // Hero selection logic:

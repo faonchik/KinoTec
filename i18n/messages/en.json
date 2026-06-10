@@ -45,6 +45,7 @@
     "calendar": "Premieres",
     "watchParty": "Watch Party",
     "blog": "Blog",
+    "roulette": "Roulette",
     "profile": "Profile",
     "admin": "Admin Panel",
     "signIn": "Sign In",
@@ -308,6 +309,31 @@
   },
   "watchPage": {
     "availableFilms": "Available to watch"
+  },
+  "roulette": {
+    "title": "Movie Roulette",
+    "subtitle": "Can't choose a movie? Let fate decide!",
+    "genre": "Genre",
+    "year": "Year",
+    "anyGenre": "Any genre",
+    "anyYear": "Any year",
+    "loading": "Loading...",
+    "available": "Available movies: {count}",
+    "spinning": "🎲 Spinning...",
+    "spin": "🎲 Spin!",
+    "clickToView": "Click to view",
+    "pressToChoose": "Press the button to pick a movie",
+    "history": "📜 History"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "viewAll": "All notifications",
+    "justNow": "just now",
+    "minutesAgo": "{minutes} min ago",
+    "hoursAgo": "{hours}h ago",
+    "daysAgo": "{days}d ago"
   },
   "notFound": {
     "title": "404",

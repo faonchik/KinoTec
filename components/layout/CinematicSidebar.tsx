@@ -83,6 +83,20 @@ function PartyIc(p: SVGProps<SVGSVGElement>) {
   );
 }
 
+function RouletteIc(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...p}>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" strokeDasharray="3 2" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
+      <line x1="12" y1="2" x2="12" y2="5" strokeLinecap="round" />
+      <line x1="12" y1="19" x2="12" y2="22" strokeLinecap="round" />
+      <line x1="2" y1="12" x2="5" y2="12" strokeLinecap="round" />
+      <line x1="19" y1="12" x2="22" y2="12" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function CinematicSidebar() {
   const pathname = usePathname();
   const t = useTranslations("nav");
@@ -96,6 +110,7 @@ export function CinematicSidebar() {
     { href: "/directors", label: t("directors"), Icon: DirectorIc },
     { href: "/blog", label: t("blog"), Icon: ArticleIc },
     { href: "/party", label: t("watchParty"), Icon: PartyIc },
+    { href: "/roulette", label: t("roulette"), Icon: RouletteIc },
     { href: "/calendar", label: t("calendar"), Icon: CalendarIc },
     { href: "/profile", label: t("profile"), Icon: UserIc },
   ];

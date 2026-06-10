@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { createNotification } from "@/lib/notifications/createNotification";
 
 export async function PATCH(
   request: NextRequest,
@@ -17,10 +18,31 @@ export async function PATCH(
     const { id } = await params;
     const { isApproved } = await request.json();
 
+    // Fetch review with movie details and current approval state before updating
+    const oldReview = await prisma.review.findUnique({
+      where: { id },
+      select: { userId: true, isApproved: true, movie: { select: { title: true } } },
+    });
+
     const review = await prisma.review.update({
       where: { id },
       data: { isApproved },
     });
+
+    // Send notification if newly approved
+    if (isApproved && oldReview && !oldReview.isApproved) {
+      try {
+        await createNotification({
+          userId: oldReview.userId,
+          type: "REVIEW_APPROVED",
+          title: "Отзыв одобрен",
+          message: `Ваш отзыв на фильм "${oldReview.movie.title}" был одобрен модератором!`,
+          link: `/movies/${review.movieId}`,
+        });
+      } catch (err) {
+        console.error("Error creating review approval notification:", err);
+      }
+    }
 
     return NextResponse.json(review);
   } catch (error) {
