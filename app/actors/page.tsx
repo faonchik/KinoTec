@@ -4,11 +4,17 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Pagination } from "@/components/ui/Pagination";
 import { getProxiedImageUrl, shouldUseUnoptimized } from "@/lib/images";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Актёры",
-  description: "Список актёров в базе КиноТеки",
-};
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("actors");
+  return {
+    title: t("title") || "Актёры",
+    description: t("subtitle") || "Список актёров в базе КиноТеки",
+  };
+}
 
 interface ActorsPageProps {
   searchParams: Promise<{ page?: string; q?: string }>;
@@ -49,6 +55,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
   const params = await searchParams;
   const page = parseInt(params.page || "1");
   const { actors, total, totalPages } = await getActors(page, params.q);
+  const t = await getTranslations("actors");
 
   return (
     <div className="min-h-screen bg-[#141414]">
@@ -59,9 +66,9 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
       <div className="px-14 py-12">
         {/* Title Section */}
         <div className="mb-2">
-          <h1 className="font-oswald text-4xl font-bold text-white">Актёры</h1>
+          <h1 className="font-oswald text-4xl font-bold text-white">{t("title")}</h1>
           <p className="font-mono text-[13px] text-white/45 mt-2 max-w-2xl">
-            Откройте для себя талантливых актёров. Загляните в их фильмографию и биографию.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -75,7 +82,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
               name="q"
               type="text"
               defaultValue={params.q || ""}
-              placeholder="Поиск актёров..."
+              placeholder={t("searchPlaceholder")}
               className="w-full h-12 bg-[#121821] rounded-2xl pl-12 pr-4 font-mono text-[13px] text-white placeholder:text-white/35 border border-white/[0.08] outline-none focus:ring-1 focus:ring-[#ffb84d]/50 transition-all"
             />
           </form>
@@ -85,14 +92,14 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <span className="font-mono text-[13px] text-white/35">
-              Всего: {total} актёров
+              {t("total", { count: total })}
             </span>
           </div>
           <button className="flex items-center gap-2 bg-[#ffb84d] hover:bg-[#ffc56a] text-white font-mono text-[13px] font-semibold px-5 py-2.5 rounded-2xl transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
             </svg>
-            Популярные
+            {t("popular")}
           </button>
         </div>
 
@@ -128,7 +135,7 @@ export default async function ActorsPage({ searchParams }: ActorsPageProps) {
               </h3>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="font-mono text-[11px] text-white/35">
-                  {actor._count.movies} {actor._count.movies === 1 ? "фильм" : "фильмов"}
+                  {t("moviesCount", { count: actor._count.movies })}
                 </span>
               </div>
             </Link>

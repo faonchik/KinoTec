@@ -9,6 +9,8 @@ import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 const fontDisplay = Oswald({
   subsets: ["latin", "cyrillic-ext", "cyrillic"],
   variable: "--font-sp-display",

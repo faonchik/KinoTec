@@ -2,10 +2,17 @@ import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import { UsersClient } from "./UsersClient";
 
-export const metadata: Metadata = {
-  title: "Пользователи",
-  description: "Найдите друзей и кинолюбителей",
-};
+import { getTranslations } from "next-intl/server";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("community");
+  return {
+    title: t("title") || "Пользователи",
+    description: t("subtitle") || "Найдите друзей и кинолюбителей",
+  };
+}
 
 async function getUsers() {
   const users = await prisma.user.findMany({

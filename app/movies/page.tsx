@@ -4,7 +4,7 @@ import { MovieGrid } from "@/components/movies/MovieGrid";
 import { MovieFilters } from "@/components/movies/MovieFilters";
 import { Pagination } from "@/components/ui/Pagination";
 import { ExportMoviesButton } from "@/components/movies/ExportMoviesButton";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale, getMessages } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("movies");

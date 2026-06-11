@@ -2,6 +2,8 @@ import { getStreamingPreviewPayload } from "@/lib/streaming-preview/getStreaming
 import { buildPayloadFromPool } from "@/lib/streaming-preview/fallbackMovies";
 import { CinematicMainExperience } from "@/components/streaming-preview/CinematicMainExperience";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   let data;
   try {

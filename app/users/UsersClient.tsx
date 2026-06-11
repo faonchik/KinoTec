@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 interface User {
   id: string;
@@ -30,6 +31,7 @@ export function UsersClient({ users }: UsersClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
+  const t = useTranslations("community");
 
   const filteredUsers = users.filter((user) =>
     user.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -66,8 +68,8 @@ export function UsersClient({ users }: UsersClientProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-2">👥 Сообщество</h1>
-        <p className="text-slate-400 mb-8">Найдите друзей и единомышленников</p>
+        <h1 className="text-3xl font-bold text-white mb-2">👥 {t("title")}</h1>
+        <p className="text-slate-400 mb-8">{t("subtitle")}</p>
 
         {/* Поиск */}
         <div className="mb-8">
@@ -75,7 +77,7 @@ export function UsersClient({ users }: UsersClientProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Поиск по имени..."
+            placeholder={t("searchPlaceholder")}
             className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
           />
         </div>
@@ -116,7 +118,7 @@ export function UsersClient({ users }: UsersClientProps) {
                       href={`/users/${user.id}`}
                       className="font-semibold text-white hover:text-amber-400 transition-colors"
                     >
-                      {user.name || "Пользователь"}
+                      {user.name || t("userDefaultName")}
                     </Link>
 
                     {user.bio && (
@@ -128,13 +130,22 @@ export function UsersClient({ users }: UsersClientProps) {
                     {/* Статистика */}
                     <div className="flex flex-wrap gap-3 mt-3 text-sm">
                       <span className="text-slate-500">
-                        <span className="text-white">{user._count.watchHistory}</span> просмотрено
+                        {t.rich("watchedCount", {
+                          count: user._count.watchHistory,
+                          white: (chunks) => <span className="text-white">{chunks}</span>
+                        })}
                       </span>
                       <span className="text-slate-500">
-                        <span className="text-white">{user._count.reviews}</span> отзывов
+                        {t.rich("reviewsCount", {
+                          count: user._count.reviews,
+                          white: (chunks) => <span className="text-white">{chunks}</span>
+                        })}
                       </span>
                       <span className="text-slate-500">
-                        <span className="text-white">{user._count.followers}</span> подписчиков
+                        {t.rich("followersCount", {
+                          count: user._count.followers,
+                          white: (chunks) => <span className="text-white">{chunks}</span>
+                        })}
                       </span>
                     </div>
                   </div>
@@ -153,8 +164,8 @@ export function UsersClient({ users }: UsersClientProps) {
                       {isLoading
                         ? "..."
                         : isFollowing
-                        ? "Отписаться"
-                        : "Подписаться"}
+                        ? t("unfollow")
+                        : t("follow")}
                     </button>
                   )}
                 </div>
@@ -165,7 +176,7 @@ export function UsersClient({ users }: UsersClientProps) {
 
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-slate-400">Пользователи не найдены</p>
+            <p className="text-slate-400">{t("notFound")}</p>
           </div>
         )}
       </div>

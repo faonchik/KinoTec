@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import { RecommendClient } from "./RecommendClient";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Что посмотреть?",
   description: "Умный помощник подберёт фильм под ваше настроение",

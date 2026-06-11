@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
 import { Rating } from "@/components/ui/Rating";
 import { CommentSection } from "@/components/reviews/CommentSection";
+import { useTranslations } from "next-intl";
 
 interface Review {
   id: string;
@@ -31,6 +32,9 @@ interface ReviewSectionProps {
 export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
   const { data: session } = useSession();
   const router = useRouter();
+  const t = useTranslations("reviews");
+  const tCommon = useTranslations("common");
+
   const [showForm, setShowForm] = useState(false);
   const [content, setContent] = useState("");
   const [rating, setRating] = useState(0);
@@ -63,17 +67,17 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
     setEditError("");
 
     if (!editContent.trim()) {
-      setEditError("Введите текст отзыва");
+      setEditError(t("enterText"));
       return;
     }
 
     if (editContent.length < 10) {
-      setEditError("Отзыв должен содержать минимум 10 символов");
+      setEditError(t("minLength"));
       return;
     }
 
     if (editRating === 0) {
-      setEditError("Выберите рейтинг");
+      setEditError(t("selectRating"));
       return;
     }
 
@@ -88,20 +92,20 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Ошибка при обновлении отзыва");
+        throw new Error(data.error || t("errorUpdate"));
       }
 
       setEditingId(null);
       router.refresh();
     } catch (err) {
-      setEditError(err instanceof Error ? err.message : "Ошибка при обновлении отзыва");
+      setEditError(err instanceof Error ? err.message : t("errorUpdate"));
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleDelete = async (reviewId: string) => {
-    if (!confirm("Вы уверены, что хотите удалить этот отзыв?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
 
     try {
       const response = await fetch(`/api/reviews/${reviewId}`, {
@@ -110,12 +114,12 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Ошибка при удалении отзыва");
+        throw new Error(data.error || t("errorDelete"));
       }
 
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка при удалении отзыва");
+      alert(err instanceof Error ? err.message : t("errorDelete"));
     }
   };
 
@@ -124,17 +128,17 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
     setError("");
 
     if (!content.trim()) {
-      setError("Введите текст отзыва");
+      setError(t("enterText"));
       return;
     }
 
     if (content.length < 10) {
-      setError("Отзыв должен содержать минимум 10 символов");
+      setError(t("minLength"));
       return;
     }
 
     if (rating === 0) {
-      setError("Выберите рейтинг");
+      setError(t("selectRating"));
       return;
     }
 
@@ -149,7 +153,7 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Ошибка при отправке отзыва");
+        throw new Error(data.error || t("errorSubmit"));
       }
 
       setContent("");
@@ -157,7 +161,7 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
       setShowForm(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ошибка при отправке отзыва");
+      setError(err instanceof Error ? err.message : t("errorSubmit"));
     } finally {
       setIsSubmitting(false);
     }
@@ -169,11 +173,11 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">
-          Отзывы ({reviews.length})
+          {t("reviewsCount", { count: reviews.length })}
         </h2>
         {session && !showForm && !hasReviewed && (
           <Button onClick={() => setShowForm(true)}>
-            Написать отзыв
+            {t("write")}
           </Button>
         )}
       </div>
@@ -184,11 +188,11 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
           onSubmit={handleSubmit}
           className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-6 mb-8"
         >
-          <h3 className="text-lg font-semibold text-white mb-4">Ваш отзыв</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">{t("yourReview")}</h3>
           
           <div className="mb-4">
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Ваша оценка
+              {t("yourRating")}
             </label>
             <Rating value={rating} onChange={setRating} size="md" />
           </div>
@@ -196,7 +200,7 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Поделитесь своим мнением о фильме..."
+            placeholder={t("placeholder")}
             rows={5}
             className="mb-4"
           />
@@ -207,7 +211,7 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
 
           <div className="flex gap-4">
             <Button type="submit" isLoading={isSubmitting}>
-              Отправить
+              {tCommon("submit")}
             </Button>
             <Button
               type="button"
@@ -219,7 +223,7 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
                 setError("");
               }}
             >
-              Отмена
+              {tCommon("cancel")}
             </Button>
           </div>
         </form>
@@ -231,18 +235,18 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
           <svg className="w-16 h-16 mx-auto text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          <p className="text-slate-400">Пока нет отзывов</p>
+          <p className="text-slate-400">{t("noReviews")}</p>
           {session && (
             <Button onClick={() => setShowForm(true)} className="mt-4">
-              Будьте первым!
+              {t("beFirst")}
             </Button>
           )}
           {!session && (
             <p className="text-slate-500 text-sm mt-2">
               <a href="/auth/signin" className="text-amber-400 hover:underline">
-                Войдите
+                {tCommon("signIn")}
               </a>
-              , чтобы оставить отзыв
+              {t("loginToReviewText")}
             </p>
           )}
         </div>
@@ -260,11 +264,11 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
                   </div>
                   <div>
                     <p className="font-medium text-white">
-                      {review.user.name || "Пользователь"}
+                      {review.user.name || t("userDefaultName")}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-sm text-slate-400">
-                        {new Date(review.createdAt).toLocaleDateString("ru-RU", {
+                        {new Date(review.createdAt).toLocaleDateString(undefined, {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
@@ -285,13 +289,13 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
                       onClick={() => handleEditStart(review)}
                       className="text-xs text-slate-400 hover:text-[#ffb84d] transition-colors font-mono"
                     >
-                      ✏️ Ред.
+                      {t("editShort")}
                     </button>
                     <button
                       onClick={() => handleDelete(review.id)}
                       className="text-xs text-slate-400 hover:text-red-400 transition-colors font-mono"
                     >
-                      ❌ Удал.
+                      {t("deleteShort")}
                     </button>
                   </div>
                 )}
@@ -301,7 +305,7 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
                 <form onSubmit={(e) => handleUpdate(e, review.id)} className="mt-2">
                   <div className="mb-4">
                     <label className="block text-xs font-medium text-slate-400 mb-1">
-                      Ваша оценка
+                      {t("yourRating")}
                     </label>
                     <Rating value={editRating} onChange={setEditRating} size="sm" />
                   </div>
@@ -314,10 +318,10 @@ export function ReviewSection({ movieId, reviews }: ReviewSectionProps) {
                   {editError && <p className="text-red-400 text-xs mb-3">{editError}</p>}
                   <div className="flex gap-2">
                     <Button type="submit" size="sm" isLoading={isUpdating}>
-                      Сохранить
+                      {tCommon("save")}
                     </Button>
                     <Button type="button" variant="ghost" size="sm" onClick={handleEditCancel}>
-                      Отмена
+                      {tCommon("cancel")}
                     </Button>
                   </div>
                 </form>

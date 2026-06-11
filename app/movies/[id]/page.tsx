@@ -11,6 +11,7 @@ import { MovieActions } from "./MovieActions";
 import { MovieComments } from "@/components/comments/MovieComments";
 import { HeroBackdrop } from "@/components/ui/HeroBackdrop";
 import { ProxiedImage } from "@/components/ui/ProxiedImage";
+import { getTranslations } from "next-intl/server";
 
 interface MoviePageProps {
   params: Promise<{ id: string }>;
@@ -87,6 +88,7 @@ export async function generateMetadata({ params }: MoviePageProps): Promise<Meta
 export default async function MoviePage({ params }: MoviePageProps) {
   const { id } = await params;
   const movie = await getMovie(id);
+  const t = await getTranslations("movies");
 
   const avgRating = movie.ratings.length
     ? movie.ratings.reduce((acc, r) => acc + r.value, 0) / movie.ratings.length
@@ -158,7 +160,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
                 {movie.releaseDate && (
                   <span>{new Date(movie.releaseDate).getFullYear()}</span>
                 )}
-                {movie.runtime && <span>{movie.runtime} мин</span>}
+                {movie.runtime && <span>{movie.runtime} {t("details.minutes")}</span>}
                 {movie.country && <span>{movie.country}</span>}
               </div>
 
@@ -177,7 +179,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {movie.director && (
                   <div>
-                    <p className="text-slate-500 text-sm mb-1">Режиссёр</p>
+                    <p className="text-slate-500 text-sm mb-1">{t("details.director")}</p>
                     <Link
                       href={`/directors/${movie.director.id}`}
                       className="text-white hover:text-amber-400 transition-colors"
@@ -188,18 +190,18 @@ export default async function MoviePage({ params }: MoviePageProps) {
                 )}
                 {movie.budget && Number(movie.budget) > 0 && (
                   <div>
-                    <p className="text-slate-500 text-sm mb-1">Бюджет</p>
+                    <p className="text-slate-500 text-sm mb-1">{t("details.budget")}</p>
                     <p className="text-white">{formatMoney(movie.budget)}</p>
                   </div>
                 )}
                 {movie.revenue && Number(movie.revenue) > 0 && (
                   <div>
-                    <p className="text-slate-500 text-sm mb-1">Сборы</p>
+                    <p className="text-slate-500 text-sm mb-1">{t("details.revenue")}</p>
                     <p className="text-white">{formatMoney(movie.revenue)}</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-slate-500 text-sm mb-1">Рейтингов</p>
+                  <p className="text-slate-500 text-sm mb-1">{t("details.rating")}</p>
                   <p className="text-white">{movie.ratings.length}</p>
                 </div>
               </div>
@@ -211,7 +213,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
       {/* Cast */}
       {movie.actors.length > 0 && (
         <section className="container mx-auto px-4 py-12">
-          <h2 className="text-2xl font-bold text-white mb-6">В ролях</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">{t("details.cast")}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {movie.actors.map((ma) => (
               <Link
@@ -261,7 +263,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
       {/* Similar Movies */}
       {similarMovies.length > 0 && (
         <section className="container mx-auto px-4 py-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Похожие фильмы</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">{t("details.similar")}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {similarMovies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
@@ -272,4 +274,3 @@ export default async function MoviePage({ params }: MoviePageProps) {
     </div>
   );
 }
-

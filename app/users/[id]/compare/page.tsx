@@ -130,13 +130,18 @@ async function getOtherUser(id: string) {
   });
 }
 
+import { getTranslations } from "next-intl/server";
+
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: ComparePageProps): Promise<Metadata> {
   const { id } = await params;
   const user = await getOtherUser(id);
+  const t = await getTranslations("compare");
 
   return {
-    title: user ? `Сравнение вкусов с ${user.name}` : "Сравнение вкусов",
-    description: "Узнайте насколько совпадают ваши вкусы в кино",
+    title: user ? t("metaTitle", { name: user.name }) : t("title"),
+    description: t("metaDescription"),
   };
 }
 
@@ -158,10 +163,11 @@ export default async function ComparePage({ params }: ComparePageProps) {
   }
 
   const comparison = await getComparisonData(session.user.id, otherUserId);
+  const t = await getTranslations("compare");
 
   return (
     <CompareClient
-      currentUser={{ id: session.user.id, name: session.user.name || "Вы", avatar: null }}
+      currentUser={{ id: session.user.id, name: session.user.name || t("you"), avatar: null }}
       otherUser={otherUser}
       comparison={comparison}
     />

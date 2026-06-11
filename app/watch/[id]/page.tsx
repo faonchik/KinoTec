@@ -15,6 +15,8 @@ import { usesExplicitMovieEmbedTemplate } from "@/lib/player/embedUrl";
 import { isUsableDirectVideoUrlForNativePlayer } from "@/lib/player/directVideoUrl";
 import { getTranslations } from "next-intl/server";
 
+export const dynamic = "force-dynamic";
+
 interface WatchPageProps {
   params: Promise<{ id: string }>;
 }

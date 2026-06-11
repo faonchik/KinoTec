@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface User {
   id: string;
@@ -42,6 +43,8 @@ interface CompareClientProps {
 }
 
 export function CompareClient({ currentUser, otherUser, comparison }: CompareClientProps) {
+  const t = useTranslations("compare");
+
   const getCompatibilityEmoji = (value: number) => {
     if (value >= 80) return "🤝";
     if (value >= 60) return "👍";
@@ -59,18 +62,18 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
   };
 
   const getCompatibilityText = (value: number) => {
-    if (value >= 80) return "Отличное совпадение вкусов!";
-    if (value >= 60) return "Хорошее совпадение";
-    if (value >= 40) return "Средняя совместимость";
-    if (value >= 20) return "Разные вкусы";
-    return "Полные противоположности";
+    if (value >= 80) return t("compatibilityText.excellent");
+    if (value >= 60) return t("compatibilityText.good");
+    if (value >= 40) return t("compatibilityText.average");
+    if (value >= 20) return t("compatibilityText.different");
+    return t("compatibilityText.opposite");
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Заголовок */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-white mb-4">📊 Сравнение вкусов</h1>
+        <h1 className="text-4xl font-bold text-white mb-4">📊 {t("title")}</h1>
         
         {/* Аватары */}
         <div className="flex items-center justify-center gap-8 mb-8">
@@ -81,7 +84,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
             <p className="text-white font-medium">{currentUser.name}</p>
           </div>
 
-          <div className="text-4xl">VS</div>
+          <div className="text-4xl">{t("vs")}</div>
 
           <Link href={`/users/${otherUser.id}`} className="text-center group">
             {otherUser.avatar ? (
@@ -111,7 +114,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
           </div>
           <p className="text-white/80 text-lg">{getCompatibilityText(comparison.compatibility)}</p>
           <p className="text-white/60 text-sm mt-2">
-            На основе {comparison.commonMoviesCount} общих фильмов
+            {t("basedOn", { count: comparison.commonMoviesCount })}
           </p>
         </div>
       </div>
@@ -119,15 +122,15 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
       {comparison.commonMoviesCount === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🎬</div>
-          <p className="text-slate-400 text-lg mb-4">У вас пока нет общих оценённых фильмов</p>
-          <p className="text-slate-500">Оценивайте больше фильмов, чтобы сравнить вкусы!</p>
+          <p className="text-slate-400 text-lg mb-4">{t("noCommon")}</p>
+          <p className="text-slate-500">{t("rateMore")}</p>
         </div>
       ) : (
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Наибольшие совпадения */}
           <div className="bg-slate-800/50 rounded-xl p-6 border border-green-500/30">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>💚</span> Похожие оценки
+              <span>💚</span> {t("similarRatings")}
             </h2>
             <div className="space-y-3">
               {comparison.commonMovies.slice(0, 5).map((item) => (
@@ -164,7 +167,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
           {/* Наибольшие разногласия */}
           <div className="bg-slate-800/50 rounded-xl p-6 border border-red-500/30">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>💔</span> Разные мнения
+              <span>💔</span> {t("disagreements")}
             </h2>
             <div className="space-y-3">
               {comparison.biggestDisagreements.map((item) => (
@@ -187,11 +190,11 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium line-clamp-1">{item.movie.title}</p>
-                    <p className="text-red-400 text-xs">Разница: {item.diff}</p>
+                    <p className="text-red-400 text-xs">{t("difference", { count: item.diff })}</p>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-amber-400">{item.rating1}</span>
-                    <span className="text-slate-500">vs</span>
+                    <span className="text-slate-500">{t("vs").toLowerCase()}</span>
                     <span className="text-blue-400">{item.rating2}</span>
                   </div>
                 </Link>
@@ -202,7 +205,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
           {/* Жанровые предпочтения */}
           <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>🎭</span> Топ жанров: {currentUser.name}
+              <span>🎭</span> {t("topGenres", { name: currentUser.name })}
             </h2>
             <div className="space-y-2">
               {comparison.currentUserGenres.map((g, idx) => (
@@ -217,7 +220,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
 
           <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>🎭</span> Топ жанров: {otherUser.name}
+              <span>🎭</span> {t("topGenres", { name: otherUser.name })}
             </h2>
             <div className="space-y-2">
               {comparison.otherUserGenres.map((g, idx) => (
@@ -234,7 +237,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
           {comparison.recommendFromOther.length > 0 && (
             <div className="bg-slate-800/50 rounded-xl p-6 border border-amber-500/30">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span>💡</span> {otherUser.name} рекомендует вам
+                <span>💡</span> {t("recommends", { name: otherUser.name })}
               </h2>
               <div className="grid grid-cols-3 gap-3">
                 {comparison.recommendFromOther.map((movie) => (
@@ -266,7 +269,7 @@ export function CompareClient({ currentUser, otherUser, comparison }: CompareCli
           {comparison.recommendToOther.length > 0 && (
             <div className="bg-slate-800/50 rounded-xl p-6 border border-blue-500/30">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span>💡</span> Вы можете порекомендовать
+                <span>💡</span> {t("youRecommend")}
               </h2>
               <div className="grid grid-cols-3 gap-3">
                 {comparison.recommendToOther.map((movie) => (

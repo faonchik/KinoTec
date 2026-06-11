@@ -4,10 +4,15 @@ import prisma from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
 import { SearchClient } from "./SearchClient";
 
-export const metadata: Metadata = {
-  title: "Поиск",
-  description: "Поиск фильмов, актёров и режиссёров",
-};
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return {
+    title: t("search") || "Поиск",
+    description: t("searchAdvanced") || "Поиск фильмов, актёров и режиссёров",
+  };
+}
 
 async function getGenres() {
   return await prisma.genre.findMany({ orderBy: { name: "asc" } });

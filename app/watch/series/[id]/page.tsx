@@ -11,6 +11,8 @@ import { SeriesWatchExperienceClient } from "@/components/player/SeriesWatchExpe
 import { resolveSeriesWatchEmbed } from "@/lib/player/resolveWatchEmbed";
 import { getTranslations, getLocale } from "next-intl/server";
 
+export const dynamic = "force-dynamic";
+
 interface WatchSeriesPageProps {
   params: Promise<{ id: string }>;
 }

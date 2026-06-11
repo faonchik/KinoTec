@@ -157,7 +157,12 @@
     "deathDate": "Date of Death",
     "years": "years",
     "movies": "movies",
-    "photoGallery": "Photo Gallery"
+    "photoGallery": "Photo Gallery",
+    "subtitle": "Discover talented actors. Explore their filmography and biography.",
+    "searchPlaceholder": "Search actors...",
+    "total": "Total: {count} actors",
+    "popular": "Popular",
+    "moviesCount": "{count, plural, =0 {no movies} one {# movie} other {# movies}}"
   },
   "directors": {
     "title": "Directors",
@@ -168,7 +173,9 @@
     "deathDate": "Date of Death",
     "years": "years",
     "movies": "movies",
-    "photoGallery": "Photo Gallery"
+    "photoGallery": "Photo Gallery",
+    "total": "Total directors: {count}",
+    "moviesCount": "{count, plural, =0 {no movies} one {# movie} other {# movies}}"
   },
   "reviews": {
     "title": "Reviews",
@@ -179,7 +186,19 @@
     "minLength": "Review must be at least 10 characters",
     "selectRating": "Select rating",
     "submitted": "Review submitted",
-    "loginToReview": "Sign in to leave a review"
+    "loginToReview": "Sign in to leave a review",
+    "reviewsCount": "Reviews ({count})",
+    "noReviews": "No reviews yet",
+    "beFirst": "Be the first!",
+    "loginToReviewText": "to leave a review",
+    "userDefaultName": "User",
+    "editShort": "✏️ Edit",
+    "deleteShort": "❌ Delete",
+    "deleteConfirm": "Are you sure you want to delete this review?",
+    "enterText": "Please enter review text",
+    "errorUpdate": "Error updating review",
+    "errorDelete": "Error deleting review",
+    "errorSubmit": "Error submitting review"
   },
   "comments": {
     "title": "Comments",
@@ -539,5 +558,40 @@
     "importSuccess": "Imported: {imported}, errors: {errors}",
     "importError": "Error: {error}",
     "invalidJson": "Error reading file. Please ensure it is a valid JSON file."
+  },
+  "community": {
+    "title": "Community",
+    "subtitle": "Find friends and like-minded people",
+    "searchPlaceholder": "Search by name...",
+    "watchedCount": "<white>{count}</white> watched",
+    "reviewsCount": "<white>{count}</white> reviews",
+    "followersCount": "<white>{count}</white> followers",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "notFound": "No users found",
+    "userDefaultName": "User"
+  },
+  "compare": {
+    "title": "Taste Comparison",
+    "metaTitle": "Taste comparison with {name}",
+    "metaDescription": "Find out how much your movie tastes match",
+    "vs": "VS",
+    "compatibilityText": {
+      "excellent": "Excellent taste match!",
+      "good": "Good match",
+      "average": "Average compatibility",
+      "different": "Different tastes",
+      "opposite": "Complete opposites"
+    },
+    "basedOn": "Based on {count, plural, =0 {no movies} one {# movie} other {# movies}}",
+    "noCommon": "You have no rated movies in common yet",
+    "rateMore": "Rate more movies to compare tastes!",
+    "similarRatings": "Similar Ratings",
+    "disagreements": "Different Opinions",
+    "difference": "Difference: {count}",
+    "topGenres": "Top Genres: {name}",
+    "recommends": "{name} recommends to you",
+    "youRecommend": "You can recommend",
+    "you": "You"
   }
 }

@@ -3,13 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Pagination } from "@/components/ui/Pagination";
-
-export const metadata: Metadata = {
-  title: "Режиссёры",
-  description: "Список режиссёров в базе КиноТеки",
-};
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("directors");
+  return {
+    title: t("title") || "Режиссёры",
+    description: t("title") || "Список режиссёров в базе КиноТеки",
+  };
+}
 
 interface DirectorsPageProps {
   searchParams: Promise<{ page?: string }>;
@@ -43,12 +47,13 @@ export default async function DirectorsPage({ searchParams }: DirectorsPageProps
   const params = await searchParams;
   const page = parseInt(params.page || "1");
   const { directors, total, totalPages } = await getDirectors(page);
+  const t = await getTranslations("directors");
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Режиссёры</h1>
-        <p className="text-slate-400">Всего режиссёров: {total}</p>
+        <h1 className="text-4xl font-bold text-white mb-2">{t("title")}</h1>
+        <p className="text-slate-400">{t("total", { count: total })}</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -79,7 +84,7 @@ export default async function DirectorsPage({ searchParams }: DirectorsPageProps
               {director.name}
             </h3>
             <p className="text-sm text-slate-400">
-              {director._count.movies} {director._count.movies === 1 ? "фильм" : "фильмов"}
+              {t("moviesCount", { count: director._count.movies })}
             </p>
           </Link>
         ))}
