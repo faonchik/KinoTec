@@ -77,8 +77,8 @@ export async function getStreamingPreviewPayload(): Promise<StreamingPreviewPayl
   if (session?.user && personalMapped.length > 0) {
     rows.push({
       key: "personal",
-      title: "✨ Для вас",
-      subtitle: "Рекомендации на основе ваших просмотров",
+      title: t("forYou"),
+      subtitle: t("forYouDescription"),
       movies: padRowWithDemoMovies(personalMapped, 20),
     });
   }

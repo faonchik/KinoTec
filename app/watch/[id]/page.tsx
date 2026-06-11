@@ -1,3 +1,5 @@
+
+
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +13,7 @@ import { WatchExperienceClient } from "@/components/player/WatchExperienceClient
 import { resolveMovieWatchEmbed } from "@/lib/player/resolveWatchEmbed";
 import { usesExplicitMovieEmbedTemplate } from "@/lib/player/embedUrl";
 import { isUsableDirectVideoUrlForNativePlayer } from "@/lib/player/directVideoUrl";
+import { getTranslations } from "next-intl/server";
 
 interface WatchPageProps {
   params: Promise<{ id: string }>;
@@ -56,16 +59,21 @@ async function getRecommendations(movieId: string, genreIds: string[]) {
 export async function generateMetadata({ params }: WatchPageProps): Promise<Metadata> {
   const { id } = await params;
   const movie = await getMovie(id);
+  const t = await getTranslations("watchPage");
 
   return {
-    title: `Смотреть ${movie.title} онлайн`,
-    description: `Смотреть фильм ${movie.title} (${movie.originalTitle || ""}) онлайн бесплатно в хорошем качестве`,
+    title: t("seoTitle", { title: movie.title }),
+    description: t("seoDescription", {
+      title: movie.title,
+      originalTitle: movie.originalTitle || "",
+    }),
   };
 }
 
 export default async function WatchPage({ params }: WatchPageProps) {
   const { id } = await params;
   const movie = await getMovie(id);
+  const t = await getTranslations("watchPage");
 
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
@@ -129,9 +137,9 @@ export default async function WatchPage({ params }: WatchPageProps) {
           />
           {!hasPlayback && (
             <p className="px-4 py-3 text-center text-sm text-white/50">
-              Не удалось подобрать онлайн-плеер
-              {usedTmdbSearch ? " (поиск TMDB не дал подходящего id)." : "."} Укажите tmdbId или Kinopoisk id в карточке
-              фильма либо настройте переменные окружения плеера в документации проекта.
+              {t("playerError")}
+              {usedTmdbSearch ? t("playerErrorTmdb") : "."}
+              {t("playerErrorSuffix")}
             </p>
           )}
         </div>
@@ -162,13 +170,13 @@ export default async function WatchPage({ params }: WatchPageProps) {
             <div className="flex flex-wrap items-center gap-4 text-slate-400 mb-6">
               {year && <span>{year}</span>}
               {movie.country && <span>{movie.country}</span>}
-              {movie.runtime && <span>{movie.runtime} мин</span>}
+              {movie.runtime && <span>{movie.runtime} {t("minutes") || "мин"}</span>}
               {movie.director && (
                 <Link
                   href={`/directors/${movie.director.id}`}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  Режиссёр: {movie.director.name}
+                  {t("director")}: {movie.director.name}
                 </Link>
               )}
             </div>
@@ -187,7 +195,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
             {/* Описание */}
             {movie.description && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold text-white mb-3">Описание</h2>
+                <h2 className="text-xl font-semibold text-white mb-3">{t("description")}</h2>
                 <p className="text-slate-300 leading-relaxed">{movie.description}</p>
               </div>
             )}
@@ -195,7 +203,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
             {/* Актёры */}
             {movie.actors.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold text-white mb-4">В ролях</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">{t("cast")}</h2>
                 <div className="flex flex-wrap gap-3">
                   {movie.actors.map((ma) => (
                     <Link
@@ -236,13 +244,13 @@ export default async function WatchPage({ params }: WatchPageProps) {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Подробнее о фильме
+              {t("moreInfo")}
             </Link>
           </div>
 
           {/* Сайдбар с рекомендациями */}
           <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Похожие фильмы</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">{t("similar")}</h2>
             <div className="space-y-4">
               {recommendations.map((rec) => {
                 const recRating = rec.ratings.length

@@ -160,16 +160,16 @@ export function Header() {
   ];
 
   const adminNavigation = [
-    { name: "📊 Дашборд", href: "/admin" },
-    { name: "🎬 Фильмы", href: "/admin/movies" },
-    { name: "🎭 Актёры", href: "/admin/actors" },
-    { name: "🎬 Режиссёры", href: "/admin/directors" },
-    { name: "🏷️ Жанры", href: "/admin/genres" },
-    { name: "👥 Пользователи", href: "/admin/users" },
-    { name: "💬 Отзывы", href: "/admin/reviews" },
-    { name: "📝 Статьи", href: "/admin/articles" },
-    { name: "🌐 Импорт TMDB", href: "/admin/tmdb" },
-    { name: "← На главную", href: "/" },
+    { name: t("dashboard"), href: "/admin" },
+    { name: `🎬 ${t("movies")}`, href: "/admin/movies" },
+    { name: `🎭 ${t("actors")}`, href: "/admin/actors" },
+    { name: `🎬 ${t("directors")}`, href: "/admin/directors" },
+    { name: t("genres"), href: "/admin/genres" },
+    { name: t("users"), href: "/admin/users" },
+    { name: t("reviews"), href: "/admin/reviews" },
+    { name: t("articles"), href: "/admin/articles" },
+    { name: t("importTmdb"), href: "/admin/tmdb" },
+    { name: t("backToHome"), href: "/" },
   ];
 
   const currentNav = isAdmin ? adminNavigation : navigation;
@@ -214,14 +214,14 @@ export function Header() {
             className="block px-4 py-2.5 text-sm text-white/65 transition hover:bg-white/[0.06] hover:text-white"
             onClick={() => setIsUserMenuOpen(false)}
           >
-            Еженедельный отчёт
+            {t("weeklyReport")}
           </Link>
           <Link
             href="/profile/export"
             className="block px-4 py-2.5 text-sm text-white/65 transition hover:bg-white/[0.06] hover:text-white"
             onClick={() => setIsUserMenuOpen(false)}
           >
-            Экспорт/Импорт
+            {t("exportImport")}
           </Link>
           {(session.user.role === "ADMIN" || session.user.role === "MODERATOR") && (
             <Link

@@ -33,7 +33,9 @@
     "searchAdvanced": "Advanced search",
     "typeMovie": "Movie",
     "typeActor": "Actor",
-    "typeDirector": "Director"
+    "typeDirector": "Director",
+    "pageOf": "Page {current} of {total}",
+    "showing": "Showing {start}–{end} of {total}"
   },
   "nav": {
     "home": "Home",
@@ -52,7 +54,16 @@
     "signOut": "Sign Out",
     "signUp": "Sign Up",
     "favorites": "Favorites",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "weeklyReport": "Weekly Report",
+    "exportImport": "Export/Import",
+    "uiPreview": "UI Preview",
+    "dashboard": "📊 Dashboard",
+    "genres": "🏷️ Genres",
+    "users": "👥 Users",
+    "articles": "📝 Articles",
+    "importTmdb": "🌐 TMDB Import",
+    "backToHome": "← Back to Home"
   },
   "home": {
     "title": "Welcome to KinoTeka",
@@ -78,6 +89,18 @@
     "addToFavorites": "Add to Favorites",
     "emptyCatalogTitle": "Nothing to watch yet",
     "emptyCatalogDescription": "Connect your database and import movies — or browse the catalog when data is available.",
+    "forYou": "✨ For You",
+    "forYouDescription": "Recommendations based on your watch history",
+    "originalSeasonPremiere": "Original · Season Premiere",
+    "heroDescriptionFallback": "Immerse yourself in history, where every frame is cinema.",
+    "details": "Details",
+    "watchProgress": "Watch Progress",
+    "noDescription": "Description will appear later.",
+    "inWatchlist": "In watchlist",
+    "addToWatchlist": "+ Watchlist",
+    "similar": "More Like This",
+    "demoPlayerPreview": "Demo Player · Interface Preview",
+    "fullscreen": "Fullscreen",
     "articleCategories": {
       "NEWS": "News",
       "INTERVIEW": "Interview",
@@ -89,6 +112,7 @@
     "catalog": "Movie Catalog",
     "found": "Found {count} movies",
     "notFound": "No movies found",
+    "seoDescription": "Movie catalog with filtering by genres, release years, and sorting options",
     "filters": {
       "all": "All Genres",
       "allYears": "All Years",
@@ -96,7 +120,11 @@
       "sortByPopularity": "By Popularity",
       "sortByRating": "By Rating",
       "sortByDate": "By Release Date",
-      "sortByTitle": "By Title"
+      "sortByTitle": "By Title",
+      "searchPlaceholder": "Search by title...",
+      "year": "Release Year",
+      "apply": "Apply",
+      "reset": "Reset"
     },
     "details": {
       "director": "Director",
@@ -113,10 +141,10 @@
       "similar": "Similar Movies",
       "noReviews": "No reviews yet",
       "beFirst": "Be the first!",
-    "watchTrailer": "Watch Trailer",
-    "watch": "Watch",
-    "trailer": "Trailer"
-  },
+      "watchTrailer": "Watch Trailer",
+      "watch": "Watch",
+      "trailer": "Trailer"
+    },
     "export": "Export to PDF",
     "exporting": "Creating PDF..."
   },
@@ -308,7 +336,22 @@
     "findMovies": "Find movies"
   },
   "watchPage": {
-    "availableFilms": "Available to watch"
+    "availableFilms": "Available to watch",
+    "seoTitle": "Watch {title} online",
+    "seoDescription": "Watch the movie {title} ({originalTitle}) online for free in high quality",
+    "playerError": "Could not resolve online player",
+    "playerErrorTmdb": " (TMDB search returned no suitable ID).",
+    "playerErrorSuffix": " Specify a tmdbId or Kinopoisk ID in the movie page, or configure the player environment variables in the project documentation.",
+    "director": "Director",
+    "genres": "Genres",
+    "description": "Description",
+    "cast": "Cast",
+    "moreInfo": "More info",
+    "similar": "Similar Movies",
+    "hide": "Hide",
+    "about": "About Movie",
+    "stars": "Stars:",
+    "backToDesc": "Back to movie description"
   },
   "roulette": {
     "title": "Movie Roulette",
@@ -374,6 +417,127 @@
       "subtitle": "HTTP Version Not Supported (505)",
       "message": "Your browser is trying to use an outdated protocol. Time to upgrade to the talkies movie era!"
     }
+  },
+  "theme": {
+    "title": "🎨 Theme Selection",
+    "switcherAriaLabel": "Toggle theme",
+    "rarity": {
+      "UNCOMMON": "Uncommon",
+      "RARE": "Rare",
+      "EPIC": "Epic",
+      "LEGENDARY": "Legendary"
+    },
+    "dark": {
+      "name": "Dark",
+      "desc": "Classic dark theme"
+    },
+    "light": {
+      "name": "Light",
+      "desc": "Light theme for daytime"
+    },
+    "midnight": {
+      "name": "Midnight Blue",
+      "desc": "Deep blue tones"
+    },
+    "forest": {
+      "name": "Forest Green",
+      "desc": "Natural earthy colors"
+    },
+    "amethyst": {
+      "name": "Amethyst",
+      "desc": "Purple shades"
+    },
+    "retro": {
+      "name": "Retro Cinema",
+      "desc": "80s vintage style"
+    },
+    "noir": {
+      "name": "Noir",
+      "desc": "Monochrome classic"
+    },
+    "cyberpunk": {
+      "name": "Cyberpunk",
+      "desc": "Neon futurism"
+    },
+    "hollywood": {
+      "name": "Hollywood",
+      "desc": "Golden era of movies"
+    },
+    "space": {
+      "name": "Space",
+      "desc": "Outer space experience"
+    },
+    "chameleon": {
+      "name": "Chameleon",
+      "desc": "Changes throughout the day"
+    }
+  },
+  "series": {
+    "title": "TV Shows",
+    "subtitle": "Find your next favorite TV show",
+    "searchPlaceholder": "Search TV shows...",
+    "notFound": "No TV shows found",
+    "notFoundSubtitle": "Try changing your search options",
+    "seasonsAbbr": "{count} seas.",
+    "status": {
+      "RETURNING": "Returning",
+      "ENDED": "Ended",
+      "CANCELED": "Canceled",
+      "IN_PRODUCTION": "In Production"
+    },
+    "seoTitle": "TV Shows | KinoTeka",
+    "seoDescription": "Catalog of TV shows with ratings and reviews",
+    "watch": {
+      "playerError": "Failed to find player for the series",
+      "playerErrorTmdb": " (TMDB search returned no ID).",
+      "playerErrorSuffix": " Specify a tmdbId for the series or configure `NEXT_PUBLIC_PLAYER_TV_EMBED_URL`.",
+      "runtimeEpisode": "{runtime} min/episode",
+      "seasons": "Seasons",
+      "seasonsCount": "{count, plural, one {# season} other {# seasons}}",
+      "episodesCount": "{count, plural, one {# episode} other {# episodes}}",
+      "airDate": "Premiere: {date}",
+      "aboutSeries": "More about the series",
+      "similar": "Similar TV Shows"
+    }
+  },
+  "weeklyReport": {
+    "title": "Weekly Report",
+    "sendEmail": "📧 Send to email",
+    "sending": "Sending...",
+    "sentSuccess": "Report has been sent to your email!",
+    "sentError": "Failed to send report",
+    "noData": "No data",
+    "noDataDesc": "Start watching movies to generate reports",
+    "goToCatalog": "Go to Catalog",
+    "movies": "Movies",
+    "series": "TV Shows",
+    "hours": "Hours watched",
+    "avgRating": "Average rating",
+    "activity": "Activity",
+    "ratingsLeft": "Ratings left",
+    "reviewsWritten": "Reviews written",
+    "favoriteGenres": "Favorite genres",
+    "watchedMovies": "Watched movies",
+    "watchedSeries": "Watched TV shows"
+  },
+  "exportImport": {
+    "title": "Data Export and Import",
+    "exportSection": "Data Export",
+    "exportDesc": "Export your watchlists, favorites, and ratings to JSON or CSV formats",
+    "jsonFormat": "JSON Format",
+    "csvFormat": "CSV Format",
+    "exportAll": "Export All ({format})",
+    "watchlist": "Watchlist ({format})",
+    "favorites": "Favorites ({format})",
+    "watched": "Watched ({format})",
+    "importSection": "Data Import",
+    "importDesc": "Import data from a previously exported JSON file",
+    "selectFile": "Select JSON file",
+    "importBtn": "Import",
+    "importing": "Importing...",
+    "exportError": "Export failed",
+    "importSuccess": "Imported: {imported}, errors: {errors}",
+    "importError": "Error: {error}",
+    "invalidJson": "Error reading file. Please ensure it is a valid JSON file."
   }
 }
-

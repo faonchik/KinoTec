@@ -1,13 +1,283 @@
 import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Условия использования | КиноТека",
-  description: "Условия использования КиноТека",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  if (locale === "en") {
+    return {
+      title: "Terms of Service | KinoTeka",
+      description: "Terms of Service of KinoTeka",
+    };
+  }
+  return {
+    title: "Условия использования | КиноТека",
+    description: "Условия использования КиноТека",
+  };
+}
 
 export const dynamic = "force-static";
 
 export default async function TermsPage() {
+  const locale = await getLocale();
+
+  if (locale === "en") {
+    return (
+      <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--bg-primary, #0f172a)' }}>
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h1 className="text-4xl font-bold mb-8" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+            Terms of Service
+          </h1>
+          
+          <div className="prose prose-invert max-w-none">
+            <section className="mb-8">
+              <p className="text-sm mb-6" style={{ color: 'var(--text-muted, #94a3b8)' }}>
+                Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+              </p>
+              
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                1. Acceptance of Terms
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                By using the KinoTeka website (hereinafter referred to as the "Website"), you agree to these Terms of Service.
+                If you do not agree to any terms, please do not use the Website.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                These Terms of Service (hereinafter referred to as the "Terms") govern the relationship between the Website administration
+                and the users. By using the Website, you confirm that you have read, understood, and agree to comply
+                with all provisions of these Terms.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                2. Use of the Website
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                You agree to use the Website only for lawful purposes and in accordance with these Terms,
+                as well as applicable law. When using the Website, it is prohibited to:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Post illegal, offensive, defamatory, discriminatory, or harmful content</li>
+                <li>Violate intellectual property rights of third parties</li>
+                <li>Attempt to gain unauthorized access to systems, data, or accounts of other users</li>
+                <li>Use automated tools (bots, scripts) to collect data without written permission</li>
+                <li>Create fake accounts, impersonate another person or organization</li>
+                <li>Distribute spam, advertisements, or unsolicited messages</li>
+                <li>Use the Website for any illegal or fraudulent purposes</li>
+                <li>Disrupt the Website operation or attempt to hack its security systems</li>
+                <li>Collect or store personal data of other users without their consent</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Violation of any of these prohibitions may lead to account suspension,
+                content deletion, and liability in accordance with applicable law.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                3. User Content
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                By posting content on the Website (reviews, comments, ratings, lists, images),
+                you grant us a non-exclusive, royalty-free, perpetual license to use,
+                reproduce, distribute, modify, and moderate this content in connection with the Website operation.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                You are solely responsible for the content posted and warrant that:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>The content does not violate intellectual property rights of third parties</li>
+                <li>The content does not contain illegal, offensive, or defamatory information</li>
+                <li>You have all necessary rights to post this content</li>
+                <li>The content complies with applicable law</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We reserve the right to delete any content that violates these Terms
+                without prior notice.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                4. Intellectual Property
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                All content on the Website, including but not limited to: design, text, images, logos,
+                graphics, software code, databases, is protected by copyright and other
+                intellectual property rights.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Use of the Website materials (copying, distribution, modification, publication)
+                without written permission of the Website administration is prohibited, except in cases
+                provided by copyright law.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                You may use the Website materials only for personal, non-commercial purposes.
+                Any commercial use of the Website materials requires prior written permission.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                5. Limitation of Liability
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                The Website is provided on an "as is" and "as available" basis. We do not warrant:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Uninterrupted and error-free operation of the Website</li>
+                <li>Absence of technical failures, errors, or interruptions in operation</li>
+                <li>Completeness, accuracy, and relevance of all information on the Website</li>
+                <li>Absence of viruses or malicious software</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We are not liable for:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Any direct, indirect, incidental, or consequential damages resulting from the use of the Website</li>
+                <li>Loss of data, lost profits, or business interruption</li>
+                <li>Actions of third parties, including hacking, viruses, or malicious software</li>
+                <li>Content posted by users on the Website</li>
+                <li>Links to external resources posted on the Website</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Information on the Website is provided for informational purposes and may contain inaccuracies.
+                We do not guarantee the reliability of information obtained from external sources.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                6. Content Moderation
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We reserve the right to moderate, edit, move, or delete any content
+                posted by users if it:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Violates these Terms of Service</li>
+                <li>Violates applicable law</li>
+                <li>Contains offensive, defamatory, or discriminatory content</li>
+                <li>Violates intellectual property rights</li>
+                <li>Contains spam or advertisements</li>
+                <li>Is undesirable or inappropriate at our discretion</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Moderation can be carried out both before and after the content publication.
+                We are not obliged to notify users of the reasons for moderating or deleting content,
+                but may do so at our discretion.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                7. User Account
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                When registering on the Website, you agree to:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Provide accurate and current information</li>
+                <li>Maintain the security of your account and password</li>
+                <li>Be responsible for all actions taken under your account</li>
+                <li>Immediately notify us of any unauthorized use of your account</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We reserve the right to block, suspend, or delete your account in case of:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Violation of these Terms of Service</li>
+                <li>Violation of applicable law</li>
+                <li>Prolonged inactivity of the account (more than 2 years)</li>
+                <li>At the request of law enforcement agencies</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Blocking or deletion of the account may be carried out without prior notice
+                in case of serious violations.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                8. Virtual Currency and Purchases
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                The Website uses a virtual currency system (coins) to purchase customization items.
+                Coins are not real money and cannot be exchanged for real currency.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We reserve the right to:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Change prices for items in the shop</li>
+                <li>Add, change, or remove items from the shop</li>
+                <li>Change methods for obtaining coins</li>
+                <li>Revoke coins in case of violation of these Terms of Service</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                All purchases in the shop are final and non-refundable,
+                except in cases of technical errors.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                9. Changes to the Terms of Service
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We reserve the right to modify these Terms of Service at any time.
+                We will notify users of significant changes via the Website, by email, or other means.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                By continuing to use the Website after changes are made, you agree to the new edition
+                of the Terms of Service. If you do not agree to the changes, you must stop using the Website.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We recommend periodically reviewing this page to read the current version of the Terms.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                10. Governing Law and Dispute Resolution
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                These Terms of Service are governed by the laws of the Russian Federation.
+                All disputes arising in connection with the use of the Website shall be resolved in accordance
+                with the laws of the Russian Federation.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                In case of disputes, the parties commit to make every effort to resolve them
+                through negotiations. If a dispute cannot be resolved through negotiations, it shall be
+                submitted to the court at the location of the Website administration.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                11. Contacts
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                For all questions related to these Terms of Service, you can contact us:
+              </p>
+              <div className="p-4 rounded-lg mt-4" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                <p className="mb-2" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                  <strong style={{ color: 'var(--text-primary, #f1f5f9)' }}>Email:</strong> support@kinoteka.com
+                </p>
+                <p className="mb-2" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                  <strong style={{ color: 'var(--text-primary, #f1f5f9)' }}>Via feedback form:</strong> on the Website
+                </p>
+              </div>
+              <p className="leading-relaxed mt-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We commit to review your request in the shortest time possible and provide the necessary information.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--bg-primary, #0f172a)' }}>
       <div className="container mx-auto px-4 max-w-4xl">
@@ -66,7 +336,7 @@ export default async function TermsPage() {
             </h2>
             <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
               Размещая контент на Сайте (отзывы, комментарии, рейтинги, подборки, изображения), 
-              вы предоставляете нам неисключительную, безвозмездную, бессрочную лицензию на использование, 
+              you предоставляете нам неисключительную, безвозмездную, бессрочную лицензию на использование, 
               воспроизведение, распространение, модификацию и модерацию этого контента в рамках работы Сайта.
             </p>
             <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
@@ -264,4 +534,3 @@ export default async function TermsPage() {
     </div>
   );
 }
-

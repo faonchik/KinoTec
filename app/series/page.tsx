@@ -1,10 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { SeriesListClient } from "./SeriesListClient";
 
-export const metadata = {
-  title: "Сериалы | КиноТека",
-  description: "Каталог сериалов с рейтингами и отзывами",
-};
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("series");
+  return {
+    title: t("seoTitle") || "Сериалы | КиноТека",
+    description: t("seoDescription") || "Каталог сериалов с рейтингами и отзывами",
+  };
+}
 
 export default async function SeriesPage() {
   const series = await prisma.series.findMany({

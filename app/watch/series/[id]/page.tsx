@@ -3,17 +3,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getServerSession } from "next-auth";
+import { cache } from "react";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { Badge } from "@/components/ui/Badge";
 import { SeriesWatchExperienceClient } from "@/components/player/SeriesWatchExperienceClient";
 import { resolveSeriesWatchEmbed } from "@/lib/player/resolveWatchEmbed";
+import { getTranslations, getLocale } from "next-intl/server";
 
 interface WatchSeriesPageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getSeries(id: string) {
+const getSeries = cache(async (id: string) => {
   const series = await prisma.series.findUnique({
     where: { id },
     include: {
@@ -34,7 +36,7 @@ async function getSeries(id: string) {
 
   if (!series) notFound();
   return series;
-}
+});
 
 async function getRecommendations(seriesId: string, genreIds: string[]) {
   return await prisma.series.findMany({
@@ -58,16 +60,22 @@ async function getRecommendations(seriesId: string, genreIds: string[]) {
 export async function generateMetadata({ params }: WatchSeriesPageProps): Promise<Metadata> {
   const { id } = await params;
   const series = await getSeries(id);
+  const t = await getTranslations("series");
 
   return {
-    title: `Смотреть ${series.title} онлайн`,
-    description: `Смотреть сериал ${series.title} (${series.originalTitle || ""}) онлайн бесплатно в хорошем качестве`,
+    title: t("watch.seoTitle", { title: series.title }) || `Смотреть ${series.title} онлайн`,
+    description: t("watch.seoDescription", {
+      title: series.title,
+      originalTitle: series.originalTitle || "",
+    }) || `Смотреть сериал ${series.title} (${series.originalTitle || ""}) онлайн бесплатно в хорошем качестве`,
   };
 }
 
 export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) {
   const { id } = await params;
   const series = await getSeries(id);
+  const t = await getTranslations("series");
+  const locale = await getLocale();
   
   const genreIds = series.genres.map((g) => g.genreId);
   const recommendations = await getRecommendations(id, genreIds);
@@ -116,8 +124,9 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
           />
           {!hasPlayback && (
             <p className="px-4 py-3 text-center text-sm text-white/50">
-              Не удалось подобрать плеер для сериала
-              {usedTmdbSearch ? " (поиск TMDB не дал id)." : "."} Укажите tmdbId у сериала или настройте `NEXT_PUBLIC_PLAYER_TV_EMBED_URL`.
+              {t("watch.playerError")}
+              {usedTmdbSearch ? t("watch.playerErrorTmdb") : "."}
+              {t("watch.playerErrorSuffix")}
             </p>
           )}
         </div>
@@ -148,9 +157,9 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             <div className="flex flex-wrap items-center gap-4 text-white/45 mb-6">
               {year && <span>{year}</span>}
               {series.country && <span>{series.country}</span>}
-              {series.episodeRuntime && <span>{series.episodeRuntime} мин/эпизод</span>}
+              {series.episodeRuntime && <span>{t("watch.runtimeEpisode", { runtime: series.episodeRuntime })}</span>}
               {series.seasons.length > 0 && (
-                <span>{series.seasons.length} {series.seasons.length === 1 ? "сезон" : series.seasons.length < 5 ? "сезона" : "сезонов"}</span>
+                <span>{t("watch.seasonsCount", { count: series.seasons.length })}</span>
               )}
               {series.status && (
                 <span className={`px-2 py-1 rounded text-xs ${
@@ -158,9 +167,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                   series.status === "ENDED" ? "bg-white/[0.08] text-white/60" :
                   "bg-yellow-500/20 text-yellow-400"
                 }`}>
-                  {series.status === "RETURNING" ? "Продолжается" :
-                   series.status === "ENDED" ? "Завершён" :
-                   series.status === "CANCELED" ? "Отменён" : "В производстве"}
+                  {t(`status.${series.status}`)}
                 </span>
               )}
             </div>
@@ -179,7 +186,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             {/* Описание */}
             {series.description && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold text-white mb-3">Описание</h2>
+                <h2 className="text-xl font-semibold text-white mb-3">{t("watch.aboutSeries")}</h2>
                 <p className="text-white/80 leading-relaxed">{series.description}</p>
               </div>
             )}
@@ -187,16 +194,16 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             {/* Сезоны */}
             {series.seasons.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold text-white mb-4">Сезоны</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">{t("watch.seasons")}</h2>
                 <div className="space-y-4">
                   {series.seasons.map((season) => (
                     <div key={season.id} className="bg-[#1e1e1e]/60 rounded-xl p-4 border border-white/[0.06]">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-semibold text-white">
-                          {season.name || `Сезон ${season.seasonNumber}`}
+                          {season.name || `${t("watch.seasonsCount", { count: 1 }).replace("1", "").trim()} ${season.seasonNumber}`}
                         </h3>
                         <span className="text-white/45 text-sm">
-                          {season.episodes.length} {season.episodes.length === 1 ? "эпизод" : season.episodes.length < 5 ? "эпизода" : "эпизодов"}
+                          {t("watch.episodesCount", { count: season.episodes.length })}
                         </span>
                       </div>
                       {season.overview && (
@@ -204,10 +211,12 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
                       )}
                       {season.airDate && (
                         <p className="text-white/35 text-xs">
-                          Премьера: {new Date(season.airDate).toLocaleDateString("ru-RU", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
+                          {t("watch.airDate", {
+                            date: new Date(season.airDate).toLocaleDateString(locale, {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
                           })}
                         </p>
                       )}
@@ -220,7 +229,7 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
             {/* Актёры */}
             {series.actors.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold text-white mb-4">В ролях</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">{t("watch.cast")}</h2>
                 <div className="flex flex-wrap gap-3">
                   {series.actors.map((sa) => (
                     <Link
@@ -261,13 +270,13 @@ export default async function WatchSeriesPage({ params }: WatchSeriesPageProps) 
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Подробнее о сериале
+              {t("watch.moreInfo")}
             </Link>
           </div>
 
           {/* Сайдбар с рекомендациями */}
           <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Похожие сериалы</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">{t("watch.similar")}</h2>
             <div className="space-y-4">
               {recommendations.map((rec) => {
                 const recRating = rec.ratings.length

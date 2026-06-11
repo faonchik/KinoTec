@@ -162,7 +162,7 @@ export function CinematicSidebar() {
       </nav>
       <div className="mt-4 hidden rounded-xl border border-white/[0.06] bg-black/20 p-2.5 text-[10px] leading-relaxed text-white/35 lg:block">
         <Link href="/streaming-preview" className="text-white/50 hover:text-white hover:underline">
-          UI-превью
+          {t("uiPreview")}
         </Link>
       </div>
     </aside>

@@ -2,10 +2,15 @@ import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import { RouletteClient } from "./RouletteClient";
 
-export const metadata: Metadata = {
-  title: "КиноРулетка",
-  description: "Не знаете что посмотреть? Покрутите рулетку!",
-};
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("roulette");
+  return {
+    title: t("title") || "КиноРулетка",
+    description: t("subtitle") || "Не знаете что посмотреть? Покрутите рулетку!",
+  };
+}
 
 async function getGenres() {
   return await prisma.genre.findMany({

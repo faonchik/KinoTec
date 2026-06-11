@@ -4,13 +4,16 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { useTranslations } from "next-intl";
 
 export default function ExportPage() {
   const { status } = useSession();
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
-  const [importResult, setImportResult] = useState<string | null>(null);
+  const [importStatus, setImportStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const t = useTranslations("exportImport");
+  const tc = useTranslations("common");
 
   if (status === "unauthenticated") {
     redirect("/auth/signin");
@@ -31,7 +34,7 @@ export default function ExportPage() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Export error:", error);
-      alert("Ошибка экспорта");
+      alert(t("exportError"));
     } finally {
       setExporting(false);
     }
@@ -42,7 +45,7 @@ export default function ExportPage() {
     if (!importFile) return;
 
     setImporting(true);
-    setImportResult(null);
+    setImportStatus(null);
 
     try {
       const text = await importFile.text();
@@ -64,13 +67,22 @@ export default function ExportPage() {
 
       const result = await res.json();
       if (res.ok) {
-        setImportResult(`Импортировано: ${result.imported}, ошибок: ${result.errors}`);
+        setImportStatus({
+          type: "success",
+          message: t("importSuccess", { imported: result.imported, errors: result.errors }),
+        });
         setImportFile(null);
       } else {
-        setImportResult(`Ошибка: ${result.error}`);
+        setImportStatus({
+          type: "error",
+          message: t("importError", { error: result.error }),
+        });
       }
     } catch {
-      setImportResult("Ошибка чтения файла. Убедитесь, что это валидный JSON файл.");
+      setImportStatus({
+        type: "error",
+        message: t("invalidJson"),
+      });
     } finally {
       setImporting(false);
     }
@@ -79,26 +91,26 @@ export default function ExportPage() {
   if (status === "loading") {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center text-slate-400">Загрузка...</div>
+        <div className="text-center text-slate-400">{tc("loading")}</div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-white mb-8">Экспорт и импорт данных</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">{t("title")}</h1>
 
       <div className="space-y-8">
         {/* Export */}
         <section className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-white mb-4">Экспорт данных</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">{t("exportSection")}</h2>
           <p className="text-slate-400 mb-6">
-            Экспортируйте свои списки просмотра, избранное и оценки в JSON или CSV формат
+            {t("exportDesc")}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
-              <h3 className="font-semibold text-white">Формат JSON</h3>
+              <h3 className="font-semibold text-white">{t("jsonFormat")}</h3>
               <div className="space-y-2">
                 <Button
                   onClick={() => handleExport("json", "all")}
@@ -106,7 +118,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Экспортировать всё (JSON)
+                  {t("exportAll", { format: "JSON" })}
                 </Button>
                 <Button
                   onClick={() => handleExport("json", "watchlist")}
@@ -114,7 +126,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Список просмотра (JSON)
+                  {t("watchlist", { format: "JSON" })}
                 </Button>
                 <Button
                   onClick={() => handleExport("json", "favorites")}
@@ -122,7 +134,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Избранное (JSON)
+                  {t("favorites", { format: "JSON" })}
                 </Button>
                 <Button
                   onClick={() => handleExport("json", "watched")}
@@ -130,13 +142,13 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Просмотренные (JSON)
+                  {t("watched", { format: "JSON" })}
                 </Button>
               </div>
             </div>
 
             <div className="space-y-3">
-              <h3 className="font-semibold text-white">Формат CSV</h3>
+              <h3 className="font-semibold text-white">{t("csvFormat")}</h3>
               <div className="space-y-2">
                 <Button
                   onClick={() => handleExport("csv", "all")}
@@ -144,7 +156,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Экспортировать всё (CSV)
+                  {t("exportAll", { format: "CSV" })}
                 </Button>
                 <Button
                   onClick={() => handleExport("csv", "watchlist")}
@@ -152,7 +164,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Список просмотра (CSV)
+                  {t("watchlist", { format: "CSV" })}
                 </Button>
                 <Button
                   onClick={() => handleExport("csv", "favorites")}
@@ -160,7 +172,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Избранное (CSV)
+                  {t("favorites", { format: "CSV" })}
                 </Button>
                 <Button
                   onClick={() => handleExport("csv", "watched")}
@@ -168,7 +180,7 @@ export default function ExportPage() {
                   variant="outline"
                   className="w-full"
                 >
-                  Просмотренные (CSV)
+                  {t("watched", { format: "CSV" })}
                 </Button>
               </div>
             </div>
@@ -177,15 +189,15 @@ export default function ExportPage() {
 
         {/* Import */}
         <section className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-white mb-4">Импорт данных</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">{t("importSection")}</h2>
           <p className="text-slate-400 mb-6">
-            Импортируйте данные из ранее экспортированного JSON файла
+            {t("importDesc")}
           </p>
 
           <form onSubmit={handleImport} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Выберите JSON файл
+                {t("selectFile")}
               </label>
               <input
                 type="file"
@@ -195,18 +207,18 @@ export default function ExportPage() {
               />
             </div>
 
-            {importResult && (
+            {importStatus && (
               <div className={`p-4 rounded-lg ${
-                importResult.includes("Ошибка") 
+                importStatus.type === "error" 
                   ? "bg-red-500/20 text-red-400" 
                   : "bg-green-500/20 text-green-400"
               }`}>
-                {importResult}
+                {importStatus.message}
               </div>
             )}
 
             <Button type="submit" disabled={!importFile || importing}>
-              {importing ? "Импорт..." : "Импортировать"}
+              {importing ? t("importing") : t("importBtn")}
             </Button>
           </form>
         </section>

@@ -4,11 +4,15 @@ import { MovieGrid } from "@/components/movies/MovieGrid";
 import { MovieFilters } from "@/components/movies/MovieFilters";
 import { Pagination } from "@/components/ui/Pagination";
 import { ExportMoviesButton } from "@/components/movies/ExportMoviesButton";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Каталог фильмов",
-  description: "Каталог фильмов с фильтрацией по жанрам, годам и сортировкой",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("movies");
+  return {
+    title: t("catalog") || "Каталог фильмов",
+    description: t("seoDescription") || "Каталог фильмов с фильтрацией по жанрам, годам и сортировкой",
+  };
+}
 
 interface MoviesPageProps {
   searchParams: Promise<{
@@ -119,6 +123,9 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
     getGenres(),
   ]);
 
+  const t = await getTranslations("movies");
+  const tc = await getTranslations("common");
+
   const params = await searchParams;
   const baseUrl = `/movies?${new URLSearchParams(
     Object.entries(params).filter(([key]) => key !== "page") as [string, string][]
@@ -131,9 +138,9 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
     <div className="min-h-full bg-[#141414]">
       <div className="flex flex-col gap-4 px-4 pb-4 pt-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 lg:px-12">
         <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl">Каталог фильмов</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl">{t("catalog")}</h1>
           <p className="mt-1 text-sm text-white/45">
-            {total > 0 ? `Найдено: ${total} фильмов` : "Фильмы не найдены"}
+            {total > 0 ? t("found", { count: total }) : t("notFound")}
           </p>
         </div>
         <ExportMoviesButton queryParams={params} />
@@ -153,7 +160,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
       {totalPages > 1 && (
         <div className="flex flex-col items-center justify-between gap-3 px-4 py-6 pb-10 sm:flex-row sm:px-8 lg:px-12">
           <span className="hidden text-sm text-white/35 sm:block">
-            Страница {currentPage} из {totalPages}
+            {tc("pageOf", { current: currentPage, total: totalPages })}
           </span>
           <Pagination
             currentPage={currentPage}
@@ -161,7 +168,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
             baseUrl={baseUrl}
           />
           <span className="text-sm text-white/35">
-            Показано {startItem}–{endItem} из {total}
+            {tc("showing", { start: startItem, end: endItem, total })}
           </span>
         </div>
       )}

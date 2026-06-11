@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getProxiedImageUrl, shouldUseUnoptimized } from "@/lib/images";
+import { useTranslations } from "next-intl";
 
 interface Series {
   id: string;
@@ -31,6 +32,8 @@ interface SeriesListClientProps {
 export function SeriesListClient({ series, genres }: SeriesListClientProps) {
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const t = useTranslations("series");
+  const tf = useTranslations("movies.filters");
 
   const filteredSeries = series.filter((s) => {
     const matchesGenre = !selectedGenre || s.genres.some((g) => g.genre.id === selectedGenre);
@@ -41,13 +44,6 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
   const getAvgRating = (ratings: Array<{ value: number }>) => {
     if (!ratings.length) return null;
     return (ratings.reduce((acc, r) => acc + r.value, 0) / ratings.length).toFixed(1);
-  };
-
-  const statusLabels: Record<string, string> = {
-    RETURNING: "В эфире",
-    ENDED: "Завершён",
-    CANCELED: "Отменён",
-    IN_PRODUCTION: "В производстве",
   };
 
   const statusColors: Record<string, string> = {
@@ -62,10 +58,10 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
       {/* Title Section */}
       <div className="px-4 pb-3 pt-6 sm:px-8 sm:pt-8 lg:px-12">
         <div className="mb-3 flex items-center gap-3">
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl">Сериалы</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl">{t("title")}</h1>
         </div>
         <div className="inline-block rounded-full border border-white/[0.08] bg-[#121821] px-4 py-2 ring-1 ring-white/[0.06]">
-          <p className="text-sm font-medium text-white/80">Найдите свой следующий любимый сериал</p>
+          <p className="text-sm font-medium text-white/80">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -79,7 +75,7 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Поиск сериала..."
+            placeholder={t("searchPlaceholder")}
             className="h-12 w-full rounded-2xl border border-white/[0.08] bg-[#121821] pl-12 pr-4 text-sm text-white placeholder:text-white/35 outline-none transition focus:ring-1 focus:ring-[#ffb84d]/40 sm:min-w-[200px]"
           />
         </div>
@@ -90,7 +86,7 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
             onChange={(e) => setSelectedGenre(e.target.value || null)}
             className="h-12 w-full rounded-2xl border border-white/[0.08] bg-[#121821] px-4 pr-10 text-sm text-white/65 outline-none transition focus:ring-1 focus:ring-[#ffb84d]/40 sm:h-12 sm:min-w-[200px]"
           >
-            <option value="">Все жанры</option>
+            <option value="">{tf("all")}</option>
             {genres.map((genre) => (
               <option key={genre.id} value={genre.id}>
                 {genre.name}
@@ -107,8 +103,8 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
       <div className="px-4 sm:px-8 lg:px-12 py-6">
         {filteredSeries.length === 0 ? (
           <div className="py-16 text-center">
-            <h2 className="mb-2 font-display text-2xl font-semibold text-white">Сериалы не найдены</h2>
-            <p className="text-sm text-white/35">Попробуйте изменить параметры поиска</p>
+            <h2 className="mb-2 font-display text-2xl font-semibold text-white">{t("notFound")}</h2>
+            <p className="text-sm text-white/35">{t("notFoundSubtitle")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -140,12 +136,12 @@ export function SeriesListClient({ series, genres }: SeriesListClientProps) {
                   <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
                     {/* Status badge */}
                     <span className={`rounded-lg px-2 py-1 font-mono text-[10px] font-medium text-white ${statusColors[s.status] || "bg-[#ffb84d] text-black"}`}>
-                      {statusLabels[s.status] || s.status}
+                      {t(`status.${s.status}`) || s.status}
                     </span>
 
                     {/* Seasons badge */}
                     <span className="font-mono text-[10px] px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-white">
-                      {s.seasons.length} сез.
+                      {t("seasonsAbbr", { count: s.seasons.length })}
                     </span>
                   </div>
                 </div>

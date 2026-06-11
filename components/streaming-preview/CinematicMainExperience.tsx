@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { previewMoviePageHref, previewWatchPageHref } from "@/lib/streaming-preview/previewLinks";
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { HeroBackdrop } from "@/components/ui/HeroBackdrop";
 import { ProxiedImage } from "@/components/ui/ProxiedImage";
 import type { StreamingPreviewMovie, StreamingPreviewPayload } from "./types";
@@ -47,6 +48,8 @@ type Props = {
 };
 
 export function CinematicMainExperience({ data, embedded = false }: Props) {
+  const t = useTranslations("home");
+  const tCommon = useTranslations("common");
   const [detail, setDetail] = useState<StreamingPreviewMovie | null>(null);
   const [miniPlayer, setMiniPlayer] = useState<StreamingPreviewMovie | null>(null);
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
@@ -177,7 +180,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                 className="max-w-3xl"
               >
                 <p className="mb-3 font-[family-name:var(--font-sp-display)] text-xs font-semibold uppercase tracking-[0.35em] text-[#ffb84d]/90">
-                  Оригинал · премьера сезона
+                  {t("originalSeasonPremiere")}
                 </p>
                 <h1 className="font-[family-name:var(--font-sp-display)] text-4xl font-semibold leading-[0.95] tracking-tight text-white shadow-black/50 text-balance sm:text-5xl lg:text-7xl">
                   {hero.title}
@@ -190,7 +193,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   {hero.runtime && (
                     <>
                       <span className="text-white/25">·</span>
-                      <span>{hero.runtime} мин</span>
+                      <span>{hero.runtime} {tCommon("minutes")}</span>
                     </>
                   )}
                   {hero.genreNames.slice(0, 3).map((g) => (
@@ -208,7 +211,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   )}
                 </div>
                 <p className="mt-6 line-clamp-3 max-w-2xl text-base leading-relaxed text-white/70 lg:text-lg">
-                  {hero.description ?? "Погрузитесь в историю, где каждый кадр — кино."}
+                  {hero.description ?? t("heroDescriptionFallback")}
                 </p>
                 <div className="mt-8 flex flex-col gap-5">
                   <div className="flex items-center gap-1.5 sm:gap-4 w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
@@ -223,7 +226,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                       className="inline-flex items-center gap-1 rounded-full bg-[#ffb84d] sm:px-8 px-4 sm:py-3.5 py-2 text-xs sm:text-sm font-semibold text-[#141414] shadow-[0_12px_40px_rgba(255,184,77,0.35)] ring-1 ring-black/10 transition hover:bg-[#ffc56a] hover:shadow-[0_14px_44px_rgba(255,184,77,0.42)] shrink-0"
                     >
                       <PlaySolidIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                      Смотреть
+                      {t("play")}
                     </motion.button>
                     <motion.button
                       type="button"
@@ -233,7 +236,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                       className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/[0.08] sm:px-7 px-3.5 sm:py-3.5 py-2 text-xs sm:text-sm font-medium text-white backdrop-blur-md transition hover:border-white/30 hover:bg-white/[0.12] shrink-0"
                     >
                       <InfoIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white/80" />
-                      Детали
+                      {t("details")}
                     </motion.button>
                     <button
                       type="button"
@@ -243,7 +246,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                           ? "border-[#ffb84d]/50 bg-[#ffb84d]/15 text-[#ffb84d]"
                           : "border-white/15 bg-black/25 text-white/70 hover:text-white"
                       }`}
-                      aria-label="В список"
+                      aria-label={t("addToWatchlist")}
                     >
                       <BookmarkIcon className="h-4 w-4 sm:h-5 sm:w-5" filled={watchlist.has(hero.id)} />
                     </button>
@@ -255,7 +258,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                           ? "border-rose-400/50 bg-rose-500/15 text-rose-300"
                           : "border-white/15 bg-black/25 text-white/70 hover:text-white"
                       }`}
-                      aria-label="Избранное"
+                      aria-label={t("addToFavorites")}
                     >
                       <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" filled={favorites.has(hero.id)} />
                     </button>
@@ -263,7 +266,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   {hero.demoProgress > 0 && (
                     <div className="max-w-md border-t border-white/[0.08] pt-4">
                       <div className="mb-1.5 flex justify-between text-xs text-white/50">
-                        <span>Прогресс просмотра</span>
+                        <span>{t("watchProgress")}</span>
                         <span>{hero.demoProgress}%</span>
                       </div>
                       <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -316,7 +319,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   href="/movies"
                   className="shrink-0 text-xs font-medium uppercase tracking-wider text-[#ffb84d]/90 hover:text-[#ffb84d]"
                 >
-                  Все →
+                  {t("viewAll")} →
                 </Link>
               </div>
               <CarouselRow
@@ -401,7 +404,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                     ))}
                   </div>
                   <p className="mt-5 text-sm leading-relaxed text-white/65">
-                    {detail.description ?? "Описание появится позже."}
+                    {detail.description ?? t("noDescription")}
                   </p>
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link
@@ -409,18 +412,18 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                       className="inline-flex items-center gap-2 rounded-full bg-[#ffb84d] px-6 py-2.5 text-sm font-semibold text-black"
                     >
                       <PlaySolidIcon className="h-4 w-4" />
-                      Воспроизвести
+                      {t("play")}
                     </Link>
                     <button
                       type="button"
                       onClick={() => toggleWatchlist(detail.id)}
                       className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white/80"
                     >
-                      {watchlist.has(detail.id) ? "В watchlist" : "+ Watchlist"}
+                      {watchlist.has(detail.id) ? t("inWatchlist") : t("addToWatchlist")}
                     </button>
                   </div>
                   <h3 className="mt-10 font-[family-name:var(--font-sp-display)] text-lg font-semibold text-white/90">
-                    Похожее
+                    {t("similar")}
                   </h3>
                   <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                     {similar.map((m) => (
@@ -488,7 +491,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-white">{miniPlayer.title}</p>
-                <p className="truncate text-xs text-white/45">Демо-плеер · превью интерфейса</p>
+                <p className="truncate text-xs text-white/45">{t("demoPlayerPreview")}</p>
                 <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-[#ffb84d] to-amber-100"
@@ -501,7 +504,7 @@ export function CinematicMainExperience({ data, embedded = false }: Props) {
                   href={previewWatchPageHref(miniPlayer.id)}
                   className="hidden rounded-full border border-white/15 px-4 py-2 text-xs font-medium text-white/85 sm:inline-block"
                 >
-                  На весь экран
+                  {t("fullscreen")}
                 </Link>
                 <button
                   type="button"

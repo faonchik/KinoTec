@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 
 interface Genre {
   id: string;
@@ -17,6 +18,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("movies.filters");
 
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [selectedGenre, setSelectedGenre] = useState(searchParams.get("genre") || "");
@@ -72,7 +74,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
         </svg>
         <input
           type="text"
-          placeholder="Поиск по названию..."
+          placeholder={t("searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && applyFilters()}
@@ -91,7 +93,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
           }}
           className="h-11 bg-[#1A2236] rounded-2xl px-4 pr-10 font-mono text-[13px] text-[#8B95A8] border-none outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FF8400]/50"
         >
-          <option value="">Все жанры</option>
+          <option value="">{t("all")}</option>
           {genres.map((g) => (
             <option key={g.id} value={g.slug}>{g.name}</option>
           ))}
@@ -112,7 +114,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
           }}
           className="h-11 bg-[#1A2236] rounded-2xl px-4 pr-10 font-mono text-[13px] text-[#8B95A8] border-none outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FF8400]/50"
         >
-          <option value="">Год выхода</option>
+          <option value="">{t("year")}</option>
           {years.map((y) => (
             <option key={y} value={y.toString()}>{y}</option>
           ))}
@@ -133,10 +135,10 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
           }}
           className="h-11 bg-[#1A2236] rounded-2xl px-4 pr-10 font-mono text-[13px] text-[#8B95A8] border-none outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FF8400]/50"
         >
-          <option value="popularity">По популярности</option>
-          <option value="rating">По рейтингу</option>
-          <option value="releaseDate">По дате выхода</option>
-          <option value="title">По названию</option>
+          <option value="popularity">{t("sortByPopularity")}</option>
+          <option value="rating">{t("sortByRating")}</option>
+          <option value="releaseDate">{t("sortByDate")}</option>
+          <option value="title">{t("sortByTitle")}</option>
         </select>
         <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A6478] pointer-events-none" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -149,7 +151,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
         disabled={isPending}
         className="h-11 bg-[#FF8400] hover:bg-[#FF9F2E] text-white font-mono text-[13px] font-semibold px-6 rounded-2xl transition-colors disabled:opacity-50"
       >
-        {isPending ? "..." : "Применить"}
+        {isPending ? "..." : t("apply")}
       </button>
 
       {/* Reset */}
@@ -158,7 +160,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
           onClick={resetFilters}
           className="h-11 font-mono text-[13px] text-[#8B95A8] hover:text-white transition-colors"
         >
-          Сбросить
+          {t("reset")}
         </button>
       )}
     </div>

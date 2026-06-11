@@ -1,13 +1,258 @@
 import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Политика конфиденциальности | КиноТека",
-  description: "Политика конфиденциальности КиноТека",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  if (locale === "en") {
+    return {
+      title: "Privacy Policy | KinoTeka",
+      description: "Privacy Policy of KinoTeka",
+    };
+  }
+  return {
+    title: "Политика конфиденциальности | КиноТека",
+    description: "Политика конфиденциальности КиноТека",
+  };
+}
 
 export const dynamic = "force-static";
 
 export default async function PrivacyPage() {
+  const locale = await getLocale();
+
+  if (locale === "en") {
+    return (
+      <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--bg-primary, #0f172a)' }}>
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h1 className="text-4xl font-bold mb-8" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+            Privacy Policy
+          </h1>
+          
+          <div className="prose prose-invert max-w-none">
+            <section className="mb-8">
+              <p className="text-sm mb-6" style={{ color: 'var(--text-muted, #94a3b8)' }}>
+                Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+              </p>
+              
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                1. General Provisions
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                This Privacy Policy determines the procedure for processing and protecting personal data
+                of users of the KinoTeka website (hereinafter referred to as the "Website"). By using the Website, you agree to the terms
+                of this Privacy Policy.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                The Website Administration undertakes to respect the confidentiality of users' personal data
+                and take all possible measures to protect it from unauthorized access, modification, disclosure
+                or destruction.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                2. Collected Data
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                When using the Website, we may collect the following types of data:
+              </p>
+              <div className="space-y-4 mb-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>
+                    Personal Data
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    <li>Username (upon registration)</li>
+                    <li>Email address (for registration and notifications)</li>
+                    <li>Profile avatar (optional, uploaded by the user)</li>
+                    <li>Password (stored in encrypted form)</li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>
+                    Activity Data
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    <li>Watched movies and TV shows</li>
+                    <li>Ratings and scores</li>
+                    <li>Reviews and comments</li>
+                    <li>Created collections and lists</li>
+                    <li>Activity history on the website</li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>
+                    Technical Data
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    <li>IP address</li>
+                    <li>Browser type and version</li>
+                    <li>Operating system</li>
+                    <li>Device information</li>
+                    <li>Access and error logs</li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>
+                    Preference Data
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    <li>Selected theme layout</li>
+                    <li>Profile settings and customization</li>
+                    <li>Language settings</li>
+                    <li>Preferences on genres and movies</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                3. Data Usage
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Collected data is used solely for the following purposes:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Providing access to the functions and services of the Website</li>
+                <li>Personalization of content and recommendations based on your preferences</li>
+                <li>Improving Website operation and developing new features</li>
+                <li>Processing your requests, inquiries, and technical support</li>
+                <li>Sending notifications about important events (only with your consent)</li>
+                <li>Ensuring security and preventing fraud</li>
+                <li>Compliance with legal requirements</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We do not transfer your personal data to third parties, except as
+                required by law or when necessary to provide services.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                4. Data Protection
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We apply comprehensive measures to protect your personal data:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Password encryption using modern algorithms (bcrypt)</li>
+                <li>Protection against unauthorized access using security systems</li>
+                <li>Regular security updates and vulnerability patching</li>
+                <li>Limiting access to personal data to authorized personnel only</li>
+                <li>Data backup to prevent information loss</li>
+                <li>Monitoring and logging of suspicious activity</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Despite the measures taken, no method of transmitting data over the Internet
+                is absolutely secure. We cannot guarantee the absolute security of
+                data, but make every effort to protect it.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                5. User Rights
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                In accordance with personal data protection laws, you have the following rights:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Right to receive information about your personal data that we process</li>
+                <li>Right to access your personal data</li>
+                <li>Right to correct inaccurate or incomplete data</li>
+                <li>Right to erase your personal data (right to be forgotten)</li>
+                <li>Right to restrict data processing</li>
+                <li>Right to data portability</li>
+                <li>Right to withdraw consent to data processing at any time</li>
+                <li>Right to object to data processing</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                To exercise your rights, you can contact us via the feedback form
+                or write to the specified email. We will process your request within 30 days.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                6. Cookies and Similar Technologies
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                The Website uses cookies and similar technologies to improve performance,
+                personalize content, and analyze Website usage. Cookies are small
+                text files that are saved on your device when visiting a website.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We use the following types of cookies:
+              </p>
+              <ul className="list-disc list-inside space-y-2 mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                <li>Necessary cookies — to ensure the basic functionality of the Website</li>
+                <li>Functional cookies — to save your preferences and settings</li>
+                <li>Analytical cookies — to analyze Website usage and improve its operation</li>
+              </ul>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                You can disable cookies in your browser settings, however, this may affect
+                the Website functionality and limit access to some features.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                7. Data Retention
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Your personal data is stored on secure servers for the period
+                necessary to achieve the purposes of processing, or for the period established
+                by law. After the storage period expires, the data is deleted or anonymized.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Upon account deletion, all associated personal data will be deleted within
+                30 days, except in cases where the law requires its retention.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                8. Changes to the Privacy Policy
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We reserve the right to make changes to this Privacy Policy
+                at any time. We will notify users of significant changes via the Website,
+                by email, or by other means.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                By continuing to use the Website after changes are made, you agree to the new
+                edition of the Privacy Policy. We recommend periodically reviewing
+                this page to read the current version.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                9. Contacts
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                For all questions related to the processing of personal data, the exercise of your rights
+                or this Privacy Policy, you can contact us:
+              </p>
+              <div className="p-4 rounded-lg mt-4" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                <p className="mb-2" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                  <strong style={{ color: 'var(--text-primary, #f1f5f9)' }}>Email:</strong> support@kinoteka.com
+                </p>
+                <p className="mb-2" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                  <strong style={{ color: 'var(--text-primary, #f1f5f9)' }}>Via feedback form:</strong> on the Website
+                </p>
+              </div>
+              <p className="leading-relaxed mt-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We commit to review your request in the shortest time possible and provide the necessary information.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--bg-primary, #0f172a)' }}>
       <div className="container mx-auto px-4 max-w-4xl">
@@ -239,4 +484,3 @@ export default async function PrivacyPage() {
     </div>
   );
 }
-

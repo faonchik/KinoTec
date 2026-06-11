@@ -1,8 +1,14 @@
+
+
+
+
+
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { VideoPlayer } from "@/components/player/VideoPlayer";
 import { Badge } from "@/components/ui/Badge";
 
@@ -42,6 +48,7 @@ export function WatchPageClient({
   recommendations,
   isAuthenticated,
 }: WatchPageClientProps) {
+  const t = useTranslations("watchPage");
   const [showInfo, setShowInfo] = useState(false);
 
   const handleProgress = async (progress: number) => {
@@ -101,7 +108,7 @@ export function WatchPageClient({
               {movie.releaseDate && (
                 <span>{new Date(movie.releaseDate).getFullYear()}</span>
               )}
-              {movie.runtime && <span>{movie.runtime} мин</span>}
+              {movie.runtime && <span>{movie.runtime} {t("minutes") || "мин"}</span>}
               {movie.director && (
                 <Link
                   href={`/directors/${movie.director.id}`}
@@ -120,7 +127,7 @@ export function WatchPageClient({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {showInfo ? "Скрыть" : "О фильме"}
+            {showInfo ? t("hide") : t("about")}
           </button>
         </div>
 
@@ -155,7 +162,7 @@ export function WatchPageClient({
               {/* Актёры */}
               {movie.actors.length > 0 && (
                 <div>
-                  <h3 className="text-white font-semibold mb-2">В главных ролях:</h3>
+                  <h3 className="text-white font-semibold mb-2">{t("stars")}</h3>
                   <div className="flex flex-wrap gap-2">
                     {movie.actors.map((ma) => (
                       <Link
@@ -185,7 +192,7 @@ export function WatchPageClient({
         {/* Рекомендации */}
         {recommendations.length > 0 && (
           <section>
-            <h2 className="text-xl font-bold text-white mb-4">Похожие фильмы</h2>
+            <h2 className="text-xl font-bold text-white mb-4">{t("similar")}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {recommendations.map((rec) => (
                 <Link
@@ -242,7 +249,7 @@ export function WatchPageClient({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Вернуться к описанию фильма
+            {t("backToDesc")}
           </Link>
         </div>
       </div>

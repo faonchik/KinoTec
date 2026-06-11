@@ -1,13 +1,141 @@
 import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "О проекте | КиноТека",
-  description: "Информация о проекте КиноТека",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  if (locale === "en") {
+    return {
+      title: "About | KinoTeka",
+      description: "Information about the KinoTeka project",
+    };
+  }
+  return {
+    title: "О проекте | КиноТека",
+    description: "Информация о проекте КиноТека",
+  };
+}
 
 export const dynamic = "force-static";
 
 export default async function AboutPage() {
+  const locale = await getLocale();
+
+  if (locale === "en") {
+    return (
+      <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--bg-primary, #0f172a)' }}>
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h1 className="text-4xl font-bold mb-8" style={{ color: 'var(--text-primary, #f1f5f9)' }}>About Project</h1>
+          
+          <div className="prose prose-invert max-w-none">
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                KinoTeka — Your Guide to the World of Cinema
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                KinoTeka is a modern information portal about movies, TV shows, actors, and directors.
+                We created a platform where you can find detailed information about any movie or TV show,
+                read reviews from other users, rate watched movies, and discover new cinematic works.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                Our mission is to make searching and exploring cinema as convenient and interesting as possible.
+                We collect information from various authoritative sources to provide you with the most complete
+                and up-to-date details about movies and TV shows. Our database is constantly updated with new
+                releases and details.
+              </p>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                KinoTeka is not just a movie catalog. It is a community of movie buffs where everyone can
+                share their opinion, create personal lists, follow premieres, and get personalized
+                recommendations based on their preferences.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                Platform Features
+              </h2>
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>📚 Extensive Database</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Thousands of movies and TV shows with detailed information, cast, directors, and genres
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>⭐ Rating System</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Rate movies, read and write reviews, and share opinions with other users
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>🎯 Personalized Recommendations</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Smart recommendation system based on your watch history, ratings, and preferences
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>📅 Premiere Calendar</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Keep track of upcoming premieres and new cinema releases
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>📋 Collections</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Create your own movie collections and share them with the community
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>🎮 Gamification</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Achievements, coin system, and a profile customization shop
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>👥 Social Features</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Watch movies together with friends, comment, and discuss
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary, #1e293b)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--accent, #f59e0b)' }}>🎨 Customization</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                    Customize your profile appearance with frames, badges, colors, and layout themes
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                Technologies
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                KinoTeka is built on modern technologies to ensure fast performance,
+                a user-friendly interface, and reliability. We use Next.js for server-side rendering,
+                PostgreSQL for data storage, and many other modern tools to deliver the best user experience.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
+                Contacts & Feedback
+              </h2>
+              <p className="leading-relaxed mb-4" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We are always open to feedback and suggestions. If you have questions,
+                ideas for improving the platform, or want to report a bug, please contact us
+                via the feedback form on the website or write to us by email.
+              </p>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary, #cbd5e1)' }}>
+                We value every user and strive to make KinoTeka the best platform for movie lovers.
+                Your feedback helps us get better!
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--bg-primary, #0f172a)' }}>
       <div className="container mx-auto px-4 max-w-4xl">
