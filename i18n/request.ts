@@ -27,9 +27,16 @@ export default getRequestConfig(async () => {
     }
   }
 
+  let messages;
+  if (locale === "ru") {
+    messages = (await import("./messages/ru_clean.json")).default;
+  } else {
+    messages = (await import("./messages/en.json")).default;
+  }
+
   return {
     locale,
-    messages: (await import(`./messages/${locale}.json`)).default,
+    messages,
   };
 });
 
