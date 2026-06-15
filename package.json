@@ -40,8 +40,6 @@
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "react-google-recaptcha": "^3.1.0",
-    "resend": "^6.5.2",
-    "sib-api-v3-sdk": "^8.5.0",
     "undici": "^6.25.0",
     "zod": "^3.24.0",
     "zustand": "^5.0.2"
