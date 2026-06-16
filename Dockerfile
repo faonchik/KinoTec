@@ -23,6 +23,8 @@ RUN for i in 1 2 3; do \
     (echo "Attempt $i failed, retrying..." && sleep 10); \
     done && npx next build
 
+RUN npm prune --omit=dev
+
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
@@ -39,10 +41,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Копируем Prisma для миграций
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# Копируем Prisma и все production-зависимости
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 RUN mkdir -p /tmp/.npm && chown nextjs:nodejs /tmp/.npm
@@ -58,4 +58,4 @@ ENV HOSTNAME "0.0.0.0"
 # Увеличиваем лимит размера заголовков для предотвращения HTTP 431 (64KB)
 ENV NODE_OPTIONS="--max-http-header-size=65536"
 
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && exec node server.js"]
