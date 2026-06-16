@@ -1,22 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LoadingOverlay } from "@/components/ui/LoadingOverlay";
-
-/** Сторонний kinobox.min.js часто вставляет оверлеи/ссылки на YouTube; клик по «чёрному» уводил с сайта. */
-function isYoutubeNavigationHref(href: string): boolean {
-  try {
-    const u = new URL(href, "https://kinobox.tv");
-    const h = u.hostname.toLowerCase();
-    return h === "youtube.com" || h === "www.youtube.com" || h === "m.youtube.com" || h === "youtu.be";
-  } catch {
-    return /youtube\.com|youtu\.be/i.test(href);
-  }
-}
-
-type KinoboxGlobal = {
-  Kinobox?: new (selector: string, options: { search: Record<string, string> }) => { init: () => void };
-};
 
 interface KinoboxPlayerProps {
   kinopoiskId?: string | number;
@@ -25,8 +10,13 @@ interface KinoboxPlayerProps {
   title?: string;
   year?: number;
   className?: string;
-  /** Если Kinobox не вставил iframe/видео за несколько секунд — переключиться на запасной embed. */
+  /** Если Kinobox не вернул источников — переключиться на запасной embed. */
   onFallback?: () => void;
+}
+
+interface VideoSource {
+  type: string;
+  iframeUrl: string;
 }
 
 export function KinoboxPlayer({
@@ -38,172 +28,146 @@ export function KinoboxPlayer({
   className = "",
   onFallback,
 }: KinoboxPlayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  /** Уникальный id для селектора — документация: `new Kinobox('.kinobox_player', { search }).init()` */
-  const rootIdRef = useRef(`kinobox-root-${Math.random().toString(36).slice(2, 12)}`);
+  const [sources, setSources] = useState<VideoSource[]>([]);
+  const [selectedSource, setSelectedSource] = useState<VideoSource | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const onFallbackRef = useRef(onFallback);
   onFallbackRef.current = onFallback;
 
-  const searchQuery = !kinopoiskId && !tmdbId && !imdbId && title
-    ? (year ? `${title} ${year}` : title)
-    : undefined;
-
-  const blockYoutubeLinkTakeover = useCallback((e: SyntheticEvent) => {
-    const t = e.target;
-    if (!(t instanceof Element)) return;
-    const a = t.closest("a[href]");
-    if (!(a instanceof HTMLAnchorElement)) return;
-    if (!isYoutubeNavigationHref(a.href)) return;
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const container = el;
-    const rootId = rootIdRef.current;
     let cancelled = false;
-    container.innerHTML = "";
+    setIsLoading(true);
+    setError(null);
+    setSources([]);
+    setSelectedSource(null);
 
-    const scriptId = `kinobox-script-${rootId}`;
-    const existingLegacy = document.getElementById("kinobox-script");
-    if (existingLegacy) existingLegacy.remove();
+    const searchParams = new URLSearchParams();
+    if (kinopoiskId != null && String(kinopoiskId).trim()) {
+      searchParams.set("kinopoisk", String(kinopoiskId).trim());
+    }
+    if (tmdbId != null && String(tmdbId).trim()) {
+      searchParams.set("tmdb", String(tmdbId).trim());
+    }
+    if (imdbId != null && String(imdbId).trim()) {
+      searchParams.set("imdb", String(imdbId).trim());
+    }
+    if ([...searchParams.keys()].length === 0 && title?.trim()) {
+      searchParams.set("title", year ? `${title.trim()} ${year}` : title.trim());
+    }
 
-    const mirrors = [
-      "https://kinobox.tv/kinobox.min.js",
-      "https://kinobox.cc/kinobox.min.js",
-      "https://kinobox.in/kinobox.min.js",
-      "https://kinobox.net/kinobox.min.js"
-    ];
-    let mirrorIndex = 0;
+    if ([...searchParams.keys()].length === 0) {
+      setIsLoading(false);
+      onFallbackRef.current?.();
+      return;
+    }
 
-    const hideLoader = () => {
-      if (!cancelled) setIsLoading(false);
-    };
-
-    let probeId: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    const runKinoboxInit = () => {
-      if (cancelled) return;
-      const KinoboxCtor = (window as unknown as KinoboxGlobal).Kinobox;
-      if (typeof KinoboxCtor !== "function") {
-        onFallbackRef.current?.();
-        return;
-      }
-
-      const search: Record<string, string> = {};
-      if (kinopoiskId != null && String(kinopoiskId).trim()) {
-        search.kinopoisk = String(kinopoiskId).trim();
-      }
-      if (tmdbId != null && String(tmdbId).trim()) {
-        search.tmdb = String(tmdbId).trim();
-      }
-      if (imdbId != null && String(imdbId).trim()) {
-        search.imdb = String(imdbId).trim();
-      }
-      if (Object.keys(search).length === 0 && searchQuery?.trim()) {
-        search.title = searchQuery.trim();
-      }
-      if (Object.keys(search).length === 0) {
-        onFallbackRef.current?.();
-        return;
-      }
-
+    const fetchSources = async () => {
       try {
-        new KinoboxCtor(`#${rootId}`, { search }).init();
-      } catch {
-        onFallbackRef.current?.();
-        return;
-      }
+        const url = `/api/player/sources?${searchParams.toString()}`;
+        const res = await fetch(url, { method: "GET" });
 
-      const probeMs = 12_000;
-      probeId = window.setTimeout(() => {
-        if (cancelled) return;
-        const hasEmbed = Boolean(container.querySelector("iframe, video, object, embed"));
-        if (!hasEmbed) onFallbackRef.current?.();
-      }, probeMs);
-    };
-
-    const loadScript = () => {
-      if (cancelled) return;
-
-      const existingSame = document.getElementById(scriptId);
-      if (existingSame) existingSame.remove();
-
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = mirrors[mirrorIndex];
-      script.async = true;
-
-      script.onload = () => {
-        hideLoader();
-        window.requestAnimationFrame(() => {
-          window.setTimeout(() => {
-            if (cancelled) return;
-            if (!document.getElementById(rootId)) {
-              onFallbackRef.current?.();
-              return;
-            }
-            runKinoboxInit();
-          }, 50);
-        });
-      };
-
-      script.onerror = () => {
-        console.warn(`Kinobox mirror load failed: ${mirrors[mirrorIndex]}`);
-        mirrorIndex++;
-        if (mirrorIndex < mirrors.length) {
-          loadScript();
-        } else {
-          hideLoader();
-          if (!cancelled) onFallbackRef.current?.();
+        if (!res.ok) {
+          throw new Error("Источники не найдены");
         }
-      };
 
-      document.head.appendChild(script);
+        const json = await res.json();
+        if (cancelled) return;
+
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+          const validSources: VideoSource[] = json.data
+            .filter((s: any) => s && s.type && s.iframeUrl)
+            .map((s: any) => ({
+              type: s.type,
+              iframeUrl: s.iframeUrl,
+            }));
+
+          if (validSources.length > 0) {
+            setSources(validSources);
+            
+            // Восстанавливаем сохраненный плеер, если есть
+            const preferred = localStorage.getItem("kinobox-preferred-source");
+            const preferredSource = validSources.find((s) => s.type === preferred);
+            setSelectedSource(preferredSource || validSources[0]);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        throw new Error("Источники пусты");
+      } catch (err: any) {
+        console.error("Kinobox fetch error:", err);
+        if (!cancelled) {
+          setIsLoading(false);
+          setError("Источники видео недоступны");
+          onFallbackRef.current?.();
+        }
+      }
     };
 
-    const fallback = window.setTimeout(hideLoader, 14_000);
-    loadScript();
+    fetchSources();
 
     return () => {
       cancelled = true;
-      window.clearTimeout(fallback);
-      if (probeId !== undefined) window.clearTimeout(probeId);
-      const s = document.getElementById(scriptId);
-      if (s) s.remove();
-      container.innerHTML = "";
     };
   }, [kinopoiskId, imdbId, tmdbId, title, year]);
 
-  if (!kinopoiskId && !imdbId && !tmdbId && !title) {
+  const selectSource = (source: VideoSource) => {
+    setSelectedSource(source);
+    localStorage.setItem("kinobox-preferred-source", source.type);
+  };
+
+  if (isLoading) {
+    return (
+      <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-[#0D1420] ${className}`}>
+        <LoadingOverlay />
+      </div>
+    );
+  }
+
+  if (error || !selectedSource) {
     return (
       <div className={`bg-[#0D1420] rounded-xl flex items-center justify-center aspect-video ${className}`}>
         <div className="text-center p-8">
           <div className="text-4xl mb-4">⚠️</div>
-          <p className="text-white/45 font-mono text-[13px]">Не указаны параметры для поиска</p>
+          <p className="text-white/45 font-mono text-[13px]">{error || "Плеер не найден"}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className={`relative w-full aspect-video ${className}`}
-      onClickCapture={blockYoutubeLinkTakeover}
-      onAuxClickCapture={(e) => {
-        if (e.button === 1) blockYoutubeLinkTakeover(e);
-      }}
-    >
-      {isLoading && <LoadingOverlay />}
-      <div
-        id={rootIdRef.current}
-        ref={containerRef}
-        className="kinobox_player w-full h-full"
-      />
+    <div className="flex flex-col w-full gap-3">
+      {/* Плеер */}
+      <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-[#0a0a0f] border border-white/5 ${className}`}>
+        <iframe
+          src={selectedSource.iframeUrl}
+          allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full border-0"
+          title={title ?? "Kinobox Player"}
+        />
+      </div>
+
+      {/* Выбор источников в стиле KinoTec */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-white/[0.02] border border-white/5 rounded-xl">
+        <span className="text-[11px] text-white/40 font-mono px-2">Источник:</span>
+        {sources.map((s) => (
+          <button
+            key={s.type}
+            type="button"
+            onClick={() => selectSource(s)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+              selectedSource.type === s.type
+                ? "bg-[#ffb84d] text-black font-semibold shadow-sm"
+                : "text-white/60 hover:text-white hover:bg-white/[0.05]"
+            }`}
+          >
+            {s.type}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
