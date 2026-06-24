@@ -6,6 +6,7 @@ import { MovieEmbedPlayer } from "@/components/player/MovieEmbedPlayer";
 import { KinoboxPlayer } from "@/components/player/KinoboxPlayer";
 import { isUsableDirectVideoUrlForNativePlayer } from "@/lib/player/directVideoUrl";
 
+
 type WatchExperienceClientProps = {
   movieId: string;
   title: string;
@@ -23,6 +24,8 @@ type WatchExperienceClientProps = {
   isAuthenticated: boolean;
   /** Для оценки прогресса при embed (минуты). */
   runtimeMinutes?: number | null;
+  /** Дополнительные embed-источники для автофоллбека. */
+  embedFallbackSources?: string[];
 };
 
 async function postProgress(movieId: string, progress: number) {
@@ -201,8 +204,8 @@ export function WatchExperienceClient({
             className="w-full rounded-none md:rounded-xl"
             onFallback={onKinoboxFallback}
           />
-        ) : embedSrc ? (
-          <MovieEmbedPlayer src={embedSrc} title={`Смотреть: ${title}`} className="w-full rounded-none md:rounded-xl" />
+        ) : (embedSrc || playerTmdbId) ? (
+          <MovieEmbedPlayer src={embedSrc} tmdbId={playerTmdbId} title={`Смотреть: ${title}`} className="w-full rounded-none md:rounded-xl" />
         ) : (
           <div className="flex aspect-video w-full items-center justify-center rounded-none bg-[#141414] px-6 text-center md:rounded-xl">
             <p className="max-w-md text-sm text-white/50">
@@ -241,7 +244,7 @@ export function WatchExperienceClient({
           </div>
 
           {/* Right: Embed switcher */}
-          {!useDirect && embedSrc?.trim() && useKinobox && (
+          {!useDirect && (embedSrc?.trim() || playerTmdbId?.trim()) && useKinobox && (
             <div>
               {preferIframeOverKinobox || kinoboxBroken ? (
                 <button
@@ -260,14 +263,14 @@ export function WatchExperienceClient({
                   onClick={() => setPreferIframeOverKinobox(true)}
                   className="text-xs text-white/60 underline-offset-2 hover:text-white/90 hover:underline"
                 >
-                  Показать встроенный плеер (VidSrc / iframe)
+                  Показать встроенный плеер (Embed)
                 </button>
               )}
             </div>
           )}
         </div>
 
-        {!useDirect && (Boolean(embedSrc?.trim()) || useKinobox) && (
+        {!useDirect && (Boolean(embedSrc?.trim()) || Boolean(playerTmdbId?.trim()) || useKinobox) && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-slate-950 px-4 py-3">
             <p className="text-sm text-white/55">
               {isAuthenticated

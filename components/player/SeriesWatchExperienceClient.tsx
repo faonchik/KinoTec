@@ -52,6 +52,8 @@ export function SeriesWatchExperienceClient({
     return Boolean(kp || tmdb || title?.trim());
   }, [playerKinopoiskId, playerTmdbId, title]);
 
+
+
   const [kinoboxBroken, setKinoboxBroken] = useState(false);
   const [preferIframeOverKinobox, setPreferIframeOverKinobox] = useState(() =>
     computePreferIframeOverKinobox()
@@ -131,8 +133,8 @@ export function SeriesWatchExperienceClient({
             className="w-full rounded-none md:rounded-xl"
             onFallback={onKinoboxFallback}
           />
-        ) : embedSrc ? (
-          <MovieEmbedPlayer src={embedSrc} title={`Смотреть: ${title}`} className="w-full rounded-none md:rounded-xl" />
+        ) : (embedSrc || playerTmdbId) ? (
+          <MovieEmbedPlayer src={embedSrc} tmdbId={playerTmdbId} season={season} episode={episode} title={`Смотреть: ${title}`} className="w-full rounded-none md:rounded-xl" />
         ) : (
           <div className="flex aspect-video w-full items-center justify-center rounded-none bg-[#141414] px-6 text-center md:rounded-xl">
             <p className="max-w-md text-sm text-white/50">
@@ -171,7 +173,7 @@ export function SeriesWatchExperienceClient({
           </div>
 
           {/* Right: Embed switcher */}
-          {embedSrc?.trim() && useKinobox && (
+          {(embedSrc?.trim() || playerTmdbId?.trim()) && useKinobox && (
             <div>
               {preferIframeOverKinobox || kinoboxBroken ? (
                 <button
@@ -190,14 +192,14 @@ export function SeriesWatchExperienceClient({
                   onClick={() => setPreferIframeOverKinobox(true)}
                   className="text-xs text-white/60 underline-offset-2 hover:text-white/90 hover:underline"
                 >
-                  Показать встроенный плеер (VidSrc / iframe)
+                  Показать встроенный плеер (Embed)
                 </button>
               )}
             </div>
           )}
         </div>
 
-        {embedSrc && (
+        {(embedSrc || playerTmdbId) && (
           <div className="border-t border-white/10 bg-slate-950 px-4 py-3 text-sm text-white/55">
             {isAuthenticated
               ? `Сохранена позиция: сезон ${season}, серия ${episode}.`

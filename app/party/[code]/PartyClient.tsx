@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { MovieEmbedPlayer } from "@/components/player/MovieEmbedPlayer";
+import { getMovieEmbedSources, normalizeTmdbId } from "@/lib/player/embedUrl";
 
 interface User {
   id: string;
@@ -52,6 +53,13 @@ export function PartyClient({ party, embedSrc, currentUserId }: PartyClientProps
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const lastMessageCountRef = useRef(messages.length);
+
+  // Compute embed fallback sources for the party movie
+  const embedFallbackSources = useMemo(() => {
+    const tmdb = normalizeTmdbId(party.movie.tmdbId);
+    if (!tmdb) return [];
+    return getMovieEmbedSources(tmdb).filter((s) => s !== embedSrc);
+  }, [party.movie.tmdbId, embedSrc]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -172,6 +180,7 @@ export function PartyClient({ party, embedSrc, currentUserId }: PartyClientProps
           <div>
             <MovieEmbedPlayer
               src={embedSrc}
+              fallbackSources={embedFallbackSources}
               title={party.movie.originalTitle || party.movie.title}
               className="w-full rounded-xl"
             />

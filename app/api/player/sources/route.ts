@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Разрешаем самоподписанные сертификаты для проксирования внешних зеркал в dev/тест средах
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const kinopoisk = searchParams.get("kinopoisk");
@@ -20,13 +23,12 @@ export async function GET(request: NextRequest) {
     "https://api.kinobox.tv/api/players"
   ];
 
-  for (const baseUrl of apiMirrors) {
-    try {
-      const url = `${baseUrl}?${queryParams.toString()}`;
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
+  const fetchMirror = async (baseUrl: string) => {
+    const url = `${baseUrl}?${queryParams.toString()}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
+    try {
       const res = await fetch(url, {
         method: "GET",
         headers: {
@@ -38,15 +40,23 @@ export async function GET(request: NextRequest) {
 
       if (res.ok) {
         const json = await res.json();
-        if (json && json.data) {
-          // Return the successful response immediately
-          return NextResponse.json(json);
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+          return json;
         }
       }
+      throw new Error(`Mirror ${baseUrl} returned empty or invalid response`);
     } catch (err) {
-      console.warn(`Backend proxy failed for mirror ${baseUrl}:`, err);
+      clearTimeout(timeoutId);
+      throw err;
     }
-  }
+  };
 
-  return NextResponse.json({ error: "No player sources available" }, { status: 404 });
+  try {
+    // Получаем первый успешный ответ от любого из зеркал
+    const result = await Promise.any(apiMirrors.map((baseUrl) => fetchMirror(baseUrl)));
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error("All Kinobox mirrors failed:", err);
+    return NextResponse.json({ error: "No player sources available" }, { status: 404 });
+  }
 }

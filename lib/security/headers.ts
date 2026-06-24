@@ -15,7 +15,7 @@ export function securityHeaders(request: NextRequest, response: NextResponse = N
       "img-src 'self' data: https://image.tmdb.org https://images.unsplash.com https://www.google.com https://www.gstatic.com blob: https://*.kinobox.tv https://*.kinohub.vip https:",
       "font-src 'self' data: https://www.gstatic.com https://kinobox.tv https://*.kinobox.tv",
       "connect-src 'self' https://api.themoviedb.org https://api.unsplash.com https://api.groq.com https://www.google.com https://kinobox.tv https://*.kinobox.tv https://*.kinohub.vip https:",
-      "frame-src 'self' blob: https: https://kinobox.tv https://*.kinobox.tv https://www.google.com https://tv.kinohub.vip https://*.kinohub.vip https://vidsrc.to https://*.vidsrc.to https://vidsrc.xyz https://*.vidsrc.xyz https://vidsrc.in https://*.vidsrc.in https://player.vidsrc.me https://*.player.vidsrc.me https://vsembed.ru https://*.vsembed.ru",
+      "frame-src 'self' blob: https: https://kinobox.tv https://*.kinobox.tv https://www.google.com https://tv.kinohub.vip https://*.kinohub.vip https://vidsrc.in https://*.vidsrc.in https://multiembed.mov https://*.multiembed.mov https://vsembed.ru https://*.vsembed.ru https://vsembed.su https://*.vsembed.su https://vidsrc.me https://*.vidsrc.me https://vidsrcme.ru https://*.vidsrcme.ru https://player.vidsrc.me https://*.player.vidsrc.me https://player.videasy.to https://*.videasy.to https://www.vidking.net https://*.vidking.net",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
